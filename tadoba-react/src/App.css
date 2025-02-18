@@ -1,0 +1,553 @@
+/* @import 'bootstrap/scss/bootstrap'; */
+.row {
+--bs-gutter-x: 0;
+}
+.navbar-nav{
+    margin-top: 3px;
+    gap: 4px;
+    font-weight: 400;
+}
+.navbar-nav li.nav-item a {
+    font-size: 16px;
+    color: #2c2c2c;
+}
+.navbar-expand-lg .navbar-collapse {
+    display: flex !important;
+    flex-basis: auto;
+    justify-content: end;
+}
+ 
+
+ .aboutImages img{
+width: 100%;
+height: 200px;
+padding: 10px;
+object-fit: cover;
+ }
+ .aboutImage3{
+    margin-top: 20px;
+ }
+ .imageBox{
+    height: 500px;
+    width: 100%;
+    margin-top: 20px;
+    object-fit: cover;
+ }
+ 
+ .tadobaZones{
+    background-color: #F6F2F1;
+    padding: 30px !important;
+   
+    }
+
+    .bannersection .slick-slide img {
+        display: block;
+        width: 100%;
+        height: 450px;
+        object-fit: cover;
+      }
+      .bannersection .slick-prev {
+        left: 20px;
+        z-index: 1;
+      }
+      .bannersection .slick-next {
+        right: 10px;
+      }
+   header {
+    padding: 5px 0px;
+}
+ .headZones{
+    font-size: 22px;
+ 
+ }
+ 
+ .headingZone {
+    border: 1px solid rgb(197, 196, 194);
+    padding: 10px;
+    margin: 10px;
+    margin-bottom: 20px;
+    }
+.sectionTadoba .row{
+    --bs-gutter-x: unset;
+}
+.tadobaimg{
+    margin-top: 40px;
+    height: 350px;
+    object-fit: cover;
+}
+
+.webbtn{
+    font-size: 14px;
+    font-weight: 500;
+    border: none;
+    padding: 7px 15px;
+    background-color: #00053a;
+    color: #fff;
+    border-radius: 5px;
+}
+ 
+.boxx ul.thumbs.animated{
+     display: none;
+    }
+.boxx .carousel .carousel-status{
+    display: none;
+}
+.chronoImg{
+width: 100%;
+height: 300px;
+padding: 0px 30px;
+}
+
+.chronoRow{
+    padding: 30px 0px;
+    align-items: center;
+}
+.chronoSection{
+    background-color: #F3F7FF;
+}
+.packagebox{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid  rgb(197, 196, 194);
+    border-radius: 10px;
+    margin-bottom: 20px;
+}
+.package {
+padding: 0px 10px;
+}
+.packageImg{
+    height: 170px;
+    border-radius: 10px 0px 0px 10px;
+    object-fit: cover;
+}
+.readmore{
+    border: none;
+    background-color: #ffffff;
+    color: #0c274e;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 0;
+    }
+.packageHeading{
+   
+    padding: 20px 0px 20px 0px ;
+}
+.historyPara1 .historyPara2{
+    font-size: 16px;
+    padding: 10px;
+}
+.TadobaHistory{
+    background-color: #F6F2F1;
+    padding: 30px 0px;
+}
+.tourPackage{
+    padding: 30px 0px;
+}
+.map{
+    height: 270px;
+    border-radius: 5px;
+}
+.geographical{
+    padding: 30px 0px;
+}
+.wildImg{
+    width: 100%;
+    height: 180px;
+    border-radius: 10px;
+}
+.row{
+    --bs-gutter-x: none;
+}
+.roadData{
+    padding-top: 40px;
+    padding-bottom: 10px;
+}
+.imageName{
+    width: 100%;
+    height: 400px;
+}
+.aboutSection{
+    padding-top: 30px;
+}
+.newsBlogSection{
+    padding: 20px;
+}
+.newsBlogDetail{
+    padding: 10px;
+    width: 300px;
+}
+.blogtext
+{
+    padding:0px;
+    padding-top: 10px;
+    border: none;
+    border-radius: 5px;
+    padding: 10px;
+    box-shadow: 0 4px 8px 0 rgb(0 0 0 / 12%), 0 6px 20px 0 rgb(0 0 0 / 3%);
+}
+.newsBlogDetail1{
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 4px 8px 0 rgb(0 0 0 / 12%), 0 6px 20px 0 rgb(0 0 0 / 3%);
+}
+.linksImg{
+    height: 150px;
+    width: 100%;
+}
+.linksection{
+    padding-top: 40px;
+}
+.footerSection{
+    background-color: #373737;
+    color: #FFFFFF;
+    padding: 20px;
+}
+.footerSection li{
+    list-style: none;
+    color: #fff;
+}
+.blogtitle
+{
+    font-size: 18px;
+}
+footer .foothead {
+color: #fff;
+font-size: 22px;
+font-weight: 400;
+}
+footer p {
+color: #fff;
+}  
+.linkpages {
+    display: flex;
+    gap: 20px;
+    padding: 0px;
+    margin-bottom: 0;
+}
+.linkpages li {
+list-style: none;
+text-decoration: none;
+}
+.importantLinksSection {
+background-color: #f3f7ff;
+padding: 20px 0px;
+}
+.linkpages a {
+text-decoration: none;
+color: #565656;
+font-weight: 500;
+}
+.followicon svg {
+font-size: 22px;
+padding: 5px;
+}
+.suggesblk h4.blogtitle {
+padding: 0;
+}
+.moharlianotes {
+margin-bottom: 30px;
+}
+
+.bgImageZone{
+background-image: url("/src/assets/images/zoneForest.jpg");
+padding: 20px !important;
+}
+.text-zones {
+height: 27rem;
+padding: 10px 0px;
+border-radius: 10px;
+background-color: white;
+opacity: 70%;
+}
+.bgImageZone p span {
+    font-weight: 600;
+    color: #262c2c;
+    font-size: 18px;
+}
+.geographicalsection {
+background-color: #f8f8f8;
+}
+.aboutUsBox {
+background-color: #f6f2f1;
+height: 250px;
+padding: 20px;
+border-radius: 10px;
+box-shadow: 3px 3px 15px 0px #d8d6d694;
+}
+.leaf {
+background-image: url("./assets//images/leaf.jpg");
+background-repeat: no-repeat;
+background-position: top center;
+}
+.agarzarisafariImg
+{
+  width: 100%;
+  height: 160px;
+  padding: 0px 0px 0px 0px;
+  border-radius: 7px;
+  margin-top: 20px;
+  object-fit: cover;
+}
+.agarzarinotes {
+padding: 10px 15px;
+background-color: #f6f2f1;
+}
+.junonaSafariImg
+{
+    width: 100%;
+    height: 200px;
+    padding: 0px 0px 0px 0px;
+    border-radius: 7px;
+    margin-top: 25px;
+}
+
+.junonanotes {
+  padding: 10px;
+  background-color: #f6f2f1;
+}
+.moharliSafariImg
+{
+    width: 100%;
+    height: 170px;
+    padding: 0px 0px 0px 0px;
+    border-radius: 7px;
+    margin-top: 25px;
+}
+.khutwandinotes
+{
+    padding: 10px;
+    background-color: #f6f2f1;
+}
+.kolaranotes
+{
+    padding: 10px;
+    background-color: #f6f2f1;
+}
+.navegaonSafariImg
+{
+    width: 100%;
+    height: 180px;
+    padding: 0px 0px 0px 0px;
+    border-radius: 7px;
+    margin-top: 20px;
+}
+.navegaonnotes
+{
+    padding: 10px;
+    background-color: #f6f2f1;
+}
+.zarinotes {
+    padding: 10px;
+    background-color: #f6f2f1;
+}
+
+.safarigaterow {
+    padding: 10px;
+    background-color: #f3f7ff;
+    height: 275px;
+}
+
+.safarigatecol h6 {
+    padding: 5px;
+}
+.bufferzone {
+    background-color: #f6f2f1;
+}
+.bufferzone span {
+    font-size: 15px;
+    font-weight: 500;
+}
+.bordertext
+{
+    padding: 5px 15px;
+    margin: 10px;
+    border: 1px solid #ddd;
+}
+.bordertext p
+{
+    padding: 0;
+    margin: 0;
+}
+.imgFlora,
+.imgCovid {
+  width: 100%;
+  height: 160px;
+  border-radius: 10px;
+}
+.covidpara {
+background-color: #f8f4f4;
+width: 100%;
+height: 600px;
+padding: 20px;
+}
+.covidpara li {
+list-style: decimal;
+}
+.thingsImgBox {
+display: flex;
+gap: 80px;
+}
+.thingsImg {
+border-radius: 20px;
+height: 250px;
+width: 40%;
+margin-left: 30px;
+margin-bottom: 20px;
+}
+.refundImg {
+  width: 100%;
+  height: 200px;
+  padding: 0px 0px 0px 0px;
+  border-radius: 7px;
+  margin-top: 10px;
+}
+.faqs {
+display: flex;
+justify-content: space-between;
+background-color: #b9b9b9;
+padding: 5px 15px;
+/* margin: 10px 0px; */
+align-items: center;
+}
+.imgFlora{
+  width: 100%;
+  height: 180px !important;
+  border-radius: 10px;
+}
+.faqanswer {
+padding: 10px;
+background-color: #eeeeee;
+}
+.safaritable .container {
+max-width: 1220px;
+}
+.optionValue {
+width: 100%;
+height: 40px;
+border: 1px solid rgb(206, 202, 202);
+padding: 10px;
+margin: 5px;
+border-radius: 10px;
+}
+
+.calenderForm {
+background-color: #fbfbfb99;
+padding: 10px;
+border-radius: 0px;
+margin-left: 20px;
+}
+.btnbooking {
+width: 100%;
+height: 50px;
+background-color: #00053a;
+border: none;
+color: #ffffff;
+border-radius: 10px;
+}
+
+.bgImageZone {
+background-image: url("./assets/images/zoneForest.jpg");
+padding: 20px;
+height: 30rem;
+border-radius: 10px;
+}
+
+.safaritable
+{
+    background-image: url("./assets/images/safaribookingpg.jpg");
+    padding: 30px 10px;
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+.booking-des h3 {
+color: #494949;
+padding: 5px 10px 10px 10px;
+background-color: #ffffffdb;
+}
+
+.safaritable td, th
+{
+ background-color: #ffffffdb !important;
+}
+thead, tbody, tfoot, tr, td, th {
+border-color: #606060 !important;
+padding: 5px !important;
+}
+.react-calendar__tile:enabled:hover, .react-calendar__tile:enabled:focus {
+background-color: #cbcbcb;
+}
+abbr[title] {
+text-decoration: none !important;
+cursor: help;
+text-decoration-skip-ink: none;
+}
+.react-calendar__tile {
+max-width: 100%;
+padding: 5px 6px !important;
+background: none;
+text-align: center;
+font: inherit;
+font-size: 0.833em;
+}
+.react-calendar__navigation {
+display: flex;
+height: 30px !important;
+margin-bottom: 0px !important;
+}
+.routeChart {
+background-color: #ecf4fc;
+width: 100%;
+height: 230px;
+padding: 20px;
+}
+.routeChart h6
+{
+    font-size: 17px;
+}
+.routeChart p
+{
+    margin-bottom: 0px;
+}
+.jeepSafari {
+display: flex;
+justify-content: space-around;
+background-color: #eff0f0;
+padding: 20px;
+margin-top: 20px;
+}
+
+.travellerHeader {
+width: 100%;
+height: 100px;
+text-align: center;
+padding: 20px;
+/* background-color: #5b5c5c; */
+color: #ffffff;
+}
+.travellerBorder {
+border: 1px solid gray;
+}
+.payable {
+width: 200px;
+height: 50px;
+background-color: #00053a;
+padding: 12px;
+border-radius: 10px;
+color: #fff;
+border: none;
+font-weight: 500;
+text-align: center;
+}
+.bookingtable {
+background-color: #cbccce;
+}
+.safaridatetime p {
+margin-bottom: 0px;
+}
+.bookingtable {
+background-color: #cbccce;
+padding: 10px;
+font-size: 18px;
+margin-bottom: 0px;
+}

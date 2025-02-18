@@ -1,0 +1,137 @@
+@import 'bootstrap/scss/bootstrap';
+.row {
+    --bs-gutter-x: 0;
+}
+p{
+    font-size: 14px;
+    color: #565656;
+    margin-bottom: 10px;
+    text-align: justify;
+}
+h1 {
+font-size: 35px;
+color: #141414dd;
+margin-top: 0px;
+margin-bottom: 0px;
+padding-top: 10px;
+padding-bottom: 5px;
+
+}
+h2 {
+font-size: 35px;
+color: #141414dd;
+margin-top: 0px;
+margin-bottom: 0px;
+padding-top: 10px;
+padding-bottom: 5px;
+}
+h3 {
+font-size: 30px;
+color: #141414dd;
+margin-top: 0px;
+margin-bottom: 0px;
+padding-top: 10px;
+padding-bottom: 5px;
+}
+h4 {
+font-size: 26px;
+color: #141414dd;
+margin-top: 0px;
+margin-bottom: 0px;
+padding-top: 10px;
+padding-bottom: 5px;
+}
+h5 {
+font-size: 24px;
+color: #141414dd;
+margin-top: 0px;
+margin-bottom: 0px;
+padding-top: 10px;
+padding-bottom: 5px;
+}
+h6 {
+font-size: 20px;
+color: #141414dd;
+margin-top: 0px;
+margin-bottom: 0px;
+padding-top: 10px;
+padding-bottom: 5px;
+}
+.section {
+padding: 30px 0px;
+}
+li {
+    font-size: 14px;
+    color: #565656;
+    margin-bottom: 5px;
+    line-height: 1.3;
+}
+ol, ul {
+    padding-left: 1rem;
+}
+img
+{
+    width: 100%;
+}
+header img {
+width: auto;
+}
+.row > * {
+padding-right: 10px;
+padding-left: 10px;
+padding-top: 5px;
+padding-bottom: 5px;
+}
+.imgBannerMoharlli,
+.imgBannerJunona,
+.imgBannerKhutwanda,
+.imgBannerAgarzari,
+.imgBannerkolara,
+.imgBannerNavegaon,
+.imgBannerZari,
+.imgBannerTourism,
+.imgBannerSafari,
+.imgMapBanner,
+.floraBanner,
+.faunaBanner,
+.canterBanner,
+.imgFlora,
+.covidBanner,
+.permitBanner,
+.thingsBanner,
+.reachBanner,
+.planBanner,
+.timeToVisit,
+.aboutUsBanner,
+.hotelBannerImg,
+.tourPackageImg,.newsBannerImg {
+  width: 100%;
+  height: 300px;
+}
+td {
+font-size: 14px;
+color: #565656;
+}
+th {
+font-size: 14px;
+color: #565656;
+}
+input {
+font-size: 14px;
+color: #565656;
+outline: none;
+border: 1px solid #565656;
+padding: 5px;
+}
+select
+{
+color: #565656;
+font-size: 14px;
+border: 1px solid #565656;
+padding: 2px 5px;
+outline: none;
+}
+input::placeholder
+{
+    font-size: 14px;
+}
