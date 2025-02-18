@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const bookingSchema = new mongoose.Schema({
+const safariBookingSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true },
     phone: { type: String, required: true },
@@ -10,4 +10,5 @@ const bookingSchema = new mongoose.Schema({
     amountPaid: { type: Number, required: true },
 }, { timestamps: true });
 
-module.exports = mongoose.model("Booking", bookingSchema);
+module.exports = mongoose.model("SafariBooking", safariBookingSchema);
+// Compare this snippet from safari-backend/app.js:
