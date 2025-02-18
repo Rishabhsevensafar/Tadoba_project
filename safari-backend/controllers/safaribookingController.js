@@ -3,6 +3,8 @@ const SafariBooking = require("../models/safariBooking");
 // Create a new Safari booking
 const createSafariBooking = async (req, res) => {
     try {
+        console.log("Received booking data:", req.body); // 🛠 Debugging log
+
         const {
             name,
             email,
@@ -17,6 +19,7 @@ const createSafariBooking = async (req, res) => {
         } = req.body;
 
         if (!name || !email || !phone || !date || !safariZone || !vehicleType || !safariTime || !adults || !amountPaid) {
+            console.log("Missing fields!"); // 🛠 Debugging log
             return res.status(400).json({ error: "All required fields must be filled." });
         }
 
@@ -36,9 +39,11 @@ const createSafariBooking = async (req, res) => {
         await newBooking.save();
         res.status(201).json({ message: "Safari booking successful", booking: newBooking });
     } catch (error) {
+        console.error("Error saving booking:", error);
         res.status(500).json({ error: error.message });
     }
 };
+
 const addTravelerDetails = async (req, res) => {
     try {
         const { id } = req.params; // Booking ID
