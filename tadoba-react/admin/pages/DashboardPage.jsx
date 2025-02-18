@@ -13,7 +13,7 @@ import {
 } from "antd";
 import {
   DashboardOutlined,
-  ShoppingOutlined,
+  // ShoppingOutlined,
   UserOutlined,
   AppstoreOutlined,
   GiftOutlined,
