@@ -131,7 +131,7 @@ function SafariBooking() {
                   <div className="col-sm-12 col-md-6 col-lg-6">
                     <div className=" ">
                       <select name="" className="optionValue" id="">
-                        <option value="">Select</option>
+                        <option value="">Select vehical</option>
                         <option value="">Jeep</option>
                       </select>
                       <select name="" className="optionValue" id="">
@@ -166,7 +166,7 @@ function SafariBooking() {
                   </div>
                   <div className="col-sm-12 col-md-6 col-lg-6">
                     <select name="" className="optionValue" id="">
-                      <option value="">Select</option>
+                      <option value="">Select Zone</option>
                       <option value="">
                         Moharli/Mamla/Agarzari/Adegaon/Junona/Devada
                       </option>
