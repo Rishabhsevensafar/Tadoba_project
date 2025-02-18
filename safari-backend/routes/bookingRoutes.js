@@ -1,9 +1,9 @@
 const express = require("express");
-const { createBooking, getBookings } = require("../controllers/bookingController");
+const { createSafariBooking, getSafariBookings } = require("../controllers/safaribookingController");
 
 const router = express.Router();
 
-router.post("booking/create", createBooking);
-router.get("booking/", getBookings);
+router.post("/create", createSafariBooking);
+router.get("/", getSafariBookings);
 
 module.exports = router;
