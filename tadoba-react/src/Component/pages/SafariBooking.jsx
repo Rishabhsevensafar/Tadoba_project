@@ -1,17 +1,61 @@
+import { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import React from "react";
 import Header from "../Header";
 import ImportantLinks from "../ImportantLinks";
 import Footer from "../Footer";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useEffect } from "react";
+
 function SafariBooking() {
   const [date, setDate] = useState(new Date());
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    safariZone: "", // 🛠 FIXED: Ensuring safariZone is set
+    vehicleType: "Jeep",
+    safariTime: "", // 🛠 FIXED: Ensuring safariTime is set
+    children: 0,
+    adults: 1,
+    amountPaid: 6100, // 🛠 FIXED: Default value to avoid missing field
+  });
+
+  const navigate = useNavigate();
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // Handle input change
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleBooking = async () => {
+    try {
+        const payload = { ...formData, date: date.toISOString() }; 
+        console.log("Sending booking request with data:", payload);
+
+        const response = await fetch("http://localhost:5000/api/booking/book", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+        });
+
+        const data = await response.json();
+        console.log("Server Response:", data);
+
+        if (response.ok) {
+            navigate(`/travellerdetail`, { state: { booking: data.booking } }); // ✅ Pass full booking object
+        } else {
+            alert(data.error);
+        }
+    } catch (error) {
+        console.error("Booking error:", error);
+    }
+};
+
+
   return (
     <>
       <Header></Header>
@@ -130,85 +174,99 @@ function SafariBooking() {
                 <div className="row calenderForm">
                   <div className="col-sm-12 col-md-6 col-lg-6">
                     <div className=" ">
-                      <select name="" className="optionValue" id="">
+                      <select
+                        name=""
+                        className="optionValue"
+                        id=""
+                        onChange={handleChange}
+                      >
                         <option value="">Select vehical</option>
                         <option value="">Jeep</option>
                       </select>
-                      <select name="" className="optionValue" id="">
-                        <option value="">Select</option>
-                        <option value="">6-10 AM/Morning</option>
-                        <option value="">2-6 AM/Evening</option>
+                      <select
+                        name="safariTime"
+                        className="optionValue"
+                        onChange={handleChange}
+                        required
+                      >
+                        <option value="">Select Safari Time</option>
+                        <option value="6-10 AM">6-10 AM</option>
+                        <option value="2-6 PM">2-6 PM</option>
                       </select>
 
-                      <select name="" className="optionValue" id="">
-                        <option value="">Child (between 5 to 12 years)</option>
-                        <option value="">1</option>
-                        <option value="">2</option>
-                        <option value="">3</option>
-                        <option value="">4</option>
-                        <option value="">5</option>
-                        <option value="">6</option>
-                        <option value="">7</option>
-                        <option value="">8</option>
-                        <option value="">9</option>
-                        <option value="">10</option>
-                        <option value="">11</option>
-                        <option value="">12</option>
+                      <select
+                        name="children"
+                        className="optionValue"
+                        onChange={handleChange}
+                      >
+                        <option value="0">No Child</option>
+                        {[...Array(12)].map((_, i) => (
+                          <option key={i + 1} value={i + 1}>
+                            {i + 1}
+                          </option>
+                        ))}
                       </select>
                       <input
                         type="number"
-                        name=""
+                        name="phone"
                         id=""
                         className="optionValue"
                         placeholder="Enter Your Mobile"
+                        onChange={handleChange}
                       />
                     </div>
                   </div>
                   <div className="col-sm-12 col-md-6 col-lg-6">
-                    <select name="" className="optionValue" id="">
+                    <select
+                      name="safariZone"
+                      className="optionValue"
+                      onChange={handleChange}
+                      required
+                    >
                       <option value="">Select Zone</option>
-                      <option value="">
+                      <option value="Moharli/Mamla/Agarzari/Adegaon/Junona/Devada">
                         Moharli/Mamla/Agarzari/Adegaon/Junona/Devada
                       </option>
-                      <option value="">
+                      <option value="Kolara/Alizanza/Madnapur/Palasgaon/Shirkheda Belara">
                         Kolara/Alizanza/Madnapur/Palasgaon/Shirkheda Belara{" "}
                       </option>
-                      <option value="">Navegaon/Ramdegi/Nimdela</option>
-                      <option value="">
+                      <option value="Navegaon/Ramdegi/Nimdela">Navegaon/Ramdegi/Nimdela</option>
+                      <option value="Kesalaghat/Pangadi/Pangadi Aswal Chuha/Zari Peth">
                         Kesalaghat/Pangadi/Pangadi Aswal Chuha/Zari Peth
                       </option>
                     </select>
-                    <select name="" className="optionValue" id="">
-                      <option value="">Adult (above 8 years)</option>
-                      <option value="">1</option>
-                      <option value="">2</option>
-                      <option value="">3</option>
-                      <option value="">4</option>
-                      <option value="">5</option>
-                      <option value="">6</option>
-                      <option value="">7</option>
-                      <option value="">8</option>
+                    <select
+                      name="adults"
+                      className="optionValue"
+                      onChange={handleChange}
+                    >
+                      {[...Array(8)].map((_, i) => (
+                        <option key={i + 1} value={i + 1}>
+                          {i + 1}
+                        </option>
+                      ))}
                     </select>
                     <input
                       type="text"
-                      name=""
+                      name="name"
                       id=""
                       className="optionValue"
                       placeholder="Enter Your Name"
+                      onChange={handleChange}
                     />
                     <input
                       type="email"
-                      name=""
+                      name="email"
                       id=""
                       className="optionValue"
                       placeholder="Enter Your Email"
+                      onChange={handleChange}
                     />
                   </div>
-                  <Link to="/travellerdetail">
-                    <button className="btnbooking">
-                      <span>Book Now</span>
-                    </button>
-                  </Link>
+
+                  <button className="btnbooking" onClick={handleBooking}>
+                    <span>Book Now</span>
+                  </button>
                 </div>
               </div>
             </div>
