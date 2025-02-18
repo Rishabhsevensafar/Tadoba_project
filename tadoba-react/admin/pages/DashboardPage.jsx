@@ -108,7 +108,7 @@ const DashboardPage = () => {
         <div style={{ padding: 16, textAlign: "center" }}>
           <Space direction="vertical" size={collapsed ? 4 : 8}>
             <Title level={collapsed ? 4 : 3} style={{ margin: 0, whiteSpace: 'nowrap' }}>
-              {collapsed ? "TA" : "Tadoba Admin"}
+              {collapsed ? "TS" : "Tadoba Admin"}
             </Title>
           </Space>
         </div>
