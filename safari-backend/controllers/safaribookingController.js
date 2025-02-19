@@ -1,45 +1,31 @@
 const SafariBooking = require("../models/safariBooking");
 
-// Create a new Safari booking
 const createSafariBooking = async (req, res) => {
     try {
-        console.log("Received booking data:", req.body); // 🛠 Debugging log
-
         const {
-            name,
-            email,
-            phone,
-            date,
-            safariZone,
-            vehicleType,
-            safariTime,
-            children,
-            adults,
-            amountPaid,
+            name, email, phone, date, safariZone, vehicleType, safariTime, children, adults, amountPaid
         } = req.body;
 
         if (!name || !email || !phone || !date || !safariZone || !vehicleType || !safariTime || !adults || !amountPaid) {
-            console.log("Missing fields!"); // 🛠 Debugging log
             return res.status(400).json({ error: "All required fields must be filled." });
         }
 
         const newBooking = new SafariBooking({
-            name,
-            email,
-            phone,
-            date,
-            safariZone,
-            vehicleType,
-            safariTime,
-            children,
-            adults,
-            amountPaid,
+            name, email, phone, date, safariZone, vehicleType, safariTime, children, adults, amountPaid
         });
 
         await newBooking.save();
-        res.status(201).json({ message: "Safari booking successful", booking: newBooking });
+
+        // ✅ Ensure the response contains the booking ID
+        res.status(201).json({
+            message: "Safari booking successful",
+            booking: {
+                bookingId: newBooking._id, // Send ID explicitly
+                ...newBooking._doc
+            }
+        });
+
     } catch (error) {
-        console.error("Error saving booking:", error);
         res.status(500).json({ error: error.message });
     }
 };
@@ -92,7 +78,6 @@ const getSafariBookingById = async (req, res) => {
     }
 };
 
-// Delete a Safari booking
 const deleteSafariBooking = async (req, res) => {
     try {
         const booking = await SafariBooking.findByIdAndDelete(req.params.id);
