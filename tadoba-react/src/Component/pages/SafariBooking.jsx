@@ -33,28 +33,32 @@ function SafariBooking() {
 
   const handleBooking = async () => {
     try {
-        const payload = { ...formData, date: date.toISOString() }; 
-        console.log("Sending booking request with data:", payload);
-
-        const response = await fetch("http://localhost:5000/api/booking/book", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload),
-        });
-
-        const data = await response.json();
-        console.log("Server Response:", data);
-
-        if (response.ok) {
-            navigate(`/travellerdetail`, { state: { booking: data.booking } }); // ✅ Pass full booking object
-        } else {
-            alert(data.error);
-        }
+      const payload = { ...formData, date: date.toISOString() };
+      console.log("Sending booking request with data:", payload);
+  
+      const response = await fetch("http://localhost:5000/api/booking/book", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+  
+      const data = await response.json();
+      console.log("Server Response:", data);
+  
+      if (response.ok && data.booking) {
+        localStorage.setItem("booking", JSON.stringify(data.booking));
+  
+        console.log("Navigating with Booking ID:", data.booking.bookingId || data.booking._id);
+  
+        navigate(`/travellerdetail`, { state: { booking: data.booking } });
+      } else {
+        alert(data.error || "Booking failed.");
+      }
     } catch (error) {
-        console.error("Booking error:", error);
+      console.error("Booking error:", error);
     }
-};
-
+  };
+  
 
   return (
     <>
@@ -230,7 +234,9 @@ function SafariBooking() {
                       <option value="Kolara/Alizanza/Madnapur/Palasgaon/Shirkheda Belara">
                         Kolara/Alizanza/Madnapur/Palasgaon/Shirkheda Belara{" "}
                       </option>
-                      <option value="Navegaon/Ramdegi/Nimdela">Navegaon/Ramdegi/Nimdela</option>
+                      <option value="Navegaon/Ramdegi/Nimdela">
+                        Navegaon/Ramdegi/Nimdela
+                      </option>
                       <option value="Kesalaghat/Pangadi/Pangadi Aswal Chuha/Zari Peth">
                         Kesalaghat/Pangadi/Pangadi Aswal Chuha/Zari Peth
                       </option>
