@@ -96,7 +96,7 @@ function SafariBooking() {
                   <tr>
                     <td>Amount</td>
                     <td>INR 9000 </td>
-                    <td>INR 13000</td>
+                    <td>INR 10000</td>
                   </tr>
                   <tr>
                     <td>Tickets Booking in 01-03 Days (Tatkal) </td>
