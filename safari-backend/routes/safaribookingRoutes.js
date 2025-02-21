@@ -15,4 +15,5 @@ router.get("/", getSafariBookings);
 router.get("/:id", getSafariBookingById);
 router.delete("/:id", deleteSafariBooking);
 
+
 module.exports = router;

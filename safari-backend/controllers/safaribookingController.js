@@ -1,4 +1,4 @@
-const SafariBooking = require("../models/safariBooking");
+const SafariBooking = require("../models/safaribooking");
 
 const createSafariBooking = async (req, res) => {
     try {

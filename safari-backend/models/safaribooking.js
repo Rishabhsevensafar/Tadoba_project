@@ -7,7 +7,8 @@ const travelerSchema = new mongoose.Schema({
   nationality: { type: String, required: true },
 });
 
-const safariBookingSchema = new mongoose.Schema(
+// Check if the model already exists before defining it
+const SafariBookingSchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
     email: { type: String, required: true },
@@ -20,9 +21,12 @@ const safariBookingSchema = new mongoose.Schema(
     adults: { type: Number, required: true },
     amountPaid: { type: Number, required: true },
     status: { type: String, default: "Pending" },
-    travelerDetails: [travelerSchema], // New field to store traveler information
+    travelerDetails: [travelerSchema], // Traveler details
   },
   { timestamps: true }
 );
 
-module.exports = mongoose.model("SafariBooking", safariBookingSchema);
+const SafariBooking =
+  mongoose.models.SafariBooking || mongoose.model("SafariBooking", SafariBookingSchema);
+
+module.exports = SafariBooking;
