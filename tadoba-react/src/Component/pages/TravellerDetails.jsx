@@ -6,7 +6,7 @@ function TravellerDetails() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const booking = location.state?.booking || null;
+  const booking = location.state?.booking || JSON.parse(localStorage.getItem("booking")) || null;
 
   // Redirect if no booking data
   useEffect(() => {
@@ -18,7 +18,12 @@ function TravellerDetails() {
   }, [booking, navigate]);
 
   // Extract booking details
-  const bookingId = booking?.bookingId || booking?._id;
+  const bookingId = booking?.bookingId || booking?._id || "";
+  if (!bookingId) {
+    console.error("Booking ID is undefined! Cannot proceed to payment.");
+    alert("Booking ID is missing. Please try again.");
+    return;
+  }
   const {
     safariZone,
     safariTime,
@@ -31,6 +36,8 @@ function TravellerDetails() {
 
   // State to manage traveler details
   const [travelerDetails, setTravelerDetails] = useState([]);
+  // State to manage terms acceptance
+  const [termsAccepted, setTermsAccepted] = useState(false);
 
   // Generate traveler input fields dynamically
   useEffect(() => {
@@ -65,33 +72,35 @@ function TravellerDetails() {
     setTravelerDetails(updatedTravelers);
   };
 
-  // Handle submit traveler details
-  const submitTravelerDetails = async () => {
-    try {
-      const response = await fetch(
-        `http://localhost:5000/api/booking/${bookingId}/travelers`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ travelers: travelerDetails }),
-        }
-      );
-
-      const data = await response.json();
-      if (response.ok) {
-        alert("Traveler details added successfully!");
-        navigate("/payment", { state: { booking } });
-      } else {
-        alert(data.error);
+  // Validate traveler details
+  const validateTravelerDetails = () => {
+    for (const traveler of travelerDetails) {
+      if (!traveler.fullName || !traveler.age || !traveler.idNumber) {
+        return false;
       }
-    } catch (error) {
-      console.error("Error submitting traveler details:", error);
     }
+    return true;
   };
-  // Handle Razorpay Payment
+
+  // Handle Cashfree Payment
   const handlePayment = async () => {
     try {
-      console.log("Starting payment process...");
+      if (!validateTravelerDetails()) {
+        alert("Please fill in all traveler details");
+        return;
+      }
+  
+      if (!termsAccepted) {
+        alert("Please accept the terms and conditions");
+        return;
+      }
+  
+      if (!bookingId) {
+        alert("Booking ID is missing. Cannot proceed with payment.");
+        return;
+      }
+  
+      console.log("Starting payment process with Booking ID:", bookingId);
   
       // Step 1: Submit Traveler Details First
       const travelerResponse = await fetch(
@@ -106,56 +115,44 @@ function TravellerDetails() {
       const travelerData = await travelerResponse.json();
       if (!travelerResponse.ok) {
         alert(travelerData.error || "Failed to submit traveler details!");
-        return; // Stop if traveler details submission fails
+        return;
       }
   
       console.log("Traveler details submitted successfully.");
   
-      // Step 2: Now, Request Payment Order
-      const response = await fetch("http://localhost:5000/api/payment/order", {
+      // Step 2: Create Cashfree Payment Order
+      const response = await fetch("http://localhost:5000/api/payment/create-order", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount: amountPaid, receipt: `receipt_${bookingId}` }),
+        body: JSON.stringify({
+          orderId: `SAFARI_${bookingId}_${Date.now()}`,
+          amount: amountPaid,
+          customerId: `CUST_${bookingId}`,
+          customerEmail: booking.email || "customer@example.com",
+          customerPhone: booking.phone || "9999999999",
+        }),
       });
   
       const data = await response.json();
-      if (!data.success) throw new Error("Payment Order Creation Failed");
+      if (!data.success) {
+        throw new Error("Payment Order Creation Failed");
+      }
   
       console.log("Payment Order Created:", data);
   
-      const options = {
-        key: "YOUR_RAZORPAY_KEY_ID", // Ensure this is correct
-        amount: data.amount,
-        currency: data.currency,
-        name: "Tadoba Wildlife Safari",
-        description: "Safari Booking Payment",
-        order_id: data.orderId,
-        handler: async function (response) {
-          console.log("Payment Success Response:", response);
+      // ✅ Redirect to Cashfree's payment page
+      if (data.paymentLink) {
+        window.location.href = data.paymentLink;
+      } else {
+        throw new Error("Invalid Payment Link");
+      }
   
-          const verifyRes = await fetch("http://localhost:5000/api/payment/verify", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(response),
-          });
-  
-          const verifyData = await verifyRes.json();
-          if (verifyData.success) {
-            alert("Payment Successful!");
-            navigate("/booking-confirmation", { state: { booking, payment: response } });
-          } else {
-            alert("Payment Verification Failed!");
-          }
-        },
-        theme: { color: "#228B22" },
-      };
-  
-      const razorpay = new window.Razorpay(options);
-      razorpay.open();
     } catch (error) {
       console.error("Payment Error:", error);
+      alert("Payment initialization failed. Please try again.");
     }
   };  
+
   return (
     <>
       <div className="travellerHeader">
@@ -186,6 +183,7 @@ function TravellerDetails() {
                 onChange={(e) =>
                   handleTravelerChange(index, "fullName", e.target.value)
                 }
+                required
               />
             </div>
             <div>
@@ -207,6 +205,7 @@ function TravellerDetails() {
                 onChange={(e) =>
                   handleTravelerChange(index, "age", e.target.value)
                 }
+                required
               />
             </div>
             <div>
@@ -243,6 +242,7 @@ function TravellerDetails() {
                 onChange={(e) =>
                   handleTravelerChange(index, "idNumber", e.target.value)
                 }
+                required
               />
             </div>
           </div>
@@ -250,7 +250,11 @@ function TravellerDetails() {
 
         <div className="mx-2 mt-3">
           <p>
-            <input type="checkbox" /> I have read and accept the{" "}
+            <input 
+              type="checkbox" 
+              checked={termsAccepted}
+              onChange={(e) => setTermsAccepted(e.target.checked)}
+            /> I have read and accept the{" "}
             <Link to="/termandcondition">terms and conditions</Link>
           </p>
         </div>
@@ -288,7 +292,7 @@ function TravellerDetails() {
                 </td>
                 <td>{safariTime || "N/A"}</td>
                 <td>
-                  <b>Safari Zone:</b>
+                  <b>Safari Zone:</b> 
                 </td>
                 <td>{safariZone || "N/A"}</td>
               </tr>
