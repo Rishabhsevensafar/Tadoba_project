@@ -1,19 +1,9 @@
-const SafariBooking = require("../models/safariBooking");
+const SafariBooking = require("../models/safaribooking");
 
-// Create a new Safari booking
 const createSafariBooking = async (req, res) => {
     try {
         const {
-            name,
-            email,
-            phone,
-            date,
-            safariZone,
-            vehicleType,
-            safariTime,
-            children,
-            adults,
-            amountPaid,
+            name, email, phone, date, safariZone, vehicleType, safariTime, children, adults, amountPaid
         } = req.body;
 
         if (!name || !email || !phone || !date || !safariZone || !vehicleType || !safariTime || !adults || !amountPaid) {
@@ -21,24 +11,25 @@ const createSafariBooking = async (req, res) => {
         }
 
         const newBooking = new SafariBooking({
-            name,
-            email,
-            phone,
-            date,
-            safariZone,
-            vehicleType,
-            safariTime,
-            children,
-            adults,
-            amountPaid,
+            name, email, phone, date, safariZone, vehicleType, safariTime, children, adults, amountPaid
         });
 
         await newBooking.save();
-        res.status(201).json({ message: "Safari booking successful", booking: newBooking });
+
+        // ✅ Ensure the response contains the booking ID
+        res.status(201).json({
+            message: "Safari booking successful",
+            booking: {
+                bookingId: newBooking._id, // Send ID explicitly
+                ...newBooking._doc
+            }
+        });
+
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
 };
+
 const addTravelerDetails = async (req, res) => {
     try {
         const { id } = req.params; // Booking ID
@@ -87,7 +78,6 @@ const getSafariBookingById = async (req, res) => {
     }
 };
 
-// Delete a Safari booking
 const deleteSafariBooking = async (req, res) => {
     try {
         const booking = await SafariBooking.findByIdAndDelete(req.params.id);
