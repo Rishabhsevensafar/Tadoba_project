@@ -267,73 +267,69 @@ function TourPackage() {
             <p>Search</p>
           </div>
         </div>{" "}
-      </div>
+      </section>
 
       <section className="packagelisting  leaf">
         <div className="container">
           <div className="row">
             {packages.map((packages) => (
-            <div className="col-sm-12 col-md-3 col-lg-3">
-              <div className="tourPackage1">
-                <img src={tourPckages2} className="tourPackage2" alt="/tourpackagedetail" />
-                <div className="tourOverlay">
-                  <h6>Tadoba Weekend Tour - 1 Night and 2 Days</h6>
-                  <p>
-                    Lush green Tadoba is no less than heaven on earth. The real
-                    highlight of Tadoba National Park
-                  </p>
-                 <Link to="/tourpackagedetail"> <button type="button" class="btn">
-                    Read More
-                  </button></Link>
+            <><div className="col-sm-12 col-md-3 col-lg-3">
+                <div className="tourPackage1">
+                  <img src={tourPckages2} className="tourPackage2" alt="/tourpackagedetail" />
+                  <div className="tourOverlay">
+                    <h6>Tadoba Weekend Tour - 1 Night and 2 Days</h6>
+                    <p>
+                      Lush green Tadoba is no less than heaven on earth. The real
+                      highlight of Tadoba National Park
+                    </p>
+                    <Link to="/tourpackagedetail"> <button type="button" class="btn">
+                      Read More
+                    </button></Link>
+                  </div>
                 </div>
-              </div>
-            </div>
-            <div className="col-sm-12 col-md-3 col-lg-3">
-            <div className="tourPackage1">
-                <img src={tourPckages2} className="tourPackage2" alt="/tourpackagedetail" />
-                <div className="tourOverlay">
-                  <h6>Tadoba Weekend Tour - 1 Night and 2 Days</h6>
-                  <p>
-                    Lush green Tadoba is no less than heaven on earth. The real
-                    highlight of Tadoba National Park
-                  </p>
-                 <Link to="/tourpackagedetail"> <button type="button" class="btn">
-                    Read More
-                  </button></Link>
-                </div>
-              </div>
-            </div>
-            <div className="col-sm-12 col-md-3 col-lg-3">
-            <div className="tourPackage1">
-                <img src={tourPckages2} className="tourPackage2" alt="/tourpackagedetail" />
-                <div className="tourOverlay">
-                  <h6>Tadoba Weekend Tour - 1 Night and 2 Days</h6>
-                  <p>
-                    Lush green Tadoba is no less than heaven on earth. The real
-                    highlight of Tadoba National Park
-                  </p>
-                 <Link to="/tourpackagedetail"> <button type="button" class="btn">
-                    Read More
-                  </button></Link>
-                </div>
-              </div>
-            </div>
-
-            <div className="col-sm-12 col-md-3 col-lg-3">
-            <div className="tourPackage1">
-                <img src={tourPckages2} className="tourPackage2" alt="/tourpackagedetail" />
-                <div className="tourOverlay">
-                  <h6>Tadoba Weekend Tour - 1 Night and 2 Days</h6>
-                  <p>
-                    Lush green Tadoba is no less than heaven on earth. The real
-                    highlight of Tadoba National Park
-                  </p>
-                 <Link to="/tourpackagedetail"> <button type="button" class="btn">
-                    Read More
-                  </button></Link>
-                </div>
-              </div>
-            </div>
+              </div><div className="col-sm-12 col-md-3 col-lg-3">
+                  <div className="tourPackage1">
+                    <img src={tourPckages2} className="tourPackage2" alt="/tourpackagedetail" />
+                    <div className="tourOverlay">
+                      <h6>Tadoba Weekend Tour - 1 Night and 2 Days</h6>
+                      <p>
+                        Lush green Tadoba is no less than heaven on earth. The real
+                        highlight of Tadoba National Park
+                      </p>
+                      <Link to="/tourpackagedetail"> <button type="button" class="btn">
+                        Read More
+                      </button></Link>
+                    </div>
+                  </div>
+                </div><div className="col-sm-12 col-md-3 col-lg-3">
+                  <div className="tourPackage1">
+                    <img src={tourPckages2} className="tourPackage2" alt="/tourpackagedetail" />
+                    <div className="tourOverlay">
+                      <h6>Tadoba Weekend Tour - 1 Night and 2 Days</h6>
+                      <p>
+                        Lush green Tadoba is no less than heaven on earth. The real
+                        highlight of Tadoba National Park
+                      </p>
+                      <Link to="/tourpackagedetail"> <button type="button" class="btn">
+                        Read More
+                      </button></Link>
+                    </div>
+                  </div>
+                </div><div className="col-sm-12 col-md-3 col-lg-3">
+                  <div className="tourPackage1">
+                    <img src={tourPckages2} className="tourPackage2" alt="/tourpackagedetail" />
+                    <div className="tourOverlay">
+                      <h6>Tadoba Weekend Tour - 1 Night and 2 Days</h6>
+                      <p>
+                        Lush green Tadoba is no less than heaven on earth. The real
+                        highlight of Tadoba National Park
+                      </p>
+                      <Link to="/tourpackagedetail"> <button type="button" class="btn">
+                        Read More
+                      </button></Link>
+                    </div>
+                  </div>
+                </div></>
             ))}
           </div>
         </div>
