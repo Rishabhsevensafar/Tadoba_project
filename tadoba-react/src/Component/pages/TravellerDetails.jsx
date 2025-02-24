@@ -90,12 +90,10 @@ function TravellerDetails() {
         alert("Please fill in all traveler details");
         return;
       }
-
       if (!termsAccepted) {
         alert("Please accept the terms and conditions");
         return;
       }
-
       if (!bookingId) {
         alert("Booking ID is missing. Cannot proceed with payment.");
         return;
@@ -112,7 +110,6 @@ function TravellerDetails() {
           body: JSON.stringify({ travelers: travelerDetails }),
         }
       );
-
       const travelerData = await travelerResponse.json();
       if (!travelerResponse.ok) {
         alert(travelerData.error || "Failed to submit traveler details!");

@@ -5,12 +5,13 @@ const BASE_URL =
   process.env.CASHFREE_ENV === "PROD"
     ? "https://api.cashfree.com/pg"
     : "https://sandbox.cashfree.com/pg";
-    const headers = {
-      "Content-Type": "application/json",
-      "x-client-id": process.env.CASHFREE_APP_ID?.trim(),
-      "x-client-secret": process.env.CASHFREE_SECRET_KEY?.trim(),
-      "x-api-version": "2022-09-01",
-    };
+
+const headers = {
+  "Content-Type": "application/json",
+  "x-client-id": process.env.CASHFREE_APP_ID?.trim(),  // Ensure no whitespace issues
+  "x-client-secret": process.env.CASHFREE_SECRET_KEY?.trim(),
+  "x-api-version": "2022-09-01",
+};
 
 
 const createOrder = async (req, res) => {
@@ -83,7 +84,11 @@ const verifyPayment = async (req, res) => {
     if (response.data && response.data.payment_status === "SUCCESS") {
       res.json({ success: true, message: "Payment verified successfully!" });
     } else {
-      res.status(400).json({ success: false, message: "Payment verification failed!" });
+      res.status(400).json({
+        success: false,
+        message: "Payment verification failed!",
+        status: response.data?.payment_status || "UNKNOWN",
+      });
     }
   } catch (error) {
     console.error("Cashfree Payment Verification Error:", error.response?.data || error.message);

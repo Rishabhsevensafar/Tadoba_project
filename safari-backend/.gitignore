@@ -1,3 +1,7 @@
 echo "node_modules/" >> .gitignore
+<<<<<<< HEAD
 # Ignore environment files
 .env
+=======
+echo ".env" >> .gitignore
+>>>>>>> origin/main
