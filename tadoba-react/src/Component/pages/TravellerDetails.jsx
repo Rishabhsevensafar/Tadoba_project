@@ -6,9 +6,11 @@ function TravellerDetails() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const booking = location.state?.booking || JSON.parse(localStorage.getItem("booking")) || null;
+  const booking =
+    location.state?.booking ||
+    JSON.parse(localStorage.getItem("booking")) ||
+    null;
 
-  // Redirect if no booking data
   useEffect(() => {
     if (!booking) {
       console.error("No booking data received! Redirecting...");
@@ -17,7 +19,6 @@ function TravellerDetails() {
     }
   }, [booking, navigate]);
 
-  // Extract booking details
   const bookingId = booking?.bookingId || booking?._id || "";
   if (!bookingId) {
     console.error("Booking ID is undefined! Cannot proceed to payment.");
@@ -89,19 +90,19 @@ function TravellerDetails() {
         alert("Please fill in all traveler details");
         return;
       }
-  
+
       if (!termsAccepted) {
         alert("Please accept the terms and conditions");
         return;
       }
-  
+
       if (!bookingId) {
         alert("Booking ID is missing. Cannot proceed with payment.");
         return;
       }
-  
+
       console.log("Starting payment process with Booking ID:", bookingId);
-  
+
       // Step 1: Submit Traveler Details First
       const travelerResponse = await fetch(
         `http://localhost:5000/api/booking/${bookingId}/travelers`,
@@ -111,47 +112,48 @@ function TravellerDetails() {
           body: JSON.stringify({ travelers: travelerDetails }),
         }
       );
-  
+
       const travelerData = await travelerResponse.json();
       if (!travelerResponse.ok) {
         alert(travelerData.error || "Failed to submit traveler details!");
         return;
       }
-  
+
       console.log("Traveler details submitted successfully.");
-  
+
       // Step 2: Create Cashfree Payment Order
-      const response = await fetch("http://localhost:5000/api/payment/create-order", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          orderId: `SAFARI_${bookingId}_${Date.now()}`,
-          amount: amountPaid,
-          customerId: `CUST_${bookingId}`,
-          customerEmail: booking.email || "customer@example.com",
-          customerPhone: booking.phone || "9999999999",
-        }),
-      });
-  
+      const response = await fetch(
+        "http://localhost:5000/api/payment/create-order",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            orderId: `SAFARI_${bookingId}_${Date.now()}`,
+            amount: amountPaid,
+            customerId: `CUST_${bookingId}`,
+            customerName: booking.name,
+            customerEmail: booking.email || "customer@example.com",
+            customerPhone: booking.phone || "9999999999",
+          }),
+        }
+      );
       const data = await response.json();
       if (!data.success) {
         throw new Error("Payment Order Creation Failed");
       }
-  
       console.log("Payment Order Created:", data);
-  
+
       // ✅ Redirect to Cashfree's payment page
       if (data.paymentLink) {
         window.location.href = data.paymentLink;
       } else {
         throw new Error("Invalid Payment Link");
       }
-  
     } catch (error) {
       console.error("Payment Error:", error);
       alert("Payment initialization failed. Please try again.");
     }
-  };  
+  };
 
   return (
     <>
@@ -250,11 +252,12 @@ function TravellerDetails() {
 
         <div className="mx-2 mt-3">
           <p>
-            <input 
-              type="checkbox" 
+            <input
+              type="checkbox"
               checked={termsAccepted}
               onChange={(e) => setTermsAccepted(e.target.checked)}
-            /> I have read and accept the{" "}
+            />{" "}
+            I have read and accept the{" "}
             <Link to="/termandcondition">terms and conditions</Link>
           </p>
         </div>
@@ -292,7 +295,7 @@ function TravellerDetails() {
                 </td>
                 <td>{safariTime || "N/A"}</td>
                 <td>
-                  <b>Safari Zone:</b> 
+                  <b>Safari Zone:</b>
                 </td>
                 <td>{safariZone || "N/A"}</td>
               </tr>
