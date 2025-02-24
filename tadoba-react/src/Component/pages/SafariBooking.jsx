@@ -1,9 +1,15 @@
+<<<<<<< HEAD
+=======
+import { useState, useEffect } from "react";
+import { useNavigate, Link } from "react-router-dom";
+>>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
 import React from "react";
 import Header from "../Header";
 import ImportantLinks from "../ImportantLinks";
 import Footer from "../Footer";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
+<<<<<<< HEAD
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useEffect } from "react";
@@ -12,6 +18,62 @@ function SafariBooking() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+=======
+
+function SafariBooking() {
+  const [date, setDate] = useState(new Date());
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    safariZone: "", // 🛠 FIXED: Ensuring safariZone is set
+    vehicleType: "Jeep",
+    safariTime: "", // 🛠 FIXED: Ensuring safariTime is set
+    children: 0,
+    adults: 1,
+    amountPaid: 6100, // 🛠 FIXED: Default value to avoid missing field
+  });
+
+  const navigate = useNavigate();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
+  // Handle input change
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleBooking = async () => {
+    try {
+      const payload = { ...formData, date: date.toISOString() };
+      console.log("Sending booking request with data:", payload);
+  
+      const response = await fetch("http://localhost:5000/api/booking/book", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+  
+      const data = await response.json();
+      console.log("Server Response:", data);
+  
+      if (response.ok && data.booking) {
+        localStorage.setItem("booking", JSON.stringify(data.booking));
+  
+        console.log("Navigating with Booking ID:", data.booking.bookingId || data.booking._id);
+  
+        navigate(`/travellerdetail`, { state: { booking: data.booking } });
+      } else {
+        alert(data.error || "Booking failed.");
+      }
+    } catch (error) {
+      console.error("Booking error:", error);
+    }
+  };
+  
+
+>>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
   return (
     <>
       <Header></Header>
@@ -48,7 +110,11 @@ function SafariBooking() {
                   <tr>
                     <td>Amount</td>
                     <td>INR 9000 </td>
+<<<<<<< HEAD
                     <td>INR 13000</td>
+=======
+                    <td>INR 10000</td>
+>>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
                   </tr>
                   <tr>
                     <td>Tickets Booking in 01-03 Days (Tatkal) </td>
@@ -130,6 +196,7 @@ function SafariBooking() {
                 <div className="row calenderForm">
                   <div className="col-sm-12 col-md-6 col-lg-6">
                     <div className=" ">
+<<<<<<< HEAD
                       <select name="" className="optionValue" id="">
                         <option value="">Select</option>
                         <option value="">Jeep</option>
@@ -161,10 +228,52 @@ function SafariBooking() {
                         id=""
                         className="optionValue"
                         placeholder="Enter Your Mobile"
+=======
+                      <select
+                        name=""
+                        className="optionValue"
+                        id=""
+                        onChange={handleChange}
+                      >
+                        <option value="">Select vehical</option>
+                        <option value="">Jeep</option>
+                      </select>
+                      <select
+                        name="safariTime"
+                        className="optionValue"
+                        onChange={handleChange}
+                        required
+                      >
+                        <option value="">Select Safari Time</option>
+                        <option value="6-10 AM">6-10 AM</option>
+                        <option value="2-6 PM">2-6 PM</option>
+                      </select>
+
+                      <select
+                        name="children"
+                        className="optionValue"
+                        onChange={handleChange}
+                      >
+                        <option value="0">No Child</option>
+                        {[...Array(12)].map((_, i) => (
+                          <option key={i + 1} value={i + 1}>
+                            {i + 1}
+                          </option>
+                        ))}
+                      </select>
+                      <input
+                        type="number"
+                        name="phone"
+                        id=""
+                        className="optionValue"
+                        placeholder="Enter Your Mobile"
+                        onChange={handleChange}
+>>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
                       />
                     </div>
                   </div>
                   <div className="col-sm-12 col-md-6 col-lg-6">
+<<<<<<< HEAD
                     <select name="" className="optionValue" id="">
                       <option value="">Select</option>
                       <option value="">
@@ -209,6 +318,60 @@ function SafariBooking() {
                       <span>Book Now</span>
                     </button>
                   </Link>
+=======
+                    <select
+                      name="safariZone"
+                      className="optionValue"
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">Select Zone</option>
+                      <option value="Moharli/Mamla/Agarzari/Adegaon/Junona/Devada">
+                        Moharli/Mamla/Agarzari/Adegaon/Junona/Devada
+                      </option>
+                      <option value="Kolara/Alizanza/Madnapur/Palasgaon/Shirkheda Belara">
+                        Kolara/Alizanza/Madnapur/Palasgaon/Shirkheda Belara{" "}
+                      </option>
+                      <option value="Navegaon/Ramdegi/Nimdela">
+                        Navegaon/Ramdegi/Nimdela
+                      </option>
+                      <option value="Kesalaghat/Pangadi/Pangadi Aswal Chuha/Zari Peth">
+                        Kesalaghat/Pangadi/Pangadi Aswal Chuha/Zari Peth
+                      </option>
+                    </select>
+                    <select
+                      name="adults"
+                      className="optionValue"
+                      onChange={handleChange}
+                    >
+                      {[...Array(8)].map((_, i) => (
+                        <option key={i + 1} value={i + 1}>
+                          {i + 1}
+                        </option>
+                      ))}
+                    </select>
+                    <input
+                      type="text"
+                      name="name"
+                      id=""
+                      className="optionValue"
+                      placeholder="Enter Your Name"
+                      onChange={handleChange}
+                    />
+                    <input
+                      type="email"
+                      name="email"
+                      id=""
+                      className="optionValue"
+                      placeholder="Enter Your Email"
+                      onChange={handleChange}
+                    />
+                  </div>
+
+                  <button className="btnbooking" onClick={handleBooking}>
+                    <span>Book Now</span>
+                  </button>
+>>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
                 </div>
               </div>
             </div>

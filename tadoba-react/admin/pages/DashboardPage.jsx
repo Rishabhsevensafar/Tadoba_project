@@ -13,7 +13,11 @@ import {
 } from "antd";
 import {
   DashboardOutlined,
+<<<<<<< HEAD
   ShoppingOutlined,
+=======
+  // ShoppingOutlined,
+>>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
   UserOutlined,
   AppstoreOutlined,
   GiftOutlined,
@@ -108,7 +112,11 @@ const DashboardPage = () => {
         <div style={{ padding: 16, textAlign: "center" }}>
           <Space direction="vertical" size={collapsed ? 4 : 8}>
             <Title level={collapsed ? 4 : 3} style={{ margin: 0, whiteSpace: 'nowrap' }}>
+<<<<<<< HEAD
               {collapsed ? "TA" : "Tadoba Admin"}
+=======
+              {collapsed ? "TS" : "Tadoba Admin"}
+>>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
             </Title>
           </Space>
         </div>
