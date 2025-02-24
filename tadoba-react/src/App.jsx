@@ -36,6 +36,7 @@ import TravellerDetails from './Component/pages/TravellerDetails';
 import TourPackage from './Component/pages/TourPackage';
 import PaymentSuccess from './Component/Paymentsucessful';
 // import Test from './Component/Test';
+import TourPackageDetail from './Component/pages/TourPackageDetail';
 
 
 function App() {
@@ -76,7 +77,7 @@ function App() {
         <Route path="/safaribooking" element={<SafariBooking />} />
         <Route path="/travellerdetail" element={<TravellerDetails />} />
         <Route path="/tourpackage" element={<TourPackage />} />
-        <Route path="/payment-success" element={<PaymentSuccess />} />
+        <Route path='/tourpackagedetail'element={<TourPackageDetail/>}/>
 
 
 
