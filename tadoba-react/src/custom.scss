@@ -5,8 +5,7 @@
 p{
     font-size: 14px;
     color: #565656;
-    margin-bottom: 10px;
-    text-align: justify;
+    margin-bottom: 10px !important;
 }
 h1 {
 font-size: 35px;
@@ -68,6 +67,7 @@ li {
 }
 ol, ul {
     padding-left: 1rem;
+    margin-bottom: 5px;
 }
 img
 {
