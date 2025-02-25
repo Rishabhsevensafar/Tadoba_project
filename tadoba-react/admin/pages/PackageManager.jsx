@@ -60,7 +60,7 @@ const PackageManager = () => {
   // Handle delete package
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/admin/packages/${id}`, {
+      await axios.delete(`http://localhost:5000/api/tourpackage/${id}`, {
         headers: { Authorization: `Bearer ${adminToken}` },
       });
       fetchPackages(currentPage); // Refresh the package list
@@ -72,23 +72,23 @@ const PackageManager = () => {
   // Toggle package status
   const handleToggleStatus = async (id, isActive) => {
     try {
-      await axios.put(
-        `http://localhost:5000/api/admin/packages/${id}/status`,
-        { isActive: !isActive },
-        {
-          headers: { Authorization: `Bearer ${adminToken}` },
-        }
-      );
+        const response = await axios.put( // ✅ Store response in a variable
+            `http://localhost:5000/api/tourpackage/${id}/status`,
+            { isActive: !isActive },
+            {
+                headers: { Authorization: `Bearer ${adminToken}` },
+            }
+        );
 
-      if (response.data.success) {
-        fetchPackages(currentPage); // ✅ Refresh the package list
-      } else {
-        console.error("Failed to update package status:", response.data.error);
-      }
+        if (response.data.success) { // ✅ Now, response is properly referenced
+            fetchPackages(currentPage); // Refresh package list
+        } else {
+            console.error("Failed to update package status:", response.data.error);
+        }
     } catch (error) {
-      console.error("Error toggling package status:", error);
+        console.error("Error toggling package status:", error);
     }
-  };
+};
   useEffect(() => {
     fetchPackages(currentPage);
   }, [currentPage, pageSize]);
