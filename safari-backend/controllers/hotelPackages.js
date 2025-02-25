@@ -2,19 +2,14 @@
 const HotelPackage = require('../models/hotel');
 const fs = require('fs');
 const path = require('path');
-
-// Create Hotel Package with Image Upload
 exports.createHotelPackage = async (req, res) => {
     try {
-        // Ensure files are uploaded
         const imagePaths = req.files ? req.files.map(file => `/uploads/hotel/${file.filename}`) : [];
 
         // Check required fields
         if (!req.body.title || !req.body.description || !req.body.location || !req.body.room_type) {
             return res.status(400).json({ error: "Missing required fields" });
         }
-
-        // Create a new package
         const newPackage = new HotelPackage({
             title: req.body.title,
             description: req.body.description,
@@ -33,7 +28,7 @@ exports.createHotelPackage = async (req, res) => {
         });
 
         await newPackage.save();
-        res.status(201).json({ message: "Hotel package created successfully", package: newPackage });
+        res.status(201).json({ message: "Hotel Created Successfully", package: newPackage });
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
