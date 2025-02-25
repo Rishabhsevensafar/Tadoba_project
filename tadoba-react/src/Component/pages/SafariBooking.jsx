@@ -1,24 +1,11 @@
-<<<<<<< HEAD
-=======
 import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
 import React from "react";
 import Header from "../Header";
 import ImportantLinks from "../ImportantLinks";
 import Footer from "../Footer";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-<<<<<<< HEAD
-import { useState } from "react";
-import { Link } from "react-router-dom";
-import { useEffect } from "react";
-function SafariBooking() {
-  const [date, setDate] = useState(new Date());
-  useEffect(() => {
-    window.scrollTo(0, 0);
-  }, []);
-=======
 
 function SafariBooking() {
   const [date, setDate] = useState(new Date());
@@ -73,7 +60,6 @@ function SafariBooking() {
   };
   
 
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
   return (
     <>
       <Header></Header>
@@ -110,11 +96,7 @@ function SafariBooking() {
                   <tr>
                     <td>Amount</td>
                     <td>INR 9000 </td>
-<<<<<<< HEAD
-                    <td>INR 13000</td>
-=======
                     <td>INR 10000</td>
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
                   </tr>
                   <tr>
                     <td>Tickets Booking in 01-03 Days (Tatkal) </td>
@@ -196,39 +178,6 @@ function SafariBooking() {
                 <div className="row calenderForm">
                   <div className="col-sm-12 col-md-6 col-lg-6">
                     <div className=" ">
-<<<<<<< HEAD
-                      <select name="" className="optionValue" id="">
-                        <option value="">Select</option>
-                        <option value="">Jeep</option>
-                      </select>
-                      <select name="" className="optionValue" id="">
-                        <option value="">Select</option>
-                        <option value="">6-10 AM/Morning</option>
-                        <option value="">2-6 AM/Evening</option>
-                      </select>
-
-                      <select name="" className="optionValue" id="">
-                        <option value="">Child (between 5 to 12 years)</option>
-                        <option value="">1</option>
-                        <option value="">2</option>
-                        <option value="">3</option>
-                        <option value="">4</option>
-                        <option value="">5</option>
-                        <option value="">6</option>
-                        <option value="">7</option>
-                        <option value="">8</option>
-                        <option value="">9</option>
-                        <option value="">10</option>
-                        <option value="">11</option>
-                        <option value="">12</option>
-                      </select>
-                      <input
-                        type="number"
-                        name=""
-                        id=""
-                        className="optionValue"
-                        placeholder="Enter Your Mobile"
-=======
                       <select
                         name=""
                         className="optionValue"
@@ -268,57 +217,10 @@ function SafariBooking() {
                         className="optionValue"
                         placeholder="Enter Your Mobile"
                         onChange={handleChange}
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
                       />
                     </div>
                   </div>
                   <div className="col-sm-12 col-md-6 col-lg-6">
-<<<<<<< HEAD
-                    <select name="" className="optionValue" id="">
-                      <option value="">Select</option>
-                      <option value="">
-                        Moharli/Mamla/Agarzari/Adegaon/Junona/Devada
-                      </option>
-                      <option value="">
-                        Kolara/Alizanza/Madnapur/Palasgaon/Shirkheda Belara{" "}
-                      </option>
-                      <option value="">Navegaon/Ramdegi/Nimdela</option>
-                      <option value="">
-                        Kesalaghat/Pangadi/Pangadi Aswal Chuha/Zari Peth
-                      </option>
-                    </select>
-                    <select name="" className="optionValue" id="">
-                      <option value="">Adult (above 8 years)</option>
-                      <option value="">1</option>
-                      <option value="">2</option>
-                      <option value="">3</option>
-                      <option value="">4</option>
-                      <option value="">5</option>
-                      <option value="">6</option>
-                      <option value="">7</option>
-                      <option value="">8</option>
-                    </select>
-                    <input
-                      type="text"
-                      name=""
-                      id=""
-                      className="optionValue"
-                      placeholder="Enter Your Name"
-                    />
-                    <input
-                      type="email"
-                      name=""
-                      id=""
-                      className="optionValue"
-                      placeholder="Enter Your Email"
-                    />
-                  </div>
-                  <Link to="/travellerdetail">
-                    <button className="btnbooking">
-                      <span>Book Now</span>
-                    </button>
-                  </Link>
-=======
                     <select
                       name="safariZone"
                       className="optionValue"
@@ -371,7 +273,6 @@ function SafariBooking() {
                   <button className="btnbooking" onClick={handleBooking}>
                     <span>Book Now</span>
                   </button>
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
                 </div>
               </div>
             </div>

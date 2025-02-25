@@ -7,10 +7,7 @@ import { useEffect } from "react";
 import tourPckages from "../../assets/images/tour-Packages.jpg";
 import tourPckages2 from "../../assets/images/tour-Packages2.jpg";
 import tourPckages3 from "../../assets/images/tour-Packages3.jpg";
-<<<<<<< HEAD
-=======
 import pkg from "../../assets/pkg1.jpg"
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Link } from "react-router-dom";
@@ -18,18 +15,6 @@ function TourPackage() {
   const [date, setDate] = useState(new Date());
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
-<<<<<<< HEAD
-     useEffect(()=>{
-          window.scrollTo(0, 0);
-        },[])
-        
-  return (
-    <>
-      <Header></Header>
-      <div >
-        <div className="row">
-          <div className="col-sm-12 col-md-4 col-lg-4">
-=======
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -114,29 +99,20 @@ function TourPackage() {
       <div>
         <div className="row">
           <div className="col-sm-12 col-md-4 col-lg-4 p-0">
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
             <img
               src={tourPckages}
               className="tourPackageImg pe-lg-1"
               alt="Tour Packages "
             />
           </div>
-<<<<<<< HEAD
-          <div className="col-sm-12 col-md-4 col-lg-4">
-=======
           <div className="col-sm-12 col-md-4 col-lg-4 p-0">
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
             <img
               src={tourPckages2}
               className="tourPackageImg pe-lg-1"
               alt="Tour Packages "
             />
           </div>
-<<<<<<< HEAD
-          <div className="col-sm-12 col-md-4 col-lg-4">
-=======
           <div className="col-sm-12 col-md-4 col-lg-4 p-0">
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
             <img
               src={tourPckages3}
               className="tourPackageImg"
@@ -145,14 +121,8 @@ function TourPackage() {
           </div>
         </div>
       </div>
-<<<<<<< HEAD
-    
-        <div className="row hotelback ">
-          <div className="col-sm-12 col-md-3 col-lg-3 px-4 ">
-=======
         <div className="row hotelback ">
           <div className="col-sm-12 col-md-3 col-lg-3 px-2">
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
             <div className="boxx">
               <select>
                 <option value="">Select</option>
@@ -163,11 +133,7 @@ function TourPackage() {
               <p>All Hotels in tadoba</p>
             </div>
           </div>
-<<<<<<< HEAD
-          <div className="col-sm-12 col-md-3 col-lg-3 px-4">
-=======
           <div className="col-sm-12 col-md-3 col-lg-3 px-2">
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
             <div className="boxx">
               <div className="dateFormat">
                 <DatePicker
@@ -192,11 +158,7 @@ function TourPackage() {
               <p>Choose Date</p>
             </div>
           </div>
-<<<<<<< HEAD
-          <div className="col-sm-12 col-md-2 col-lg-2 px-4">
-=======
           <div className="col-sm-12 col-md-2 col-lg-2 px-2">
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
             <div className="boxx">
               <select>
                 <option value="">Select</option>
@@ -207,11 +169,7 @@ function TourPackage() {
               <p>All Hotels in tadoba</p>
             </div>
           </div>
-<<<<<<< HEAD
-          <div className="col-sm-12 col-md-2 col-lg-2 px-4">
-=======
           <div className="col-sm-12 col-md-2 col-lg-2 px-2">
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
             <div className="boxx ">
               <select>
                 <option value="">Select</option>
@@ -221,23 +179,6 @@ function TourPackage() {
               <p>All Hotels in tadoba</p>
             </div>
           </div>{" "}
-<<<<<<< HEAD
-          <div className="col-sm-12 col-md-2 col-lg-2  px-4">
-            <div className="boxxSearch">
-              <p>Search</p>
-            </div>
-          </div>{" "}
-        </div>
-    
-      <section className="packagelisting  leaf">
-        <div className="container">
-          <div className="row">
-            <div className="col-sm-12 col-md-3 col-lg-3">
-              <div className="tourPackage1">
-                <img src={tourPckages2} className="tourPackage2" alt="" />
-                <div className="tourOverlay">
-                  <h4>Tadoba Weekend Tour - 1 Night and 2 Days</h4>
-=======
           <div className="col-sm-12 col-md-2 col-lg-2  px-2">
             <button className="boxxSearch">
               Search
@@ -311,302 +252,8 @@ function TourPackage() {
             </div>
           </div>
         </div>
-        <div className="col-sm-12 col-md-2 col-lg-2 px-4">
-          <div className="boxx ">
-            <select>
-              <option value="">Select</option>
-              <option value="">Indian</option>
-              <option value="">Foreigner</option>
-            </select>
-            <p>All Hotels in tadoba</p>
-          </div>
-        </div>{" "}
-        <div className="col-sm-12 col-md-2 col-lg-2  px-4">
-          <div className="boxxSearch">
-            <p>Search</p>
-          </div>
-        </div>{" "}
-      </div>
-
-      <section className="packagelisting  leaf">
-        <div className="container">
-          <div className="row">
-            {packages.map((packages) => (
-            <div className="col-sm-12 col-md-3 col-lg-3">
-              <div className="tourPackage1">
-                <img src={tourPckages2} className="tourPackage2" alt="/tourpackagedetail" />
-                <div className="tourOverlay">
-                  <h6>Tadoba Weekend Tour - 1 Night and 2 Days</h6>
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
-                  <p>
-                    Lush green Tadoba is no less than heaven on earth. The real
-                    highlight of Tadoba National Park
-                  </p>
-<<<<<<< HEAD
-                 <Link to="/tourpackagedetail"> <button type="button" class="btn btn-info">
-                    Read More
-                  </button></Link>
-                </div>
-              </div>
-            </div>
-            <div className="col-sm-12 col-md-3 col-lg-3">
-            <div className="tourPackage1">
-                <img src={tourPckages2} className="tourPackage2" alt="" />
-                <div className="tourOverlay">
-                  <h4>Tadoba Weekend Tour - 1 Night and 2 Days</h4>
-                  <p>
-                    Lush green Tadoba is no less than heaven on earth. The real
-                    highlight of Tadoba National Park
-                  </p>
-                 <Link to="/tourpackagedetail"> <button type="button" class="btn btn-info">
-=======
-                 <Link to="/tourpackagedetail"> <button type="button" class="btn">
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
-                    Read More
-                  </button></Link>
-                </div>
-              </div>
-            </div>
-            <div className="col-sm-12 col-md-3 col-lg-3">
-            <div className="tourPackage1">
-                <img src={tourPckages2} className="tourPackage2" alt="/tourpackagedetail" />
-                <div className="tourOverlay">
-<<<<<<< HEAD
-                  <h4>Tadoba Weekend Tour - 1 Night and 2 Days</h4>
-=======
-                  <h6>Tadoba Weekend Tour - 1 Night and 2 Days</h6>
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
-                  <p>
-                    Lush green Tadoba is no less than heaven on earth. The real
-                    highlight of Tadoba National Park
-                  </p>
-<<<<<<< HEAD
-                 <Link to="/tourpackagedetail"> <button type="button" class="btn btn-info">
-=======
-                 <Link to="/tourpackagedetail"> <button type="button" class="btn">
-                    Read More
-                  </button></Link>
-                </div>
-              </div>
-            </div>
-            <div className="col-sm-12 col-md-3 col-lg-3">
-            <div className="tourPackage1">
-                <img src={tourPckages2} className="tourPackage2" alt="/tourpackagedetail" />
-                <div className="tourOverlay">
-                  <h6>Tadoba Weekend Tour - 1 Night and 2 Days</h6>
-                  <p>
-                    Lush green Tadoba is no less than heaven on earth. The real
-                    highlight of Tadoba National Park
-                  </p>
-                 <Link to="/tourpackagedetail"> <button type="button" class="btn">
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
-                    Read More
-                  </button></Link>
-                </div>
-              </div>
-            </div>
-
-            <div className="col-sm-12 col-md-3 col-lg-3">
-            <div className="tourPackage1">
-                <img src={tourPckages2} className="tourPackage2" alt="/tourpackagedetail" />
-                <div className="tourOverlay">
-<<<<<<< HEAD
-                  <h4>Tadoba Weekend Tour - 1 Night and 2 Days</h4>
-=======
-                  <h6>Tadoba Weekend Tour - 1 Night and 2 Days</h6>
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
-                  <p>
-                    Lush green Tadoba is no less than heaven on earth. The real
-                    highlight of Tadoba National Park
-                  </p>
-<<<<<<< HEAD
-                 <Link to="/tourpackagedetail"> <button type="button" class="btn btn-info">
-=======
-                 <Link to="/tourpackagedetail"> <button type="button" class="btn">
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
-                    Read More
-                  </button></Link>
-                </div>
-              </div>
-            </div>
-<<<<<<< HEAD
-          </div>
-        </div>
       </section>
 
-=======
-            ))}
-          </div>
-        </div>
-      </section>
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
-      <section className="packagelisting">
-        <div className="container">
-          <div className="row">
-            <div className="col-sm-12 col-md-3 col-lg-3">
-              <div className="tourPackage1">
-                <img src={tourPckages2} className="tourPackage2" alt="/tourpackagedetail" />
-                <div className="tourOverlay">
-<<<<<<< HEAD
-                  <h4>Tadoba Weekend Tour - 1 Night and 2 Days</h4>
-=======
-                  <h6>Tadoba Weekend Tour - 1 Night and 2 Days</h6>
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
-                  <p>
-                    Lush green Tadoba is no less than heaven on earth. The real
-                    highlight of Tadoba National Park
-                  </p>
-<<<<<<< HEAD
-                 <Link to="/tourpackagedetail"> <button type="button" class="btn btn-info">
-=======
-                 <Link to="/tourpackagedetail"> <button type="button" class="btn">
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
-                    Read More
-                  </button></Link>
-                </div>
-              </div>
-            </div>
-            <div className="col-sm-12 col-md-3 col-lg-3">
-            <div className="tourPackage1">
-                <img src={tourPckages2} className="tourPackage2" alt="/tourpackagedetail" />
-                <div className="tourOverlay">
-<<<<<<< HEAD
-                  <h4>Tadoba Weekend Tour - 1 Night and 2 Days</h4>
-=======
-                  <h6>Tadoba Weekend Tour - 1 Night and 2 Days</h6>
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
-                  <p>
-                    Lush green Tadoba is no less than heaven on earth. The real
-                    highlight of Tadoba National Park
-                  </p>
-<<<<<<< HEAD
-                 <Link to="/tourpackagedetail"> <button type="button" class="btn btn-info">
-=======
-                 <Link to="/tourpackagedetail"> <button type="button" class="btn">
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
-                    Read More
-                  </button></Link>
-                </div>
-              </div>
-            </div>
-            <div className="col-sm-12 col-md-3 col-lg-3">
-            <div className="tourPackage1">
-                <img src={tourPckages2} className="tourPackage2" alt="/tourpackagedetail" />
-                <div className="tourOverlay">
-<<<<<<< HEAD
-                  <h4>Tadoba Weekend Tour - 1 Night and 2 Days</h4>
-=======
-                  <h6>Tadoba Weekend Tour - 1 Night and 2 Days</h6>
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
-                  <p>
-                    Lush green Tadoba is no less than heaven on earth. The real
-                    highlight of Tadoba National Park
-                  </p>
-<<<<<<< HEAD
-                 <Link to="/tourpackagedetail"> <button type="button" class="btn btn-info">
-                    Read More
-                  </button></Link>
-                </div>
-              </div>
-            </div>
-
-            <div className="col-sm-12 col-md-3 col-lg-3">
-            <div className="tourPackage1">
-                <img src={tourPckages2} className="tourPackage2" alt="/tourpackagedetail" />
-                <div className="tourOverlay">
-                  <h4>Tadoba Weekend Tour - 1 Night and 2 Days</h4>
-                  <p>
-                    Lush green Tadoba is no less than heaven on earth. The real
-                    highlight of Tadoba National Park
-                  </p>
-                 <Link to="/tourpackagedetail"> <button type="button" class="btn btn-info">
-                    Read More
-                  </button></Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-      
-      <section className="packagelisting">
-        <div className="container">
-          <div className="row">
-            <div className="col-sm-12 col-md-3 col-lg-3">
-              <div className="tourPackage1">
-                <img src={tourPckages2} className="tourPackage2" alt="/tourpackagedetail" />
-                <div className="tourOverlay">
-                  <h4>Tadoba Weekend Tour - 1 Night and 2 Days</h4>
-                  <p>
-                    Lush green Tadoba is no less than heaven on earth. The real
-                    highlight of Tadoba National Park
-                  </p>
-                 <Link to="/tourpackagedetail"> <button type="button" class="btn btn-info">
-                    Read More
-                  </button></Link>
-                </div>
-              </div>
-            </div>
-            <div className="col-sm-12 col-md-3 col-lg-3">
-            <div className="tourPackage1">
-                <img src={tourPckages2} className="tourPackage2" alt="/tourpackagedetail" />
-                <div className="tourOverlay">
-                  <h4>Tadoba Weekend Tour - 1 Night and 2 Days</h4>
-                  <p>
-                    Lush green Tadoba is no less than heaven on earth. The real
-                    highlight of Tadoba National Park
-                  </p>
-                 <Link to="/tourpackagedetail"> <button type="button" class="btn btn-info">
-                    Read More
-                  </button></Link>
-                </div>
-              </div>
-            </div>
-            <div className="col-sm-12 col-md-3 col-lg-3">
-            <div className="tourPackage1">
-                <img src={tourPckages2} className="tourPackage2" alt="/tourpackagedetail" />
-                <div className="tourOverlay">
-                  <h4>Tadoba Weekend Tour - 1 Night and 2 Days</h4>
-                  <p>
-                    Lush green Tadoba is no less than heaven on earth. The real
-                    highlight of Tadoba National Park
-                  </p>
-                 <Link to="/tourpackagedetail"> <button type="button" class="btn btn-info">
-=======
-                 <Link to="/tourpackagedetail"> <button type="button" class="btn">
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
-                    Read More
-                  </button></Link>
-                </div>
-              </div>
-            </div>
-
-            <div className="col-sm-12 col-md-3 col-lg-3">
-            <div className="tourPackage1">
-                <img src={tourPckages2} className="tourPackage2" alt="" />
-                <div className="tourOverlay">
-<<<<<<< HEAD
-                  <h4>Tadoba Weekend Tour - 1 Night and 2 Days</h4>
-=======
-                  <h6>Tadoba Weekend Tour - 1 Night and 2 Days</h6>
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
-                  <p>
-                    Lush green Tadoba is no less than heaven on earth. The real
-                    highlight of Tadoba National Park
-                  </p>
-<<<<<<< HEAD
-                 <Link to=""> <button type="button" class="btn btn-info">
-=======
-                 <Link to=""> <button type="button" class="btn">
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
-                    Read More
-                  </button></Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
       <ImportantLinks></ImportantLinks>
       <Footer></Footer>
     </>

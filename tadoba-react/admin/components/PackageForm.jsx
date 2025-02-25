@@ -1,30 +1,5 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-<<<<<<< HEAD
-
-const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
-  const [categories, setCategories] = useState([]);
-  const [formData, setFormData] = useState({
-    title: "",
-    categoryId: "",
-    description: "",
-    images: [],
-    realPrice: "",
-    discountedPrice: "",
-    duration: "",
-    startDate: "",
-    endDate: "",
-    totalSeats: "",
-    inclusions: [],
-    exclusions: [],
-    tripHighlights: [],
-    itinerary: [],
-  });
-  const [newInclusion, setNewInclusion] = useState("");
-  const [newExclusion, setNewExclusion] = useState("");
-  const [newTripHighlight, setNewTripHighlight] = useState("");
-  const [newItineraryEntry, setNewItineraryEntry] = useState({ title: "", description: "" });
-=======
 import {
   Form,
   Input,
@@ -103,66 +78,10 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
     activities: "",
   });
   const [fileList, setFileList] = useState([]);
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
 
   const adminToken = localStorage.getItem("adminToken");
 
   useEffect(() => {
-<<<<<<< HEAD
-    // Fetch categories for dropdown
-    const fetchCategories = async () => {
-      try {
-        const { data } = await axios.get("http://localhost:8000/api/admin/categories/", {
-          headers: { Authorization: `Bearer ${adminToken}` },
-        });
-        setCategories(data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
-
-    fetchCategories();
-
-    if (selectedPackage) {
-      setFormData({
-        title: selectedPackage.title,
-        categoryId: selectedPackage.categoryId,
-        description: selectedPackage.description,
-        images: selectedPackage.images || [],
-        realPrice: selectedPackage.realPrice,
-        discountedPrice: selectedPackage.discountedPrice,
-        duration: selectedPackage.duration,
-        startDate: selectedPackage.startDate,
-        endDate: selectedPackage.endDate,
-        totalSeats: selectedPackage.totalSeats,
-        inclusions: selectedPackage.inclusions || [],
-        exclusions: selectedPackage.exclusions || [],
-        tripHighlights: selectedPackage.tripHighlights || [],
-        itinerary: selectedPackage.itinerary || [],
-      });
-    }
-  }, [selectedPackage]);
-
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleFileChange = (e) => {
-    setFormData({ ...formData, images: Array.from(e.target.files) });
-  };
-
-  const handleAddToList = (field, value, clearFn) => {
-    if (value) {
-      setFormData({ ...formData, [field]: [...formData[field], value] });
-      clearFn("");
-    }
-  };
-
-  const handleRemoveFromList = (field, index) => {
-    const updatedList = formData[field].filter((_, i) => i !== index);
-    setFormData({ ...formData, [field]: updatedList });
-=======
     if (selectedPackage) {
       form.setFieldsValue({
         title: selectedPackage.title,
@@ -214,24 +133,10 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
       setexcludes([...excludes, newexcludes]);
       setNewexcludes("");
     }
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
   };
 
   const handleAddItinerary = () => {
     if (newItineraryEntry.title && newItineraryEntry.description) {
-<<<<<<< HEAD
-      setFormData({
-        ...formData,
-        itinerary: [
-          ...formData.itinerary,
-          {
-            day: `Day ${formData.itinerary.length + 1}`, // Auto-assign day number
-            title: newItineraryEntry.title,
-            description: newItineraryEntry.description,
-          },
-        ],
-      });
-=======
       setItinerary([
         ...itinerary,
         {
@@ -240,37 +145,10 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
           activities: newItineraryEntry.activities,
         },
       ]);
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
       setNewItineraryEntry({ title: "", description: "" });
     }
   };
 
-<<<<<<< HEAD
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const packageData = new FormData();
-    for (let key in formData) {
-      if (key === "images") {
-        formData[key].forEach((file) => packageData.append("images", file));
-      } else if (["inclusions", "exclusions", "tripHighlights", "itinerary"].includes(key)) {
-        packageData.append(key, JSON.stringify(formData[key]));
-      } else {
-        packageData.append(key, formData[key]);
-      }
-    }
-
-    try {
-      if (selectedPackage) {
-        await axios.put(`http://localhost:8000/api/admin/packages/${selectedPackage._id}`, packageData, {
-          headers: { Authorization: `Bearer ${adminToken}` },
-        });
-      } else {
-        await axios.post("http://localhost:8000/api/admin/packages/create", packageData, {
-          headers: { Authorization: `Bearer ${adminToken}` },
-        });
-      }
-=======
   const handleSubmit = async () => {
     try {
       const values = await form.validateFields();
@@ -325,12 +203,10 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
         console.log("Package created successfully!");
       }
 
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
       fetchPackages();
       onClose();
     } catch (error) {
       console.error("Error saving package:", error);
-<<<<<<< HEAD
     }
   };
 
@@ -543,291 +419,6 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
           </form>
         </div>
       </div> 
-=======
-      Modal.error({
-        title: "Error",
-        content: "Failed to save package. Please try again.",
-      });
-    }
-  };
-
-  const uploadProps = {
-    onRemove: (file) => {
-      const index = fileList.indexOf(file);
-      const newFileList = fileList.slice();
-      newFileList.splice(index, 1);
-      setFileList(newFileList);
-    },
-    beforeUpload: (file) => {
-      setFileList([
-        ...fileList,
-        {
-          uid: file.uid,
-          name: file.name,
-          status: "done",
-          url: URL.createObjectURL(file),
-          originFileObj: file,
-        },
-      ]);
-      return false;
-    },
-    fileList,
-  };
-
-  return (
-    <div style={modalStyle}>
-      <div style={containerStyle}>
-        <div style={headerStyle}>
-          <Title level={4} style={{ margin: 0 }}>
-            {selectedPackage ? "Edit Package" : "Add Package"}
-          </Title>
-        </div>
-
-        <div style={contentStyle}>
-          <Form form={form} layout="vertical" onFinish={handleSubmit}>
-            <Form.Item
-              name="title"
-              label="Package Title"
-              rules={[
-                { required: true, message: "Please enter package title" },
-              ]}
-            >
-              <Input placeholder="Enter package title" />
-            </Form.Item>
-
-            <Form.Item
-              name="description"
-              label="Description"
-              rules={[
-                { required: true, message: "Please enter package description" },
-              ]}
-            >
-              <TextArea rows={4} placeholder="Enter package description" />
-            </Form.Item>
-
-            <Form.Item label="Package Images">
-              <Upload {...uploadProps} listType="picture-card" multiple>
-                <div>
-                  <PlusOutlined />
-                  <div style={{ marginTop: 8 }}>Upload</div>
-                </div>
-              </Upload>
-            </Form.Item>
-
-            <Row gutter={16}>
-              <Col span={12}>
-                <Form.Item
-                  name="price"
-                  label="Price"
-                  rules={[{ required: true, message: "Required" }]}
-                >
-                  <InputNumber
-                    min={0}
-                    style={{ width: "100%" }}
-                    placeholder="Enter price"
-                    formatter={(value) =>
-                      `₹ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                    }
-                    parser={(value) => value.replace(/\₹\s?|(,*)/g, "")}
-                  />
-                </Form.Item>
-              </Col>
-
-              <Col span={12}>
-                <Form.Item
-                  name="duration"
-                  label="Duration"
-                  rules={[{ required: true, message: "Required" }]}
-                >
-                  <Input placeholder="E.g., 5 days & 4 nights" />
-                </Form.Item>
-              </Col>
-            </Row>
-
-            <Form.Item
-              name="dateRange"
-              label="Package Dates"
-              rules={[
-                { required: true, message: "Please select package dates" },
-              ]}
-            >
-              <RangePicker style={{ width: "100%" }} />
-            </Form.Item>
-
-            <Form.Item
-              name="totalSeats"
-              label="Total Seats"
-              rules={[
-                {
-                  required: true,
-                  message: "Please enter total available seats",
-                },
-              ]}
-            >
-              <InputNumber min={1} style={{ width: "100%" }} />
-            </Form.Item>
-
-            <Divider orientation="left">includes</Divider>
-            <Space.Compact style={{ width: "100%" }}>
-              <Input
-                value={newincludes}
-                onChange={(e) => setNewincludes(e.target.value)}
-                placeholder="Add an includes"
-                onPressEnter={handleAddincludes}
-              />
-              <Button
-                type="primary"
-                onClick={handleAddincludes}
-                icon={<PlusOutlined />}
-              >
-                Add
-              </Button>
-            </Space.Compact>
-
-            <List
-              size="small"
-              bordered
-              style={{ marginTop: 16, marginBottom: 24 }}
-              dataSource={includes}
-              renderItem={(item, index) => (
-                <List.Item
-                  actions={[
-                    <Button
-                      type="text"
-                      danger
-                      icon={<DeleteOutlined />}
-                      onClick={() =>
-                        setincludes(includes.filter((_, i) => i !== index))
-                      }
-                    />,
-                  ]}
-                >
-                  {item}
-                </List.Item>
-              )}
-            />
-
-            <Divider orientation="left">excludes</Divider>
-            <Space.Compact style={{ width: "100%" }}>
-              <Input
-                value={newexcludes}
-                onChange={(e) => setNewexcludes(e.target.value)}
-                placeholder="Add an excludes"
-                onPressEnter={handleAddexcludes}
-              />
-              <Button
-                type="primary"
-                onClick={handleAddexcludes}
-                icon={<PlusOutlined />}
-              >
-                Add
-              </Button>
-            </Space.Compact>
-
-            <List
-              size="small"
-              bordered
-              style={{ marginTop: 16, marginBottom: 24 }}
-              dataSource={excludes}
-              renderItem={(item, index) => (
-                <List.Item
-                  actions={[
-                    <Button
-                      type="text"
-                      danger
-                      icon={<DeleteOutlined />}
-                      onClick={() =>
-                        setexcludes(excludes.filter((_, i) => i !== index))
-                      }
-                    />,
-                  ]}
-                >
-                  {item}
-                </List.Item>
-              )}
-            />
-
-            <Divider orientation="left">Itinerary</Divider>
-            <Card size="small" style={{ marginBottom: 16 }}>
-              <Space direction="vertical" style={{ width: "100%" }}>
-                <Input
-                  placeholder="Day title"
-                  value={newItineraryEntry.title}
-                  onChange={(e) =>
-                    setNewItineraryEntry({
-                      ...newItineraryEntry,
-                      title: e.target.value,
-                    })
-                  }
-                />
-                <TextArea
-                  rows={2}
-                  placeholder="Day description"
-                  value={newItineraryEntry.description}
-                  onChange={(e) =>
-                    setNewItineraryEntry({
-                      ...newItineraryEntry,
-                      description: e.target.value,
-                    })
-                  }
-                />
-                <Button
-                  type="primary"
-                  onClick={handleAddItinerary}
-                  icon={<PlusOutlined />}
-                  disabled={
-                    !newItineraryEntry.title || !newItineraryEntry.description
-                  }
-                >
-                  Add Day
-                </Button>
-              </Space>
-            </Card>
-
-            {itinerary.length > 0 && (
-              <List
-                bordered
-                dataSource={itinerary}
-                renderItem={(item, index) => (
-                  <List.Item
-                    actions={[
-                      <Button
-                        type="text"
-                        danger
-                        icon={<DeleteOutlined />}
-                        onClick={() =>
-                          setItinerary(itinerary.filter((_, i) => i !== index))
-                        }
-                      />,
-                    ]}
-                  >
-                    <List.Item.Meta
-                      title={`${item.day}: ${item.title}`}
-                      description={item.description}
-                    />
-                  </List.Item>
-                )}
-              />
-            )}
-          </Form>
-        </div>
-
-        <div style={footerStyle}>
-          <Space>
-            <Button onClick={onClose} icon={<CloseOutlined />}>
-              Cancel
-            </Button>
-            <Button
-              type="primary"
-              onClick={form.submit}
-              icon={<SaveOutlined />}
-            >
-              Save Package
-            </Button>
-          </Space>
-        </div>
-      </div>
->>>>>>> b829a27af4fb3e5f6705c3ff039c142fe99aab45
     </div>
   );
 };

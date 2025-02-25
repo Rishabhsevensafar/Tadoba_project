@@ -1,491 +1,336 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
-import { useEffect } from "react";
+
 function TravellerDetails() {
-  useEffect(()=>{
-            window.scrollTo(0, 0);
-          },[])
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const booking =
+    location.state?.booking ||
+    JSON.parse(localStorage.getItem("booking")) ||
+    null;
+
+  useEffect(() => {
+    if (!booking) {
+      console.error("No booking data received! Redirecting...");
+      navigate("/");
+      return;
+    }
+  }, [booking, navigate]);
+
+  const bookingId = booking?.bookingId || booking?._id || "";
+  if (!bookingId) {
+    console.error("Booking ID is undefined! Cannot proceed to payment.");
+    alert("Booking ID is missing. Please try again.");
+    return;
+  }
+  const {
+    safariZone,
+    safariTime,
+    date,
+    vehicleType,
+    adults = 1,
+    children = 0,
+    amountPaid = 0, 
+  } = booking;
+
+  // State to manage traveler details
+  const [travelerDetails, setTravelerDetails] = useState([]);
+  // State to manage terms acceptance
+  const [termsAccepted, setTermsAccepted] = useState(false);
+
+  // Generate traveler input fields dynamically
+  useEffect(() => {
+    let travelers = [];
+    for (let i = 0; i < adults; i++) {
+      travelers.push({
+        fullName: "",
+        age: "",
+        gender: "Male",
+        nationality: "Indian",
+        idType: "Aadhar Card",
+        idNumber: "",
+      });
+    }
+    for (let i = 0; i < children; i++) {
+      travelers.push({
+        fullName: "",
+        age: "",
+        gender: "Male",
+        nationality: "Indian",
+        idType: "Aadhar Card",
+        idNumber: "",
+      });
+    }
+    setTravelerDetails(travelers);
+  }, [adults, children]);
+
+  // Handle traveler input change
+  const handleTravelerChange = (index, field, value) => {
+    const updatedTravelers = [...travelerDetails];
+    updatedTravelers[index][field] = value;
+    setTravelerDetails(updatedTravelers);
+  };
+
+  // Validate traveler details
+  const validateTravelerDetails = () => {
+    for (const traveler of travelerDetails) {
+      if (!traveler.fullName || !traveler.age || !traveler.idNumber) {
+        return false;
+      }
+    }
+    return true;
+  };
+
+  // Handle Cashfree Payment
+  const handlePayment = async () => {
+    try {
+      if (!validateTravelerDetails()) {
+        alert("Please fill in all traveler details");
+        return;
+      }
+      if (!termsAccepted) {
+        alert("Please accept the terms and conditions");
+        return;
+      }
+
+      console.log("Starting payment process with Booking ID:", bookingId);
+
+      // Step 1: Submit Traveler Details First
+      const travelerResponse = await fetch(
+        `http://localhost:5000/api/booking/${bookingId}/travelers`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ travelers: travelerDetails }),
+        }
+      );
+      const travelerData = await travelerResponse.json();
+      if (!travelerResponse.ok) {
+        alert(travelerData.error || "Failed to submit traveler details!");
+        return;
+      }
+
+      console.log("Traveler details submitted successfully.");
+
+      // Step 2: Create Cashfree Payment Order
+      const response = await fetch(
+        "http://localhost:5000/api/payment/create-order",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            orderId: `SAFARI_${bookingId}_${Date.now()}`,
+            amount: amountPaid,
+            customerId: `CUST_${bookingId}`,
+            customerName: booking.name,
+            customerEmail: booking.email || "customer@example.com",
+            customerPhone: booking.phone || "9999999999",
+          }),
+        }
+      );
+      const data = await response.json();
+      if (!data.success) {
+        throw new Error("Payment Order Creation Failed");
+      }
+      console.log("Payment Order Created:", data);
+
+      // ✅ Redirect to Cashfree's payment page
+      if (data.paymentLink) {
+        window.location.href = data.paymentLink;
+      } else {
+        throw new Error("Invalid Payment Link");
+      }
+    } catch (error) {
+      console.error("Payment Error:", error);
+      alert("Payment initialization failed. Please try again.");
+    }
+  };
   return (
     <>
-    <div className="travellerHeader ">
-          <h2>Traveller Details : </h2>
-        </div>
-    <div className="">
-      <div className="container travellerBorder mb-5">
-                <div className="safaridatetime mt-3">
-          <h6>Safari Date: 20th Feb 2025 | Safari Time: 06:00 AM to 10:00 AM</h6>
-        </div>
-        {/* <div className="row details"> */}
-
-        {/* <div className="col-sm-12 col-md-2 col-lg-2">
-            <input type="text" placeholder="Enter Name" />
-          </div>
-          <div className="col-sm-12 col-md-2 col-lg-2">
-            <select name="" id="">
-                <option value="">Male</option>
-                <option value="">Female</option>
-            </select>
-          </div>
-          <div className="col-sm-12 col-md-2 col-lg-2">
-            <input type="number"  placeholder="Age"/>
-          </div>
-          <div className="col-sm-12 col-md-2 col-lg-2">
-            <select name="" id="">
-                <option value="">Indian</option>
-                <option value="">Foriegner</option>
-            </select>
-          </div>
-          <div className="col-sm-12 col-md-2 col-lg-2">
-            <select name="" id="">
-                <option value="">Adhar Card</option>
-                <option value="">Voter Id</option>
-                <option value="">Passport</option>
-                <option value="">Driving Licence</option>
-                <option value="">OCI</option>
-                <option value="">Any Other Id Card</option>
-            </select>
-          </div>
-          <div className="col-sm-12 col-md-2 col-lg-2">
-            <input type="number" className="ID Number"/>
-          </div>
-        </div> */}
-
-        <div >
-          <div className="d-flex justify-content-around mt-4">
-            <div>
-              <p>1. Adult</p>
-            </div>
-            <div>
-              <input type="text" placeholder="Enter Your Name" />
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Male</option>
-                <option value="">Female</option>
-              </select>
-            </div>
-            <div>
-              <input type="text" placeholder="Age" />
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Indian</option>
-                <option value="">Foreigner</option>
-              </select>
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Adhar Card</option>
-                <option value="">Voter Id</option>
-                <option value="">Passport</option>
-                <option value="">Driving Licence</option>
-                <option value="">OCI</option>
-                <option value="">Any Other Id Card</option>
-              </select>
-            </div>
-            <div>
-              <input type="text" placeholder="ID Number" />
-            </div>
-          </div>
-
-          <div className="d-flex justify-content-around mt-2">
-            <div>
-              <p>2. Adult</p>
-            </div>
-            <div>
-              <input type="text" placeholder="Enter Your Name" />
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Male</option>
-                <option value="">Female</option>
-              </select>
-            </div>
-            <div>
-              <input type="text" placeholder="Age" />
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Indian</option>
-                <option value="">Foreigner</option>
-              </select>
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Adhar Card</option>
-                <option value="">Voter Id</option>
-                <option value="">Passport</option>
-                <option value="">Driving Licence</option>
-                <option value="">OCI</option>
-                <option value="">Any Other Id Card</option>
-              </select>
-            </div>
-            <div>
-              <input type="text" placeholder="ID Number" />
-            </div>
-          </div>
-
-          <div className="d-flex justify-content-around mt-2">
-            <div>
-              <p>3. Adult</p>
-            </div>
-            <div>
-              <input type="text" placeholder="Enter Your Name" />
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Male</option>
-                <option value="">Female</option>
-              </select>
-            </div>
-            <div>
-              <input type="text" placeholder="Age" />
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Indian</option>
-                <option value="">Foreigner</option>
-              </select>
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Adhar Card</option>
-                <option value="">Voter Id</option>
-                <option value="">Passport</option>
-                <option value="">Driving Licence</option>
-                <option value="">OCI</option>
-                <option value="">Any Other Id Card</option>
-              </select>
-            </div>
-            <div>
-              <input type="text" placeholder="ID Number" />
-            </div>
-          </div>
-
-          <div className="d-flex justify-content-around mt-2">
-            <div>
-              <p>4. Adult</p>
-            </div>
-            <div>
-              <input type="text" placeholder="Enter Your Name" />
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Male</option>
-                <option value="">Female</option>
-              </select>
-            </div>
-            <div>
-              <input type="text" placeholder="Age" />
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Indian</option>
-                <option value="">Foreigner</option>
-              </select>
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Adhar Card</option>
-                <option value="">Voter Id</option>
-                <option value="">Passport</option>
-                <option value="">Driving Licence</option>
-                <option value="">OCI</option>
-                <option value="">Any Other Id Card</option>
-              </select>
-            </div>
-            <div>
-              <input type="text" placeholder="ID Number" />
-            </div>
-          </div>
-
-          <div className="d-flex justify-content-around mt-2">
-            <div>
-              <p>5. Adult</p>
-            </div>
-            <div>
-              <input type="text" placeholder="Enter Your Name" />
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Male</option>
-                <option value="">Female</option>
-              </select>
-            </div>
-            <div>
-              <input type="text" placeholder="Age" />
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Indian</option>
-                <option value="">Foreigner</option>
-              </select>
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Adhar Card</option>
-                <option value="">Voter Id</option>
-                <option value="">Passport</option>
-                <option value="">Driving Licence</option>
-                <option value="">OCI</option>
-                <option value="">Any Other Id Card</option>
-              </select>
-            </div>
-            <div>
-              <input type="text" placeholder="ID Number" />
-            </div>
-          </div>
-
-          <div className="safaridatetime mt-3">
-            <h6>Child ( Between 5 to 12 Years )</h6>
-          </div>
-
-          <div className="d-flex justify-content-around mt-4">
-            <div>
-              <p>1. Child</p>
-            </div>
-            <div>
-              <input type="text" placeholder="Enter Your Name" />
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Male</option>
-                <option value="">Female</option>
-              </select>
-            </div>
-            <div>
-              <input type="text" placeholder="Age" />
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Indian</option>
-                <option value="">Foreigner</option>
-              </select>
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Adhar Card</option>
-                <option value="">Voter Id</option>
-                <option value="">Passport</option>
-                <option value="">Driving Licence</option>
-                <option value="">OCI</option>
-                <option value="">Any Other Id Card</option>
-              </select>
-            </div>
-            <div>
-              <input type="text" placeholder="ID Number" />
-            </div>
-          </div>
-
-          <div className="d-flex justify-content-around mt-2">
-            <div>
-              <p>2. Child</p>
-            </div>
-            <div>
-              <input type="text" placeholder="Enter Your Name" />
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Male</option>
-                <option value="">Female</option>
-              </select>
-            </div>
-            <div>
-              <input type="text" placeholder="Age" />
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Indian</option>
-                <option value="">Foreigner</option>
-              </select>
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Adhar Card</option>
-                <option value="">Voter Id</option>
-                <option value="">Passport</option>
-                <option value="">Driving Licence</option>
-                <option value="">OCI</option>
-                <option value="">Any Other Id Card</option>
-              </select>
-            </div>
-            <div>
-              <input type="text" placeholder="ID Number" />
-            </div>
-          </div>
-
-          <div className="d-flex justify-content-around mt-2">
-            <div>
-              <p>3. Child</p>
-            </div>
-            <div>
-              <input type="text" placeholder="Enter Your Name" />
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Male</option>
-                <option value="">Female</option>
-              </select>
-            </div>
-            <div>
-              <input type="text" placeholder="Age" />
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Indian</option>
-                <option value="">Foreigner</option>
-              </select>
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Adhar Card</option>
-                <option value="">Voter Id</option>
-                <option value="">Passport</option>
-                <option value="">Driving Licence</option>
-                <option value="">OCI</option>
-                <option value="">Any Other Id Card</option>
-              </select>
-            </div>
-            <div>
-              <input type="text" placeholder="ID Number" />
-            </div>
-          </div>
-
-          <div className="d-flex justify-content-around mt-2">
-            <div>
-              <p>4. Child</p>
-            </div>
-            <div>
-              <input type="text" placeholder="Enter Your Name" />
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Male</option>
-                <option value="">Female</option>
-              </select>
-            </div>
-            <div>
-              <input type="text" placeholder="Age" />
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Indian</option>
-                <option value="">Foreigner</option>
-              </select>
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Adhar Card</option>
-                <option value="">Voter Id</option>
-                <option value="">Passport</option>
-                <option value="">Driving Licence</option>
-                <option value="">OCI</option>
-                <option value="">Any Other Id Card</option>
-              </select>
-            </div>
-            <div>
-              <input type="text" placeholder="ID Number" />
-            </div>
-          </div>
-
-          <div className="d-flex justify-content-around mt-2">
-            <div>
-              <p>5. Child</p>
-            </div>
-            <div>
-              <input type="text" placeholder="Enter Your Name" />
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Male</option>
-                <option value="">Female</option>
-              </select>
-            </div>
-            <div>
-              <input type="text" placeholder="Age" />
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Indian</option>
-                <option value="">Foreigner</option>
-              </select>
-            </div>
-            <div>
-              <select name="" id="">
-                <option value="">Adhar Card</option>
-                <option value="">Voter Id</option>
-                <option value="">Passport</option>
-                <option value="">Driving Licence</option>
-                <option value="">OCI</option>
-                <option value="">Any Other Id Card</option>
-              </select>
-            </div>
-            <div>
-              <input type="text" placeholder="ID Number" />
-            </div>
-          </div>
-          <div className="mx-2 mt-3">
-            <p>
-              {" "}
-              <input type="checkbox" /> I have read and accept the{" "}
-              <Link to="/termandcondition">terms and conditions</Link>
-            </p>
-          </div>
-          <button className="payable mt-2">
-            Payable Amount 6100
-          </button>
-          <div className="mt-4">
-            <table className="table w-100 table table-bordered">
-              <thead>
-                <th className="bookingtable" colSpan={4}>
-                  Booking
-                </th>
-              </thead>
-              <tbody>
-                <tr>
-                  <td style={{ width: "25%" }}>
-                    <b>Safari Date:</b>
-                  </td>
-                  <td style={{ width: "25%" }}>2025/2/7</td>
-                  <td style={{ width: "25%" }}>
-                    <b>Safari Type:</b>
-                  </td>
-                  <td style={{ width: "25%" }}>Jeep</td>
-                </tr>
-                <tr>
-                  <td style={{ width: "25%" }}>
-                    <b>Safari Timing:</b>
-                  </td>
-                  <td style={{ width: "25%" }}>06:00 AM to 10:00 AM</td>
-                  <td style={{ width: "25%" }}>
-                    <b>Safari Zone:</b>
-                  </td>
-                  <td style={{ width: "25%" }}>Moharli Zone</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-          <div>
-            <p className="bookingtable">
-              <b>Declaration</b>
-            </p>
-            <p><h6>
-              I Authorize Safari ,for using Mobile Number, Identity Proof &
-              Email mentioned in this permit for intimation and verification
-              purposes.</h6>
-            </p>
-            <ul>
-              <li>
-                All reservations inside the Tadoba National Park are provisional
-                and can be changed or cancelled without prior information.
-              </li>
-              <li>Carrying of firearms of any kind is not permitted.</li>
-              <li>No pets can be taken inside the Tadoba National Park.</li>
-              <li>Walking or trekking is strictly prohibited.</li>
-            </ul>
-          </div>
-        </div>
+      <div className="travellerHeader">
+        <h2>Traveller Details</h2>
       </div>
+
+      <div className="container travellerBorder mb-5">
+        <div className="safaridatetime mt-3">
+          <h6>
+            Safari Date: {date ? new Date(date).toLocaleDateString() : "N/A"} |
+            Safari Time: {safariTime || "N/A"}
+          </h6>
+        </div>
+
+        {/* Traveler Input Fields */}
+        {travelerDetails.map((traveler, index) => (
+          <div className="d-flex justify-content-around mt-2" key={index}>
+            <div>
+              <p>
+                {index + 1}. {index < adults ? "Adult" : "Child"}
+              </p>
+            </div>
+            <div>
+              <input
+                type="text"
+                placeholder="Enter Your Name"
+                value={traveler.fullName}
+                onChange={(e) =>
+                  handleTravelerChange(index, "fullName", e.target.value)
+                }
+                required
+              />
+            </div>
+            <div>
+              <select
+                value={traveler.gender}
+                onChange={(e) =>
+                  handleTravelerChange(index, "gender", e.target.value)
+                }
+              >
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </select>
+            </div>
+            <div>
+              <input
+                type="number"
+                placeholder="Age"
+                value={traveler.age}
+                onChange={(e) =>
+                  handleTravelerChange(index, "age", e.target.value)
+                }
+                required
+              />
+            </div>
+            <div>
+              <select
+                value={traveler.nationality}
+                onChange={(e) =>
+                  handleTravelerChange(index, "nationality", e.target.value)
+                }
+              >
+                <option value="Indian">Indian</option>
+                <option value="Foreigner">Foreigner</option>
+              </select>
+            </div>
+            <div>
+              <select
+                value={traveler.idType}
+                onChange={(e) =>
+                  handleTravelerChange(index, "idType", e.target.value)
+                }
+              >
+                <option value="Aadhar Card">Aadhar Card</option>
+                <option value="Voter Id">Voter Id</option>
+                <option value="Passport">Passport</option>
+                <option value="Driving Licence">Driving Licence</option>
+                <option value="OCI">OCI</option>
+                <option value="Other">Any Other Id Card</option>
+              </select>
+            </div>
+            <div>
+              <input
+                type="text"
+                placeholder="ID Number"
+                value={traveler.idNumber}
+                onChange={(e) =>
+                  handleTravelerChange(index, "idNumber", e.target.value)
+                }
+                required
+              />
+            </div>
+          </div>
+        ))}
+
+        <div className="mx-2 mt-3">
+          <p>
+            <input
+              type="checkbox"
+              checked={termsAccepted}
+              onChange={(e) => setTermsAccepted(e.target.checked)}
+            />{" "}
+            I have read and accept the{" "}
+            <Link to="/termandcondition">terms and conditions</Link>
+          </p>
+        </div>
+
+        <button className="payable mt-2" onClick={handlePayment}>
+          Proceed to Payment - ₹{amountPaid}
+        </button>
+
+        {/* Booking Summary Table */}
+        <div className="mt-4">
+          <table className="table w-100 table-bordered">
+            <thead>
+              <tr>
+                <th className="bookingtable" colSpan={4}>
+                  Booking Summary
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <b>Safari Date:</b>
+                </td>
+                <td>
+                  {date ? new Date(date).toLocaleDateString() : "Invalid Date"}
+                </td>
+                <td>
+                  <b>Safari Type:</b>
+                </td>
+                <td>{vehicleType || "N/A"}</td>
+              </tr>
+              <tr>
+                <td>
+                  <b>Safari Timing:</b>
+                </td>
+                <td>{safariTime || "N/A"}</td>
+                <td>
+                  <b>Safari Zone:</b> 
+                </td>
+                <td>{safariZone || "N/A"}</td>
+              </tr>
+              <tr>
+                <td>
+                  <b>Adults:</b>
+                </td>
+                <td>{adults}</td>
+                <td>
+                  <b>Children:</b>
+                </td>
+                <td>{children}</td>
+              </tr>
+              <tr>
+                <td>
+                  <b>Total Amount:</b>
+                </td>
+                <td colSpan={3}>₹{amountPaid || 0}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* Declaration */}
+        <div>
+          <p className="bookingtable">
+            <b>Declaration</b>
+          </p>
+          <p>
+            I authorize Safari for using my Mobile Number, Identity Proof &
+            Email mentioned in this permit for intimation and verification
+            purposes.
+          </p>
+          <ul>
+            <li>
+              All reservations inside the Tadoba National Park are provisional
+              and can be changed or cancelled without prior information.
+            </li>
+            <li>Carrying firearms is not permitted.</li>
+            <li>No pets can be taken inside the park.</li>
+            <li>Walking or trekking is strictly prohibited.</li>
+          </ul>
+        </div>
       </div>
     </>
   );
