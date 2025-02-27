@@ -10,6 +10,7 @@ import day1package from "../../assets/images/navegaon.jpg";
 import { useState } from "react";
 import { FaLocationDot } from "react-icons/fa6";
 import { FaCarAlt } from "react-icons/fa";
+import { FaHome } from "react-icons/fa";
 import { CiBeaker1 } from "react-icons/ci";
 import { MdOutlineWatchLater } from "react-icons/md";
 import { FaStar } from "react-icons/fa";
@@ -121,24 +122,19 @@ function TourPackageDetail() {
                     {" "}
                     <input type="checkbox" />
                     <FaStar
-                      className="mb-1 ms-1 "
-                      style={{ color: "#FFD43B" }}
+                      className="mb-1 ms-1 stardes"
                     />{" "}
                     <FaStar
-                      className="mb-1 ms-1 "
-                      style={{ color: "#FFD43B" }}
+                      className="mb-1 ms-1 stardes"
                     />
                     <FaStar
-                      className="mb-1 ms-1 "
-                      style={{ color: "#FFD43B" }}
+                      className="mb-1 ms-1 stardes"
                     />
                     <FaStar
-                      style={{ color: "#FFD43B" }}
-                      className="mb-1 ms-1"
+                      className="mb-1 ms-1 stardes"
                     />
                     <FaStar
-                      style={{ color: "#FFD43B" }}
-                      className="mb-1 ms-1"
+                      className="mb-1 ms-1 stardes"
                     />
                     <br />
                   </p>
@@ -146,20 +142,16 @@ function TourPackageDetail() {
                     {" "}
                     <input type="checkbox" />
                     <FaStar
-                      style={{ color: "#FFD43B" }}
-                      className="mb-1 ms-1 "
+                     className="mb-1 ms-1 stardes"
                     />
                     <FaStar
-                      style={{ color: "#FFD43B" }}
-                      className="mb-1 ms-1"
+                      className="mb-1 ms-1 stardes"
                     />
                     <FaStar
-                      style={{ color: "#FFD43B" }}
-                      className="mb-1 ms-1 "
+                      className="mb-1 ms-1 stardes"
                     />
                     <FaStar
-                      style={{ color: "#FFD43B" }}
-                      className="mb-1 ms-1 "
+                      className="mb-1 ms-1 stardes"
                     />
                     <br />
                   </p>
@@ -167,28 +159,23 @@ function TourPackageDetail() {
                     {" "}
                     <input type="checkbox" />
                     <FaStar
-                      style={{ color: "#FFD43B" }}
-                      className="mb-1 ms-1 "
+                      className="mb-1 ms-1 stardes"
                     />
                     <FaStar
-                      style={{ color: "#FFD43B" }}
-                      className="mb-1 ms-1 "
+                      className="mb-1 ms-1 stardes"
                     />
                     <FaStar
-                      style={{ color: "#FFD43B" }}
-                      className="mb-1 ms-1 "
+                      className="mb-1 ms-1 stardes"
                     />
                     <br />
                   </p>
                   <p>
                     <input type="checkbox" />
                     <FaStar
-                      style={{ color: "#FFD43B" }}
-                      className="mb-1 ms-1 "
+                      className="mb-1 ms-1 stardes"
                     />
                     <FaStar
-                      style={{ color: "#FFD43B" }}
-                      className="mb-1 ms-1 "
+                      className="mb-1 ms-1 stardes"
                     />
                     <br />
                   </p>
@@ -196,8 +183,7 @@ function TourPackageDetail() {
                     {" "}
                     <input type="checkbox" />
                     <FaStar
-                      style={{ color: "#FFD43B" }}
-                      className="mb-1 ms-1 "
+                      className="mb-1 ms-1 stardes"
                     />
                     <br />
                   </p>
@@ -327,9 +313,7 @@ function TourPackageDetail() {
                 <div className="ps-4">
                   <h5>
                     Tiger Valley Resort, Tadoba
-                    <FaStar className="" style={{ color: "#FFD43B" }} />
-                    <FaStar style={{ color: "#FFD43B" }} />
-                    <FaStar style={{ color: "#FFD43B" }} />{" "}
+                    
                   </h5>
                   <p>
                     {" "}
@@ -346,12 +330,16 @@ function TourPackageDetail() {
                     Request, House
                   </p>
                   <p className="">
-                    <MdOutlineWatchLater /> 1 Night/2 Days <FaCarAlt /> 1 Jeep
-                    <FaCarAlt /> Safari Deluxe Room
+                    <MdOutlineWatchLater /> 1 Night/2 Days | <FaCarAlt /> 1 Jeep | <FaHome/>  Safari Deluxe Room
                   </p>
                 </div>
 
                 <div className="ps-5 ms-auto text-end tourhotside">
+                  <div>
+                      <FaStar className="stardes" />
+                      <FaStar className="stardes" />
+                      <FaStar className="stardes" />{" "}
+                    </div>
                   <p>
                     <span>Excellent </span> <br />
                     250 Review
@@ -379,9 +367,7 @@ function TourPackageDetail() {
                 <div className="ps-4">
                   <h5>
                     Tiger Valley Resort, Tadoba
-                    <FaStar style={{ color: "#FFD43B" }} />
-                    <FaStar style={{ color: "#FFD43B" }} />
-                    <FaStar style={{ color: "#FFD43B" }} />{" "}
+                    
                   </h5>
                   <p>
                     {" "}
@@ -398,12 +384,16 @@ function TourPackageDetail() {
                     Request, House
                   </p>
                   <p className="pb-4">
-                    <MdOutlineWatchLater /> 1 Night/2 Days <FaCarAlt /> 1 Jeep
-                    Safari Deluxe Room
+                    <MdOutlineWatchLater /> 1 Night/2 Days | <FaCarAlt /> 1 Jeep | <FaHome/>   Safari Deluxe Room
                   </p>
                 </div>
 
                 <div className="ps-5 ms-auto text-end tourhotside">
+                  <div>
+                      <FaStar className="stardes" />
+                      <FaStar className="stardes" />
+                      <FaStar className="stardes" />{" "}
+                    </div>
                   <p>
                     <span>Excellent </span> <br />
                     250 Review
@@ -431,9 +421,7 @@ function TourPackageDetail() {
                 <div className="ps-4">
                   <h5>
                     Tiger Valley Resort, Tadoba
-                    <FaStar style={{ color: "#FFD43B" }} />
-                    <FaStar style={{ color: "#FFD43B" }} />
-                    <FaStar style={{ color: "#FFD43B" }} />{" "}
+                    
                   </h5>
                   <p>
                     {" "}
@@ -450,12 +438,16 @@ function TourPackageDetail() {
                     Request, House
                   </p>
                   <p className="pb-4">
-                    <MdOutlineWatchLater /> 1 Night/2 Days <FaCarAlt /> 1 Jeep
-                    Safari Deluxe Room
+                    <MdOutlineWatchLater /> 1 Night/2 Days | <FaCarAlt /> 1 Jeep | <FaHome/>  Safari Deluxe Room
                   </p>
                 </div>
 
                 <div className="ps-5 ms-auto text-end tourhotside">
+                  <div>
+                      <FaStar className="stardes" />
+                      <FaStar className="stardes" />
+                      <FaStar className="stardes" />{" "}
+                    </div>
                   <p>
                     <span>Excellent </span> <br />
                     250 Review
@@ -471,7 +463,6 @@ function TourPackageDetail() {
                   </button></Link>
                 </div>
               </div>
-
               <div className="hotelTourPackages mt-3">
                 <div>
                   <img
@@ -483,9 +474,7 @@ function TourPackageDetail() {
                 <div className="ps-4">
                   <h5>
                     Tiger Valley Resort, Tadoba
-                    <FaStar style={{ color: "#FFD43B" }} />
-                    <FaStar style={{ color: "#FFD43B" }} />
-                    <FaStar style={{ color: "#FFD43B" }} />{" "}
+                    
                   </h5>
                   <p>
                     {" "}
@@ -502,12 +491,16 @@ function TourPackageDetail() {
                     Request, House
                   </p>
                   <p className="pb-4">
-                    <MdOutlineWatchLater /> 1 Night/2 Days <FaCarAlt /> 1 Jeep
-                    Safari Deluxe Room
+                    <MdOutlineWatchLater /> 1 Night/2 Days | <FaCarAlt /> 1 Jeep | <FaHome/>  Safari Deluxe Room
                   </p>
                 </div>
 
                 <div className="ps-5 ms-auto text-end tourhotside">
+                  <div>
+                      <FaStar className="stardes" />
+                      <FaStar className="stardes" />
+                      <FaStar className="stardes" />{" "}
+                    </div>
                   <p>
                     <span>Excellent </span> <br />
                     250 Review
@@ -523,7 +516,6 @@ function TourPackageDetail() {
                   </button></Link>
                 </div>
               </div>
-
               <div className="hotelTourPackages mt-3">
                 <div>
                   <img
@@ -535,9 +527,7 @@ function TourPackageDetail() {
                 <div className="ps-4">
                   <h5>
                     Tiger Valley Resort, Tadoba
-                    <FaStar style={{ color: "#FFD43B" }} />
-                    <FaStar style={{ color: "#FFD43B" }} />
-                    <FaStar style={{ color: "#FFD43B" }} />{" "}
+                    
                   </h5>
                   <p>
                     {" "}
@@ -554,12 +544,16 @@ function TourPackageDetail() {
                     Request, House
                   </p>
                   <p className="pb-4">
-                    <MdOutlineWatchLater /> 1 Night/2 Days <FaCarAlt /> 1 Jeep
-                    Safari Deluxe Room
+                    <MdOutlineWatchLater /> 1 Night/2 Days | <FaCarAlt /> 1 Jeep | <FaHome/>   Safari Deluxe Room
                   </p>
                 </div>
 
                 <div className="ps-5 ms-auto text-end tourhotside">
+                  <div>
+                      <FaStar className="stardes" />
+                      <FaStar className="stardes" />
+                      <FaStar className="stardes" />{" "}
+                    </div>
                   <p>
                     <span>Excellent </span> <br />
                     250 Review
@@ -582,9 +576,10 @@ function TourPackageDetail() {
         <hr />
         <section>
           <h2>Tour Itinerary</h2>
-          <div className="day1Border">
-            <h4>Arrival at Nagpur & Transfer to Tadoba (Day 1)</h4>
-            <div className="day1Tadoba">
+          <div className="day1Border day1Tadoba">
+            
+            <div className="">
+              <h4>Arrival at Nagpur & Transfer to Tadoba (Day 1)</h4>
               <p>
                 After your arrival at the Nagpur railway station/ Airport, reach
                 tadoba national park (140 km) via cab or local taxis. Once
@@ -602,13 +597,15 @@ function TourPackageDetail() {
                 will be enriched with high tea, some wonderful moments with the
                 locals.
               </p>
-              <img src={day1package} className="day1package" alt="" />
+              
             </div>
+            <img src={day1package} className="day1package" alt="" />
           </div>
 
-          <div className="day1Border mt-5">
-            <h4>Jeep Safari ride in Tadoba National Park (Day 2)</h4>
-            <div className="day1Tadoba">
+          <div className="day1Border mt-5 day1Tadoba">
+            
+            <div className="">
+              <h4>Jeep Safari ride in Tadoba National Park (Day 2)</h4>
               <p>
                 After your arrival at the Nagpur railway station/ Airport, reach
                 tadoba national park (140 km) via cab or local taxis. Once
@@ -626,8 +623,9 @@ function TourPackageDetail() {
                 will be enriched with high tea, some wonderful moments with the
                 locals.
               </p>
-              <img src={day2package} className="day1package" alt="" />
+              
             </div>
+            <img src={day2package} className="day1package" alt="" />
           </div>
         </section>
         <section>
@@ -765,7 +763,7 @@ function TourPackageDetail() {
             </ul>
           </div>
         </section>
-        <section>
+        <section className="mb-3">
           <div className="day1Border mt-3">
             <h4>Payment Policy:</h4>
             <ul>
