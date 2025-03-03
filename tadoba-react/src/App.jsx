@@ -37,7 +37,11 @@ import TourPackage from './Component/pages/TourPackage';
 import PaymentSuccess from './Component/Paymentsucessful';
 // import Test from './Component/Test';
 import TourPackageDetail from './Component/pages/TourPackageDetail';
-
+import HotelPage from './Component/pages/HotelPage';
+import HotelDetails from './Component/pages/HotelDetails';
+import ReviewBookingHotel from './Component/pages/ReviewBookingHotel';
+import PaymentPage from "./Component/Pages/PaymentPage";
+import ReviewBookingTour from "./Component/Pages/ReviewBookingTour";
 
 function App() {
  
@@ -79,6 +83,13 @@ function App() {
         <Route path="/tourpackage" element={<TourPackage />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path='/tourpackagedetail'element={<TourPackageDetail/>}/>
+        <Route path="/hoteldetail" element={<HotelDetails />} />
+        <Route path="/hotelpage" element={<HotelPage />} />
+        <Route path="/paymentpage" element={<PaymentPage/>}/>
+        <Route path="/reviewbookinghotel"element={<ReviewBookingHotel/>}/>
+        <Route path="/booking" element={<ReviewBookingTour/>}/>
+
+      
     </Routes>
   </BrowserRouter>
   </>
