@@ -59,44 +59,36 @@ const PackageManager = () => {
 
   // Handle delete package
   const handleDelete = async (id) => {
-    Modal.confirm({
-      title: "Are you sure you want to delete this package?",
-      content: "This action cannot be undone",
-      okText: "Delete",
-      okType: "danger",
-      cancelText: "Cancel",
-      onOk: async () => {
-        try {
-          await axios.delete(`http://localhost:5000/api/tourpackage/${id}`, {
-            headers: { Authorization: `Bearer ${adminToken}` },
-          });
-          fetchPackages(currentPage); // Refresh the package list
-        } catch (error) {
-          console.error("Error deleting package:", error);
-        }
-      },
-    });
-  };
-
-  const handleToggleStatus = async (id, isActive) => {
     try {
-      const response = await axios.put(
-        `http://localhost:5000/api/tourpackage/${id}/status`,
-        { isActive: !isActive }, // ✅ Toggle the status
-        {
-          headers: { Authorization: `Bearer ${adminToken}` },
-        }
-      );
-
-      if (response.data.success) {
-        fetchPackages(currentPage); // ✅ Refresh the package list
-      } else {
-        console.error("Failed to update package status:", response.data.error);
-      }
+      await axios.delete(`http://localhost:5000/api/tourpackage/${id}`, {
+        headers: { Authorization: `Bearer ${adminToken}` },
+      });
+      fetchPackages(currentPage); // Refresh the package list
     } catch (error) {
-      console.error("Error toggling package status:", error);
+      console.error("Error deleting package:", error);
     }
   };
+
+  // Toggle package status
+  const handleToggleStatus = async (id, isActive) => {
+    try {
+        const response = await axios.put( // ✅ Store response in a variable
+            `http://localhost:5000/api/tourpackage/${id}/status`,
+            { isActive: !isActive },
+            {
+                headers: { Authorization: `Bearer ${adminToken}` },
+            }
+        );
+
+        if (response.data.success) { // ✅ Now, response is properly referenced
+            fetchPackages(currentPage); // Refresh package list
+        } else {
+            console.error("Failed to update package status:", response.data.error);
+        }
+    } catch (error) {
+        console.error("Error toggling package status:", error);
+    }
+};
   useEffect(() => {
     fetchPackages(currentPage);
   }, [currentPage, pageSize]);

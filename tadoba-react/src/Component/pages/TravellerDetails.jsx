@@ -6,9 +6,17 @@ function TravellerDetails() {
   const location = useLocation();
   const navigate = useNavigate();
 
+<<<<<<< HEAD
+  const booking =
+    location.state?.booking ||
+    JSON.parse(localStorage.getItem("booking")) ||
+    null;
+
+=======
   const booking = location.state?.booking || JSON.parse(localStorage.getItem("booking")) || null;
 
   // Redirect if no booking data
+>>>>>>> 045142a3932be58d81121ebdf7ef43cf37981634
   useEffect(() => {
     if (!booking) {
       console.error("No booking data received! Redirecting...");
@@ -17,7 +25,10 @@ function TravellerDetails() {
     }
   }, [booking, navigate]);
 
+<<<<<<< HEAD
+=======
   // Extract booking details
+>>>>>>> 045142a3932be58d81121ebdf7ef43cf37981634
   const bookingId = booking?.bookingId || booking?._id || "";
   if (!bookingId) {
     console.error("Booking ID is undefined! Cannot proceed to payment.");
@@ -31,7 +42,11 @@ function TravellerDetails() {
     vehicleType,
     adults = 1,
     children = 0,
+<<<<<<< HEAD
+    amountPaid = 0, 
+=======
     amountPaid = 0,
+>>>>>>> 045142a3932be58d81121ebdf7ef43cf37981634
   } = booking;
 
   // State to manage traveler details
@@ -89,11 +104,19 @@ function TravellerDetails() {
         alert("Please fill in all traveler details");
         return;
       }
+<<<<<<< HEAD
+=======
   
+>>>>>>> 045142a3932be58d81121ebdf7ef43cf37981634
       if (!termsAccepted) {
         alert("Please accept the terms and conditions");
         return;
       }
+<<<<<<< HEAD
+
+      console.log("Starting payment process with Booking ID:", bookingId);
+
+=======
   
       if (!bookingId) {
         alert("Booking ID is missing. Cannot proceed with payment.");
@@ -102,6 +125,7 @@ function TravellerDetails() {
   
       console.log("Starting payment process with Booking ID:", bookingId);
   
+>>>>>>> 045142a3932be58d81121ebdf7ef43cf37981634
       // Step 1: Submit Traveler Details First
       const travelerResponse = await fetch(
         `http://localhost:5000/api/booking/${bookingId}/travelers`,
@@ -111,12 +135,36 @@ function TravellerDetails() {
           body: JSON.stringify({ travelers: travelerDetails }),
         }
       );
+<<<<<<< HEAD
+=======
   
+>>>>>>> 045142a3932be58d81121ebdf7ef43cf37981634
       const travelerData = await travelerResponse.json();
       if (!travelerResponse.ok) {
         alert(travelerData.error || "Failed to submit traveler details!");
         return;
       }
+<<<<<<< HEAD
+
+      console.log("Traveler details submitted successfully.");
+
+      // Step 2: Create Cashfree Payment Order
+      const response = await fetch(
+        "http://localhost:5000/api/payment/create-order",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            orderId: `SAFARI_${bookingId}_${Date.now()}`,
+            amount: amountPaid,
+            customerId: `CUST_${bookingId}`,
+            customerName: booking.name,
+            customerEmail: booking.email || "customer@example.com",
+            customerPhone: booking.phone || "9999999999",
+          }),
+        }
+      );
+=======
   
       console.log("Traveler details submitted successfully.");
   
@@ -133,26 +181,39 @@ function TravellerDetails() {
         }),
       });
   
+>>>>>>> 045142a3932be58d81121ebdf7ef43cf37981634
       const data = await response.json();
       if (!data.success) {
         throw new Error("Payment Order Creation Failed");
       }
+<<<<<<< HEAD
+      console.log("Payment Order Created:", data);
+
+=======
   
       console.log("Payment Order Created:", data);
   
+>>>>>>> 045142a3932be58d81121ebdf7ef43cf37981634
       // ✅ Redirect to Cashfree's payment page
       if (data.paymentLink) {
         window.location.href = data.paymentLink;
       } else {
         throw new Error("Invalid Payment Link");
       }
+<<<<<<< HEAD
+=======
   
+>>>>>>> 045142a3932be58d81121ebdf7ef43cf37981634
     } catch (error) {
       console.error("Payment Error:", error);
       alert("Payment initialization failed. Please try again.");
     }
+<<<<<<< HEAD
+  };
+=======
   };  
 
+>>>>>>> 045142a3932be58d81121ebdf7ef43cf37981634
   return (
     <>
       <div className="travellerHeader">
@@ -250,11 +311,20 @@ function TravellerDetails() {
 
         <div className="mx-2 mt-3">
           <p>
+<<<<<<< HEAD
+            <input
+              type="checkbox"
+              checked={termsAccepted}
+              onChange={(e) => setTermsAccepted(e.target.checked)}
+            />{" "}
+            I have read and accept the{" "}
+=======
             <input 
               type="checkbox" 
               checked={termsAccepted}
               onChange={(e) => setTermsAccepted(e.target.checked)}
             /> I have read and accept the{" "}
+>>>>>>> 045142a3932be58d81121ebdf7ef43cf37981634
             <Link to="/termandcondition">terms and conditions</Link>
           </p>
         </div>

@@ -11,7 +11,6 @@
     font-size: 16px;
     color: #2c2c2c;
 }
-
 .navbar-expand-lg .navbar-collapse {
     display: flex !important;
     flex-basis: auto;
@@ -686,7 +685,6 @@ s {
 font-weight: 500;
 color: #6e0f0f;
 }
-
 .hotelDetailDiscription {
 display: flex;
 border: 2px solid rgb(219, 217, 217);

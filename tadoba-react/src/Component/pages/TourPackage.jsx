@@ -252,7 +252,6 @@ function TourPackage() {
             </div>
           </div>
         </div>
-      
       </section>
 
       <ImportantLinks></ImportantLinks>

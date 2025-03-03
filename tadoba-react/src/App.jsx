@@ -81,6 +81,7 @@ function App() {
         <Route path="/safaribooking" element={<SafariBooking />} />
         <Route path="/travellerdetail" element={<TravellerDetails />} />
         <Route path="/tourpackage" element={<TourPackage />} />
+        <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path='/tourpackagedetail'element={<TourPackageDetail/>}/>
         <Route path="/hoteldetail" element={<HotelDetails />} />
         <Route path="/hotelpage" element={<HotelPage />} />
