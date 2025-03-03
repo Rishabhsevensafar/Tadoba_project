@@ -80,3 +80,47 @@ exports.deleteHotelPackage = async (req, res) => {
         res.status(500).json({ error: error.message });
     }
 };
+// Update Hotel Package
+exports.updateHotelPackage = async (req, res) => {
+    try {
+        const package = await HotelPackage.findById(req.params.id);
+        if (!package) {
+            return res.status(404).json({ message: "Hotel package not found" });
+        }
+
+        // If new images are uploaded, replace old images
+        const imagePaths = req.files ? req.files.map(file => `/uploads/hotel/${file.filename}`) : package.images;
+
+        // Update hotel package details
+        package.title = req.body.title || package.title;
+        package.description = req.body.description || package.description;
+        package.room_type = req.body.room_type || package.room_type;
+        package.number_of_stars = req.body.number_of_stars || package.number_of_stars;
+        package.real_price = req.body.real_price || package.real_price;
+        package.discounted_price = req.body.discounted_price || package.discounted_price;
+        package.amenities = req.body.amenities ? req.body.amenities.split(",") : package.amenities;
+        package.facilities = req.body.facilities ? req.body.facilities.split(",") : package.facilities;
+        package.map_location = req.body.map_location || package.map_location;
+        package.images = imagePaths;
+
+        if (req.body.location) {
+            package.location.name = req.body.location.name || package.location.name;
+            package.location.pincode = req.body.location.pincode || package.location.pincode;
+        }
+
+        const updatedPackage = await package.save();
+        res.status(200).json({ message: "Hotel package updated successfully", package: updatedPackage });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+// ✅ Get only hotel titles & IDs for dropdown
+exports.getAllHotelsForDropdown = async (req, res) => {
+    try {
+        const hotels = await HotelPackage.find({}, "_id title"); // Fetch only title & ID
+        res.json({ success: true, hotels });
+    } catch (error) {
+        console.error("Error fetching hotels:", error);
+        res.status(500).json({ success: false, error: "Failed to retrieve hotels" });
+    }
+};

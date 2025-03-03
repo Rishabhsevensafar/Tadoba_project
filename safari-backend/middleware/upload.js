@@ -1,10 +1,10 @@
 const multer = require('multer');
 const path = require('path');
 
-// Configure storage for uploaded images
+// Configure storage
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'uploads/hotel'); // Store images in uploads/hotel folder
+        cb(null, 'uploads/hotel');
     },
     filename: function (req, file, cb) {
         cb(null, `${Date.now()}-${file.originalname}`);
@@ -24,10 +24,10 @@ const fileFilter = (req, file, cb) => {
     }
 };
 
-// Multer configuration
+// Fix file size issue (Increase limit from 5MB to 10MB)
 const upload = multer({
     storage: storage,
-    limits: { fileSize: 5 * 1024 * 1024 }, // Limit file size to 5MB
+    limits: { fileSize: 10 * 1024 * 1024 }, // 10MB file size limit
     fileFilter: fileFilter
 });
 

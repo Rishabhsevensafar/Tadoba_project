@@ -19,6 +19,8 @@ const tourPackageSchema = new mongoose.Schema(
     ],
     includes: [{ type: String }], 
     excludes: [{ type: String }], 
+    // ✅ NEW FIELD: Hotels associated with the package
+    hotels: [{ type: mongoose.Schema.Types.ObjectId, ref: "HotelPackage" }], // Reference to hotels
     isActive: { type: Boolean, default: true },
   },
   { timestamps: true }
