@@ -115,6 +115,7 @@ const PackageManager = () => {
     });
   };
 
+  // Toggle package status
   const handleToggleStatus = async (id, isActive) => {
     try {
       const response = await axios.put(
@@ -131,10 +132,9 @@ const PackageManager = () => {
         console.error("Failed to update package status:", response.data.error);
       }
     } catch (error) {
-      console.error("Error toggling package status:", error);
+        console.error("Error toggling package status:", error);
     }
   };
-  
   useEffect(() => {
     fetchPackages(currentPage);
   }, [currentPage, pageSize]);

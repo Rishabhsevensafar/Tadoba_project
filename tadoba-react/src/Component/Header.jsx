@@ -34,10 +34,10 @@ function Header() {
         <a className="nav-link" href="/tourpackage">Tour Package</a>
       </li>
       <li className="nav-item">
-        <a className="nav-link" href="#">Hotel in Tadoba</a>
+        <a className="nav-link" href="/hotelpage">Hotel in Tadoba</a>
       </li>
       <li className="nav-item">
-        <a className="nav-link" href="#">Payment</a>
+        <a className="nav-link" href="/paymentpage">Payment</a>
       </li>
       <li className="nav-item">
         <a className="nav-link" href="#">+91-7982653974 | +91-7982653974</a>
