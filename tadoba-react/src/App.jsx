@@ -41,7 +41,8 @@ import HotelPage from './Component/pages/HotelPage';
 import HotelDetails from './Component/pages/HotelDetails';
 import ReviewBookingHotel from './Component/pages/ReviewBookingHotel';
 import PaymentPage from "./Component/Pages/PaymentPage";
-import ReviewBookingTour from "./Component/Pages/ReviewBookingTour";
+import ReviewBookingTour from "./Component/pages/ReviewBookingTour";
+import TestTourPackageDetail from './Component/pages/testtourpackagedetails';
 
 function App() {
  
@@ -82,7 +83,8 @@ function App() {
         <Route path="/travellerdetail" element={<TravellerDetails />} />
         <Route path="/tourpackage" element={<TourPackage />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
-        <Route path='/tourpackagedetail'element={<TourPackageDetail/>}/>
+        <Route path='/tourpackagedetail/:id'element={<TourPackageDetail/>}/>
+        <Route path='/testtourdetails/:id' element={<TestTourPackageDetail/>}/>
         <Route path="/hoteldetail" element={<HotelDetails />} />
         <Route path="/hotelpage" element={<HotelPage />} />
         <Route path="/paymentpage" element={<PaymentPage/>}/>

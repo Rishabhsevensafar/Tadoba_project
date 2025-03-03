@@ -1,6 +1,8 @@
 import React from "react";
 import Header from "../Header";
 import { Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
+import axios from "axios";
 import ImportantLinks from "../ImportantLinks";
 import Footer from "../Footer";
 import DatePicker from "react-datepicker";
@@ -8,105 +10,121 @@ import "react-datepicker/dist/react-datepicker.css";
 import tadobaHotel from "../../assets/images/tadoba1.jpeg";
 import day1package from "../../assets/images/navegaon.jpg";
 import { useState } from "react";
-import { FaLocationDot } from "react-icons/fa6";
-import { FaCarAlt } from "react-icons/fa";
+import { FaBan, FaLocationArrow, FaUtensils, FaWifi } from "react-icons/fa6";
+import { FaCarAlt, FaRemoveFormat } from "react-icons/fa";
 import { FaHome } from "react-icons/fa";
 import { CiBeaker1 } from "react-icons/ci";
 import { MdOutlineWatchLater } from "react-icons/md";
 import { FaStar } from "react-icons/fa";
 import { useEffect } from "react";
 import day2package from "../../assets/images/morpen1.jpg";
+import { Flex } from "antd";
+import TourEnquiryModal from "../tourenquirymodel";
 function TourPackageDetail() {
   const [date, setDate] = useState(new Date());
+  const { id } = useParams(); // ✅ Get package ID from URL
+  const [packageDetails, setPackageDetails] = useState(null);
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
-  useEffect(()=>{
-            window.scrollTo(0, 0);
-          },[])
+  const [showEnquiryModal, setShowEnquiryModal] = useState(false);
+  const [selectedHotel, setSelectedHotel] = useState(null);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    fetchPackageDetails();
+  }, []);
+  const fetchPackageDetails = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/api/tourpackage/${id}`
+      );
+      setPackageDetails(response.data.package);
+    } catch (error) {
+      console.error("Error fetching package details:", error);
+    }
+  };
+  const handleOpenEnquiryModal = (hotel) => {
+    setSelectedHotel(hotel);
+    setShowEnquiryModal(true);
+  };
+
+  const handleCloseEnquiryModal = () => setShowEnquiryModal(false);
+
+  if (!packageDetails) {
+    return <p className="text-center">Loading package details...</p>;
+  }
+
   return (
     <>
       <Header></Header>
       <div className="row hotelback ">
-                <div className="col-sm-12 col-md-3 col-lg-3 px-2">
-                  <div className="boxx">
-                    <select>
-                      <option value="">Select</option>
-                      <option value="">Tiger valley resort Tdaoba</option>
-                      <option value="">Tiger valley resort Tdaoba</option>
-                      <option value="">Tiger valley resort Tdaoba</option>
-                    </select>
-                    <p>All Hotels in tadoba</p>
-                  </div>
-                </div>
-                <div className="col-sm-12 col-md-3 col-lg-3 px-2">
-                  <div className="boxx">
-                    <div className="dateFormat">
-                      <DatePicker
-                        className="date1"
-                        placeholderText="Check In"
-                        selectsStart
-                        selected={startDate}
-                        onChange={(date) => setStartDate(date)}
-                        startDate={startDate}
-                      />
-                      <DatePicker
-                        className="date1"
-                        placeholderText="Check Out"
-                        selectsEnd
-                        selected={endDate}
-                        onChange={(date) => setEndDate(date)}
-                        endDate={endDate}
-                        startDate={startDate}
-                        minDate={startDate}
-                      />
-                    </div>
-                    <p>Choose Date</p>
-                  </div>
-                </div>
-                <div className="col-sm-12 col-md-2 col-lg-2 px-2">
-                  <div className="boxx">
-                    <select>
-                      <option value="">Select</option>
-                      <option value="">Tiger valley resort Tadoba</option>
-                      <option value="">Tiger valley resort Tadoba</option>
-                      <option value="">Tiger valley resort Tadoba</option>
-                    </select>
-                    <p>All Hotels in tadoba</p>
-                  </div>
-                </div>
-                <div className="col-sm-12 col-md-2 col-lg-2 px-2">
-                  <div className="boxx ">
-                    <select>
-                      <option value="">Select</option>
-                      <option value="">Indian</option>
-                      <option value="">Foreigner</option>
-                    </select>
-                    <p>All Hotels in tadoba</p>
-                  </div>
-                </div>{" "}
-                <div className="col-sm-12 col-md-2 col-lg-2  px-2">
-                  <button className="boxxSearch">
-                    Search
-                  </button>
-                </div>{" "}
-              </div>
+        <div className="col-sm-12 col-md-3 col-lg-3 px-2">
+          <div className="boxx">
+            <select>
+              <option value="">Select</option>
+              <option value="">Tiger valley resort Tdaoba</option>
+              <option value="">Tiger valley resort Tdaoba</option>
+              <option value="">Tiger valley resort Tdaoba</option>
+            </select>
+            <p>All Hotels in tadoba</p>
+          </div>
+        </div>
+        <div className="col-sm-12 col-md-3 col-lg-3 px-2">
+          <div className="boxx">
+            <div className="dateFormat">
+              <DatePicker
+                className="date1"
+                placeholderText="Check In"
+                selectsStart
+                selected={startDate}
+                onChange={(date) => setStartDate(date)}
+                startDate={startDate}
+              />
+              <DatePicker
+                className="date1"
+                placeholderText="Check Out"
+                selectsEnd
+                selected={endDate}
+                onChange={(date) => setEndDate(date)}
+                endDate={endDate}
+                startDate={startDate}
+                minDate={startDate}
+              />
+            </div>
+            <p>Choose Date</p>
+          </div>
+        </div>
+        <div className="col-sm-12 col-md-2 col-lg-2 px-2">
+          <div className="boxx">
+            <select>
+              <option value="">Select</option>
+              <option value="">Tiger valley resort Tadoba</option>
+              <option value="">Tiger valley resort Tadoba</option>
+              <option value="">Tiger valley resort Tadoba</option>
+            </select>
+            <p>All Hotels in tadoba</p>
+          </div>
+        </div>
+        <div className="col-sm-12 col-md-2 col-lg-2 px-2">
+          <div className="boxx ">
+            <select>
+              <option value="">Select</option>
+              <option value="">Indian</option>
+              <option value="">Foreigner</option>
+            </select>
+            <p>All Hotels in tadoba</p>
+          </div>
+        </div>{" "}
+        <div className="col-sm-12 col-md-2 col-lg-2  px-2">
+          <button className="boxxSearch">Search</button>
+        </div>{" "}
+      </div>
 
       <div className="container">
         <section>
-          <h2>Tadoba Weekend Tour - 1 Night and 2 Days</h2>
-          <p>
-            Lush green Tadoba is no less than heaven on earth. The real
-            highlight of Tadoba National Park exists in its varied wildlife. The
-            immensely grown popularity for the park lies in its unfailing
-            attempt to spot tigers. The livelihood of this paradise should not
-            only be explored but living every bit of its genuinely priceless
-            experience.
-          </p>
-          <p>
-            All you can cover only in 1N/2D Tadoba Trip itinerary. We have
-            prepared a very short itinerary for you to experience the best
-            wildlife.
-          </p>
+          <h2>
+            {packageDetails.title} - {packageDetails.duration}
+          </h2>
+          <p>{packageDetails.description}</p>
         </section>
         <section>
           <div className="row">
@@ -121,164 +139,45 @@ function TourPackageDetail() {
                   <p>
                     {" "}
                     <input type="checkbox" />
-                    <FaStar
-                      className="mb-1 ms-1 stardes"
-                    />{" "}
-                    <FaStar
-                      className="mb-1 ms-1 stardes"
-                    />
-                    <FaStar
-                      className="mb-1 ms-1 stardes"
-                    />
-                    <FaStar
-                      className="mb-1 ms-1 stardes"
-                    />
-                    <FaStar
-                      className="mb-1 ms-1 stardes"
-                    />
+                    <FaStar className="mb-1 ms-1 stardes" />{" "}
+                    <FaStar className="mb-1 ms-1 stardes" />
+                    <FaStar className="mb-1 ms-1 stardes" />
+                    <FaStar className="mb-1 ms-1 stardes" />
+                    <FaStar className="mb-1 ms-1 stardes" />
                     <br />
                   </p>
                   <p>
                     {" "}
                     <input type="checkbox" />
-                    <FaStar
-                     className="mb-1 ms-1 stardes"
-                    />
-                    <FaStar
-                      className="mb-1 ms-1 stardes"
-                    />
-                    <FaStar
-                      className="mb-1 ms-1 stardes"
-                    />
-                    <FaStar
-                      className="mb-1 ms-1 stardes"
-                    />
+                    <FaStar className="mb-1 ms-1 stardes" />
+                    <FaStar className="mb-1 ms-1 stardes" />
+                    <FaStar className="mb-1 ms-1 stardes" />
+                    <FaStar className="mb-1 ms-1 stardes" />
                     <br />
                   </p>
                   <p>
                     {" "}
                     <input type="checkbox" />
-                    <FaStar
-                      className="mb-1 ms-1 stardes"
-                    />
-                    <FaStar
-                      className="mb-1 ms-1 stardes"
-                    />
-                    <FaStar
-                      className="mb-1 ms-1 stardes"
-                    />
+                    <FaStar className="mb-1 ms-1 stardes" />
+                    <FaStar className="mb-1 ms-1 stardes" />
+                    <FaStar className="mb-1 ms-1 stardes" />
                     <br />
                   </p>
                   <p>
                     <input type="checkbox" />
-                    <FaStar
-                      className="mb-1 ms-1 stardes"
-                    />
-                    <FaStar
-                      className="mb-1 ms-1 stardes"
-                    />
+                    <FaStar className="mb-1 ms-1 stardes" />
+                    <FaStar className="mb-1 ms-1 stardes" />
                     <br />
                   </p>
                   <p>
                     {" "}
                     <input type="checkbox" />
-                    <FaStar
-                      className="mb-1 ms-1 stardes"
-                    />
+                    <FaStar className="mb-1 ms-1 stardes" />
                     <br />
                   </p>
                 </div>
                 <hr />
-                <div>
-                  <h6>Facilities</h6>
-                  <div>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Swimming Pool
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Power Backup
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Restaurant
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Room Service on Request
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      House Keeping
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Refrigerator
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Indoor Games
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Kids Play Area
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Jungle Safari
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Free Parking
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Air Conditioning
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Bonfire
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Dinning Area
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      CCTV
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Fire Extinguishers
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Jacuzzi
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      First Aid Services
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Activity Centre
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Pool Towels
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Wake Up Call
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Outdoor Sports
-                    </p>
-                    
-                  </div>
-                </div>
+                <div></div>
                 <hr />
 
                 <div>
@@ -301,338 +200,152 @@ function TourPackageDetail() {
               </div>
             </div>
             <div className="col-sm-12 col-md-9 col-lg-9 ">
-              <p>5 Packages With Hotel Found</p>
-              <div className="hotelTourPackages">
-                <div>
-                  <img
-                    src={tadobaHotel}
-                    className="tadobahotelImg"
-                    alt="Tadoba hotel image"
-                  />
-                </div>
-                <div className="ps-4">
-                  <h5>
-                    Tiger Valley Resort, Tadoba
-                    
-                  </h5>
-                  <p>
-                    {" "}
-                    <FaLocationDot />
-                    Tadoba National Park, Moharli Gate,
-                   Maharashtra 442404
-                  </p>
-                  <ul>
-                    <li className="policy">Cancellation Policy</li>
-                    <li className="policy">Breakfast Included</li>
-                  </ul>
-                  <p className="">
-                    <CiBeaker1 /> Facilities: Restaurent, Room Service on
-                    Request, House
-                  </p>
-                  <p className="">
-                    <MdOutlineWatchLater /> 1 Night/2 Days | <FaCarAlt /> 1 Jeep | <FaHome/>  Safari Deluxe Room
-                  </p>
-                </div>
+              <section>
+                <h5 className="ps-3">Hotels Included in this Package</h5>
+                {packageDetails.hotels && packageDetails.hotels.length > 0 ? (
+                  packageDetails.hotels.map((hotel) => (
+                    <div className="hotelTourPackages mt-3" key={hotel._id}>
+                      <div>
+                        {/* ✅ Display the first image, if available */}
+                        <img
+                          src={
+                            hotel.images?.length > 0
+                              ? `http://localhost:5000${hotel.images[0]}`
+                              : tadobaHotel
+                          }
+                          className="tadobahotelImg"
+                          alt="Hotel"
+                        />
+                      </div>
+                      <div className="ps-4">
+                        <h5>{hotel.title || "Hotel Name Not Provided"}</h5>
+                        <p>
+                          <FaLocationArrow />{" "}
+                          {hotel.location?.name || "Location Not Provided"}
+                        </p>
+                        <p>
+                          <FaWifi /> Amenities:{" "}
+                          {hotel.amenities?.length
+                            ? hotel.amenities.join(", ")
+                            : "Not Provided"}
+                        </p>
+                        <p>
+                          <FaUtensils /> Facilities:{" "}
+                          {hotel.facilities?.length
+                            ? hotel.facilities.join(", ")
+                            : "Not Provided"}
+                        </p>
+                        <div>
+                          <p
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                            }}
+                          >
+                            <FaBan />
+                            <Link
+                              style={{
+                                textDecoration: "none",
+                                marginLeft: "3px",
+                              }}
+                            >
+                              Cancelation Policy
+                            </Link>
+                          </p>
+                        </div>
+                        <p>
+                          <MdOutlineWatchLater /> {packageDetails.duration} |{" "}
+                          <FaCarAlt /> 1 Jeep | <FaHome />{" "}
+                          {hotel.room_type || "Standard Room"}
+                        </p>
+                      </div>
 
-                <div className="ps-5 ms-auto text-end tourhotside">
-                  <div>
-                      <FaStar className="stardes" />
-                      <FaStar className="stardes" />
-                      <FaStar className="stardes" />{" "}
+                      <div className="ps-5 ms-auto text-end tourhotside">
+                        <div>
+                          {[...Array(hotel.number_of_stars || 3)].map(
+                            (_, index) => (
+                              <FaStar key={index} className="stardes" />
+                            )
+                          )}
+                        </div>
+                        <s>&#x20B9; {hotel.real_price || "N/A"}</s>
+                        <h4> &#x20B9; {hotel.discounted_price || "N/A"}</h4>
+                        <p>+ &#x20B9; 0 taxes & fees per night</p>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: "20px",
+                          }}
+                        >
+                          <button type="button" className="btn btn-dark">
+                            Book Now
+                          </button>
+                          <button className="btn btn-dark" onClick={() => handleOpenEnquiryModal(hotel)}>
+                    Send Enquiry
+                  </button>
+                        </div>
+                      </div>
                     </div>
-                  <p>
-                    <span>Excellent </span> <br />
-                    250 Review
-                  </p>
-                  <s>&#x20B9; 21094</s>
-                  <h4> &#x20B9; 13444</h4>
-                  <p>
-                    + &#x20B9; 0 taxes & fees 
-                    per night
-                  </p>
-                  <Link to="/booking"> <button type="button" className="btn btn-dark">
-                    Book Now
-                  </button></Link>
-                </div>
-              </div>
-
-              <div className="hotelTourPackages mt-3">
-                <div>
-                  <img
-                    src={tadobaHotel}
-                    className="tadobahotelImg"
-                    alt="Tadoba hotel iamge"
-                  />
-                </div>
-                <div className="ps-4">
-                  <h5>
-                    Tiger Valley Resort, Tadoba
-                    
-                  </h5>
-                  <p>
-                    {" "}
-                    <FaLocationDot />
-                    Tadoba National Park, Moharli Gate,
-                     Maharashtra 442404
-                  </p>
-                  <ul>
-                    <li className="policy">Cancellation Policy</li>
-                    <li className="policy">Breakfast Included</li>
-                  </ul>
-                  <p className="">
-                    <CiBeaker1 /> Facilities: Restaurent, Room Service on
-                    Request, House
-                  </p>
-                  <p className="pb-4">
-                    <MdOutlineWatchLater /> 1 Night/2 Days | <FaCarAlt /> 1 Jeep | <FaHome/>   Safari Deluxe Room
-                  </p>
-                </div>
-
-                <div className="ps-5 ms-auto text-end tourhotside">
-                  <div>
-                      <FaStar className="stardes" />
-                      <FaStar className="stardes" />
-                      <FaStar className="stardes" />{" "}
-                    </div>
-                  <p>
-                    <span>Excellent </span> <br />
-                    250 Review
-                  </p>
-                  <s>&#x20B9; 21094</s>
-                  <h4> &#x20B9; 13444</h4>
-                  <p>
-                    + &#x20B9; 0 taxes & fees 
-                    per night
-                  </p>
-                    <Link to="/booking"> <button type="button" className="btn btn-dark">
-                    Book Now
-                  </button></Link>
-                </div>
-              </div>
-
-              <div className="hotelTourPackages mt-3">
-                <div>
-                  <img
-                    src={tadobaHotel}
-                    className="tadobahotelImg"
-                    alt="Tadoba hotel iamge"
-                  />
-                </div>
-                <div className="ps-4">
-                  <h5>
-                    Tiger Valley Resort, Tadoba
-                    
-                  </h5>
-                  <p>
-                    {" "}
-                    <FaLocationDot />
-                    Tadoba National Park, Moharli Gate,
-                     Maharashtra 442404
-                  </p>
-                  <ul>
-                    <li className="policy">Cancellation Policy</li>
-                    <li className="policy">Breakfast Included</li>
-                  </ul>
-                  <p className="">
-                    <CiBeaker1 /> Facilities: Restaurent, Room Service on
-                    Request, House
-                  </p>
-                  <p className="pb-4">
-                    <MdOutlineWatchLater /> 1 Night/2 Days | <FaCarAlt /> 1 Jeep | <FaHome/>  Safari Deluxe Room
-                  </p>
-                </div>
-
-                <div className="ps-5 ms-auto text-end tourhotside">
-                  <div>
-                      <FaStar className="stardes" />
-                      <FaStar className="stardes" />
-                      <FaStar className="stardes" />{" "}
-                    </div>
-                  <p>
-                    <span>Excellent </span> <br />
-                    250 Review
-                  </p>
-                  <s>&#x20B9; 21094</s>
-                  <h4> &#x20B9; 13444</h4>
-                  <p>
-                    + &#x20B9; 0 taxes & fees 
-                    per night
-                  </p>
-                    <Link to="/booking"> <button type="button" className="btn btn-dark">
-                    Book Now
-                  </button></Link>
-                </div>
-              </div>
-              <div className="hotelTourPackages mt-3">
-                <div>
-                  <img
-                    src={tadobaHotel}
-                    className="tadobahotelImg"
-                    alt="Tadoba hotel iamge"
-                  />
-                </div>
-                <div className="ps-4">
-                  <h5>
-                    Tiger Valley Resort, Tadoba
-                    
-                  </h5>
-                  <p>
-                    {" "}
-                    <FaLocationDot />
-                    Tadoba National Park, Moharli Gate,
-                     Maharashtra 442404
-                  </p>
-                  <ul>
-                    <li className="policy">Cancellation Policy</li>
-                    <li className="policy">Breakfast Included</li>
-                  </ul>
-                  <p className="">
-                    <CiBeaker1 /> Facilities: Restaurent, Room Service on
-                    Request, House
-                  </p>
-                  <p className="pb-4">
-                    <MdOutlineWatchLater /> 1 Night/2 Days | <FaCarAlt /> 1 Jeep | <FaHome/>  Safari Deluxe Room
-                  </p>
-                </div>
-
-                <div className="ps-5 ms-auto text-end tourhotside">
-                  <div>
-                      <FaStar className="stardes" />
-                      <FaStar className="stardes" />
-                      <FaStar className="stardes" />{" "}
-                    </div>
-                  <p>
-                    <span>Excellent </span> <br />
-                    250 Review
-                  </p>
-                  <s>&#x20B9; 21094</s>
-                  <h4> &#x20B9; 13444</h4>
-                  <p>
-                    + &#x20B9; 0 taxes & fees 
-                    per night
-                  </p>
-                    <Link to="/booking"> <button type="button" className="btn btn-dark">
-                    Book Now
-                  </button></Link>
-                </div>
-              </div>
-              <div className="hotelTourPackages mt-3">
-                <div>
-                  <img
-                    src={tadobaHotel}
-                    className="tadobahotelImg"
-                    alt="Tadoba hotel iamge"
-                  />
-                </div>
-                <div className="ps-4">
-                  <h5>
-                    Tiger Valley Resort, Tadoba
-                    
-                  </h5>
-                  <p>
-                    {" "}
-                    <FaLocationDot />
-                    Tadoba National Park, Moharli Gate,
-                     Maharashtra 442404
-                  </p>
-                  <ul>
-                    <li className="policy">Cancellation Policy</li>
-                    <li className="policy">Breakfast Included</li>
-                  </ul>
-                  <p className="">
-                    <CiBeaker1 /> Facilities: Restaurent, Room Service on
-                    Request, House
-                  </p>
-                  <p className="pb-4">
-                    <MdOutlineWatchLater /> 1 Night/2 Days | <FaCarAlt /> 1 Jeep | <FaHome/>   Safari Deluxe Room
-                  </p>
-                </div>
-
-                <div className="ps-5 ms-auto text-end tourhotside">
-                  <div>
-                      <FaStar className="stardes" />
-                      <FaStar className="stardes" />
-                      <FaStar className="stardes" />{" "}
-                    </div>
-                  <p>
-                    <span>Excellent </span> <br />
-                    250 Review
-                  </p>
-                  <s>&#x20B9; 21094</s>
-                  <h4> &#x20B9; 13444</h4>
-                  <p>
-                    + &#x20B9; 0 taxes & fees 
-                    per night
-                  </p>
-                    <Link to="/booking"> <button type="button" className="btn btn-dark">
-                    Book Now
-                  </button></Link>
-                </div>
-              </div>
+                  ))
+                ) : (
+                  <p>No hotels added to this package.</p>
+                )}
+              </section>
             </div>
           </div>
         </section>
         <h6 className="">Showing 1 - 5 of 5 Hotels</h6>
         <hr />
+        {/* ✅ Itinerary Section */}
         <section>
           <h2>Tour Itinerary</h2>
-          <div className="day1Border day1Tadoba">
-            
-            <div className="">
-              <h4>Arrival at Nagpur & Transfer to Tadoba (Day 1)</h4>
-              <p>
-                After your arrival at the Nagpur railway station/ Airport, reach
-                tadoba national park (140 km) via cab or local taxis. Once
-                reached, complete the check-in formalities at the pre-booked
-                resort and enjoy your lunch. Post lunch get ready for
-                enthralling Jeep Safari ride in Tadoba National Park. Tadoba is
-                an abode of species like tigers, sloth bear, jackals, hyenas,
-                sambar, cheetal and many more will make your day. The oldest and
-                largest national park of Maharashtra, Tadoba houses around 195
-                birds and 74 butterflies. Thrill is not yet over as the 3 hours
-                safari covers many birds, animals. Now you can be back to your
-                cozy staying hotel for a deep relaxation. If you are the one who
-                believes in making every bit of your travel then nature walk &
-                bird-watching in the resort premises would be ideal. Evening
-                will be enriched with high tea, some wonderful moments with the
-                locals.
-              </p>
-              
-            </div>
-            <img src={day1package} className="day1package" alt="" />
-          </div>
-
-          <div className="day1Border mt-5 day1Tadoba">
-            
-            <div className="">
-              <h4>Jeep Safari ride in Tadoba National Park (Day 2)</h4>
-              <p>
-                After your arrival at the Nagpur railway station/ Airport, reach
-                tadoba national park (140 km) via cab or local taxis. Once
-                reached, complete the check-in formalities at the pre-booked
-                resort and enjoy your lunch. Post lunch get ready for
-                enthralling Jeep Safari ride in Tadoba National Park. Tadoba is
-                an abode of species like tigers, sloth bear, jackals, hyenas,
-                sambar, cheetal and many more will make your day. The oldest and
-                largest national park of Maharashtra, Tadoba houses around 195
-                birds and 74 butterflies. Thrill is not yet over as the 3 hours
-                safari covers many birds, animals. Now you can be back to your
-                cozy staying hotel for a deep relaxation. If you are the one who
-                believes in making every bit of your travel then nature walk &
-                bird-watching in the resort premises would be ideal. Evening
-                will be enriched with high tea, some wonderful moments with the
-                locals.
-              </p>
-              
-            </div>
-            <img src={day2package} className="day1package" alt="" />
-          </div>
+          {packageDetails.itinerary && packageDetails.itinerary.length > 0 ? (
+            packageDetails.itinerary.map((day, index) => (
+              <div className="day1Border day1Tadoba mt-3" key={index}>
+                <div>
+                  <h4>{day.title}</h4>
+                  <p>{day.activities}</p>
+                </div>
+                <img
+                  src={index % 2 === 0 ? day1package : day2package}
+                  className="day1package"
+                  alt=""
+                />
+              </div>
+            ))
+          ) : (
+            <p>No itinerary available.</p>
+          )}
         </section>
+        {/* ✅ Includes & Excludes */}
         <section>
           <div className="day1Border mt-3">
             <div className="d-flex">
               <ul>
-                <h4>Inclusion</h4>
+                <h4>Inclusions</h4>
+                {packageDetails.includes &&
+                packageDetails.includes.length > 0 ? (
+                  packageDetails.includes.map((item, index) => (
+                    <li key={index}>{item}</li>
+                  ))
+                ) : (
+                  <li>No inclusions specified</li>
+                )}
+              </ul>
+              <ul>
+                <h4>Exclusions</h4>
+                {packageDetails.excludes &&
+                packageDetails.excludes.length > 0 ? (
+                  packageDetails.excludes.map((item, index) => (
+                    <li key={index}>{item}</li>
+                  ))
+                ) : (
+                  <li>No exclusions specified</li>
+                )}
+              </ul>
+              <h4 className="mx-4">Notes:</h4>
+              <ul>
                 <li>Breakfast & dinner at resor</li>
                 <li>1 Jeep inside the Tadoba National Park</li>
                 <li>Expert guide during the safari</li>
@@ -641,26 +354,7 @@ function TourPackageDetail() {
                   premises.
                 </li>
               </ul>
-              <ul>
-                <h4>Exclusion</h4>
-                <li>Any airfare, train fare, transport & sightseeing.</li>
-                <li>
-                  Personal nature items like softdrink, hard drink, laundry,
-                  camera fee, tips etc.
-                </li>
-                <li>Any medical or emergency charge.</li>
-                <li>GST & PG charges</li>
-              </ul>
             </div>
-            <h4 className="mx-4">Notes:</h4>
-            <ul>
-              <li>Breakfast & dinner at resor</li>
-              <li>1 Jeep inside the Tadoba National Park</li>
-              <li>Expert guide during the safari</li>
-              <li>
-                Complimentary use of recreational activities in resort premises.
-              </li>
-            </ul>
           </div>
         </section>
         <section>
@@ -781,7 +475,10 @@ function TourPackageDetail() {
                 Travelers can pay 100% amount to confirm the booking and enjoy
                 more discount benefits.
               </li>
-              <li>Travelers agree to pay all statutory taxes, surcharges and fees, as applicable.</li>
+              <li>
+                Travelers agree to pay all statutory taxes, surcharges and fees,
+                as applicable.
+              </li>
             </ul>
           </div>
         </section>
@@ -789,6 +486,7 @@ function TourPackageDetail() {
 
       <ImportantLinks></ImportantLinks>
       <Footer></Footer>
+      <TourEnquiryModal show={showEnquiryModal} handleClose={handleCloseEnquiryModal} hotel={selectedHotel} />
     </>
   );
 }
