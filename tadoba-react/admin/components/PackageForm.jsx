@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { getAllHotelsForDropdown, getHotelPackageById } from "../service/api";
 import {
   Form,
   Input,
@@ -15,18 +16,34 @@ import {
   Card,
   Row,
   Col,
+  Tooltip,
+  Select,
+  message,
 } from "antd";
 import {
   PlusOutlined,
   DeleteOutlined,
   SaveOutlined,
   CloseOutlined,
+  UploadOutlined,
+  CalendarOutlined,
+  DollarOutlined,
+  FieldTimeOutlined,
+  TeamOutlined,
+  FileTextOutlined,
+  PictureOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  OrderedListOutlined,
+  EditOutlined,
+  InfoCircleOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
 
 const { TextArea } = Input;
 const { RangePicker } = DatePicker;
-const { Title } = Typography;
+const { Title, Text } = Typography;
+const { Option } = Select;
 
 const modalStyle = {
   position: "fixed",
@@ -54,6 +71,8 @@ const containerStyle = {
 const headerStyle = {
   padding: "16px 24px",
   borderBottom: "1px solid #f0f0f0",
+  display: "flex",
+  alignItems: "center",
 };
 
 const contentStyle = {
@@ -68,16 +87,20 @@ const footerStyle = {
 
 const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
   const [form] = Form.useForm();
-  const [includes, setincludes] = useState([]);
-  const [excludes, setexcludes] = useState([]);
+  const [includes, setIncludes] = useState([]);
+  const [excludes, setExcludes] = useState([]);
   const [itinerary, setItinerary] = useState([]);
-  const [newincludes, setNewincludes] = useState("");
-  const [newexcludes, setNewexcludes] = useState("");
+  const [newIncludes, setNewIncludes] = useState("");
+  const [newExcludes, setNewExcludes] = useState("");
   const [newItineraryEntry, setNewItineraryEntry] = useState({
     title: "",
     activities: "",
   });
   const [fileList, setFileList] = useState([]);
+  const [submitting, setSubmitting] = useState(false);
+  const [hotels, setHotels] = useState([]); // Store hotel list for dropdown
+  const [selectedHotels, setSelectedHotels] = useState([]); // Store selected hotel IDs
+  const [selectedHotelNames, setSelectedHotelNames] = useState([]); // Store selected hotel names
 
   const adminToken = localStorage.getItem("adminToken");
 
@@ -87,6 +110,7 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
         title: selectedPackage.title,
         description: selectedPackage.description,
         price: selectedPackage.price,
+        location: selectedPackage.location,
         duration: selectedPackage.duration,
         totalSeats: selectedPackage.totalSeats,
         dateRange:
@@ -109,34 +133,65 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
         })) || [];
 
       setFileList(existingImages);
-      setincludes(selectedPackage.includes || []);
-      setexcludes(selectedPackage.excludes || []);
+      setIncludes(selectedPackage.includes || []);
+      setExcludes(selectedPackage.excludes || []);
       setItinerary(selectedPackage.itinerary || []);
     } else {
       form.resetFields();
       setFileList([]);
-      setincludes([]);
-      setexcludes([]);
+      setIncludes([]);
+      setExcludes([]);
       setItinerary([]);
     }
   }, [selectedPackage, form]);
+  useEffect(() => {
+    fetchHotels();
+  }, []);
 
-  const handleAddincludes = () => {
-    if (newincludes.trim()) {
-      setincludes([...includes, newincludes]);
-      setNewincludes("");
+  useEffect(() => {
+    fetchHotels();
+  }, []);
+
+  const fetchHotels = async () => {
+    try {
+      const response = await getAllHotelsForDropdown();
+      setHotels(response.data.hotels);
+    } catch (error) {
+      message.error("Failed to load hotels");
     }
   };
 
-  const handleAddexcludes = () => {
-    if (newexcludes.trim()) {
-      setexcludes([...excludes, newexcludes]);
-      setNewexcludes("");
+  const handleHotelSelect = (hotelIds) => {
+    setSelectedHotels(hotelIds);
+    const selectedNames = hotels
+      .filter((hotel) => hotelIds.includes(hotel._id))
+      .map((hotel) => hotel.title);
+    setSelectedHotelNames(selectedNames);
+  };
+
+  const handleRemoveHotel = (hotelId) => {
+    const updatedHotels = selectedHotels.filter((id) => id !== hotelId);
+    setSelectedHotels(updatedHotels);
+    setSelectedHotelNames(
+      selectedHotelNames.filter((_, index) => selectedHotels[index] !== hotelId)
+    );
+  };
+  const handleAddIncludes = () => {
+    if (newIncludes.trim()) {
+      setIncludes([...includes, newIncludes]);
+      setNewIncludes("");
+    }
+  };
+
+  const handleAddExcludes = () => {
+    if (newExcludes.trim()) {
+      setExcludes([...excludes, newExcludes]);
+      setNewExcludes("");
     }
   };
 
   const handleAddItinerary = () => {
-    if (newItineraryEntry.title && newItineraryEntry.description) {
+    if (newItineraryEntry.title && newItineraryEntry.activities) {
       setItinerary([
         ...itinerary,
         {
@@ -145,20 +200,24 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
           activities: newItineraryEntry.activities,
         },
       ]);
-      setNewItineraryEntry({ title: "", description: "" });
+      setNewItineraryEntry({ title: "", activities: "" });
     }
   };
 
   const handleSubmit = async () => {
     try {
+      setSubmitting(true);
       const values = await form.validateFields();
-      const packageData = new FormData();
 
+      const packageData = new FormData(); // ✅ Correct initialization
+
+      // ✅ Append form fields
       packageData.append("title", values.title);
       packageData.append("description", values.description);
       packageData.append("price", values.price);
-      packageData.append("location", values.location); // ✅ Ensure location is sent
+      packageData.append("location", values.location);
       packageData.append("duration", values.duration);
+      packageData.append("totalSeats", values.totalSeats);
 
       if (values.dateRange && values.dateRange.length === 2) {
         packageData.append(
@@ -168,39 +227,53 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
         packageData.append("endDate", values.dateRange[1].format("YYYY-MM-DD"));
       }
 
-      packageData.append("totalSeats", values.totalSeats);
-
+      // ✅ Append images
       fileList.forEach((file) => {
         if (file.originFileObj) {
           packageData.append("images", file.originFileObj);
         }
       });
 
+     // ✅ Send hotels as an actual array (NOT a string)
+     console.log("Selected Hotels Before Sending:", selectedHotels);
+     selectedHotels.forEach((id) => packageData.append("hotels[]", id));
+
+      // ✅ Append itinerary, includes, excludes as JSON strings
+      packageData.append("itinerary", JSON.stringify(itinerary));
       packageData.append("includes", JSON.stringify(includes));
       packageData.append("excludes", JSON.stringify(excludes));
-      packageData.append("itinerary", JSON.stringify(itinerary));
 
+      // ✅ Determine whether to create or update the package
       if (selectedPackage) {
         await axios.put(
           `http://localhost:5000/api/tourpackage/${selectedPackage._id}`,
           packageData,
           {
-            headers: { Authorization: `Bearer ${adminToken}` },
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${adminToken}`,
+            },
           }
         );
-        console.log("Package updated successfully!");
+        Modal.success({
+          title: "Success",
+          content: "Package updated successfully!",
+        });
       } else {
         await axios.post(
           "http://localhost:5000/api/tourpackage/create",
           packageData,
           {
             headers: {
-              "Content-Type": "multipart/form-data", // ✅ Required for file uploads
+              "Content-Type": "multipart/form-data",
               Authorization: `Bearer ${adminToken}`,
             },
           }
         );
-        console.log("Package created successfully!");
+        Modal.success({
+          title: "Success",
+          content: "Package created successfully!",
+        });
       }
 
       fetchPackages();
@@ -211,6 +284,8 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
         title: "Error",
         content: "Failed to save package. Please try again.",
       });
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -242,7 +317,15 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
       <div style={containerStyle}>
         <div style={headerStyle}>
           <Title level={4} style={{ margin: 0 }}>
-            {selectedPackage ? "Edit Package" : "Add Package"}
+            {selectedPackage ? (
+              <>
+                <EditOutlined /> Edit Package
+              </>
+            ) : (
+              <>
+                <PlusOutlined /> Add Package
+              </>
+            )}
           </Title>
         </div>
 
@@ -250,7 +333,12 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
           <Form form={form} layout="vertical" onFinish={handleSubmit}>
             <Form.Item
               name="title"
-              label="Package Title"
+              label={
+                <Space>
+                  <FileTextOutlined />
+                  <span>Package Title</span>
+                </Space>
+              }
               rules={[
                 { required: true, message: "Please enter package title" },
               ]}
@@ -260,7 +348,12 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
 
             <Form.Item
               name="description"
-              label="Description"
+              label={
+                <Space>
+                  <InfoCircleOutlined />
+                  <span>Description</span>
+                </Space>
+              }
               rules={[
                 { required: true, message: "Please enter package description" },
               ]}
@@ -268,20 +361,35 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
               <TextArea rows={4} placeholder="Enter package description" />
             </Form.Item>
 
-            <Form.Item label="Package Images">
+            <Form.Item
+              label={
+                <Space>
+                  <PictureOutlined />
+                  <span>Package Images</span>
+                </Space>
+              }
+            >
               <Upload {...uploadProps} listType="picture-card" multiple>
                 <div>
-                  <PlusOutlined />
+                  <UploadOutlined style={{ fontSize: "24px" }} />
                   <div style={{ marginTop: 8 }}>Upload</div>
                 </div>
               </Upload>
+              <Text type="secondary">
+                Upload high-quality images of the destination
+              </Text>
             </Form.Item>
 
             <Row gutter={16}>
               <Col span={12}>
                 <Form.Item
                   name="price"
-                  label="Price"
+                  label={
+                    <Space>
+                      <DollarOutlined />
+                      <span>Price</span>
+                    </Space>
+                  }
                   rules={[{ required: true, message: "Required" }]}
                 >
                   <InputNumber
@@ -292,6 +400,7 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
                       `₹ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
                     }
                     parser={(value) => value.replace(/\₹\s?|(,*)/g, "")}
+                    prefix={<DollarOutlined />}
                   />
                 </Form.Item>
               </Col>
@@ -299,27 +408,109 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
               <Col span={12}>
                 <Form.Item
                   name="duration"
-                  label="Duration"
+                  label={
+                    <Space>
+                      <FieldTimeOutlined />
+                      <span>Duration</span>
+                    </Space>
+                  }
                   rules={[{ required: true, message: "Required" }]}
                 >
-                  <Input placeholder="E.g., 5 days & 4 nights" />
+                  <Input
+                    placeholder="E.g., 5 days & 4 nights"
+                    prefix={<FieldTimeOutlined />}
+                  />
                 </Form.Item>
               </Col>
             </Row>
 
             <Form.Item
+              name="location"
+              label={
+                <Space>
+                  <span role="img" aria-label="location">
+                    📍
+                  </span>
+                  <span>Location</span>
+                </Space>
+              }
+              rules={[
+                { required: true, message: "Please enter package location" },
+              ]}
+            >
+              <Input placeholder="Enter destination location" />
+            </Form.Item>
+
+            <Form.Item
               name="dateRange"
-              label="Package Dates"
+              label={
+                <Space>
+                  <CalendarOutlined />
+                  <span>Package Dates</span>
+                </Space>
+              }
               rules={[
                 { required: true, message: "Please select package dates" },
               ]}
             >
-              <RangePicker style={{ width: "100%" }} />
+              <RangePicker
+                style={{ width: "100%" }}
+                format="DD MMM YYYY"
+                placeholder={["Start Date", "End Date"]}
+              />
+            </Form.Item>
+            {/* ✅ Hotel Dropdown */}
+            {/* ✅ Multi-Select Hotel Dropdown */}
+            <Form.Item label="Select Hotels for Package">
+              <Select
+                mode="multiple"
+                placeholder="Choose hotels"
+                onChange={handleHotelSelect}
+                value={selectedHotels}
+              >
+                {hotels.map((hotel) => (
+                  <Option key={hotel._id} value={hotel._id}>
+                    {hotel.title}
+                  </Option>
+                ))}
+              </Select>
             </Form.Item>
 
-            <Form.Item
+            {/* ✅ Display Selected Hotels */}
+            {selectedHotelNames.length > 0 && (
+              <List
+                size="small"
+                bordered
+                dataSource={selectedHotelNames}
+                renderItem={(item, index) => (
+                  <List.Item
+                    actions={[
+                      <Tooltip title="Remove">
+                        <Button
+                          type="text"
+                          danger
+                          icon={<DeleteOutlined />}
+                          onClick={() =>
+                            handleRemoveHotel(selectedHotels[index])
+                          }
+                        />
+                      </Tooltip>,
+                    ]}
+                  >
+                    {item}
+                  </List.Item>
+                )}
+              />
+            )}
+
+            <Form.Item  
               name="totalSeats"
-              label="Total Seats"
+              label={
+                <Space>
+                  <TeamOutlined />
+                  <span>Total Seats</span>
+                </Space>
+              }
               rules={[
                 {
                   required: true,
@@ -330,91 +521,142 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
               <InputNumber min={1} style={{ width: "100%" }} />
             </Form.Item>
 
-            <Divider orientation="left">includes</Divider>
+            <Divider>
+              <Space>
+                <CheckCircleOutlined />
+                <span>What's Included</span>
+              </Space>
+            </Divider>
             <Space.Compact style={{ width: "100%" }}>
               <Input
-                value={newincludes}
-                onChange={(e) => setNewincludes(e.target.value)}
-                placeholder="Add an includes"
-                onPressEnter={handleAddincludes}
+                value={newIncludes}
+                onChange={(e) => setNewIncludes(e.target.value)}
+                placeholder="Add an inclusion (e.g., Breakfast, WiFi)"
+                onPressEnter={handleAddIncludes}
+                prefix={<CheckCircleOutlined style={{ color: "#52c41a" }} />}
               />
-              <Button
-                type="primary"
-                onClick={handleAddincludes}
-                icon={<PlusOutlined />}
-              >
-                Add
-              </Button>
+              <Tooltip title="Add Inclusion">
+                <Button
+                  type="primary"
+                  onClick={handleAddIncludes}
+                  icon={<PlusOutlined />}
+                >
+                  Add
+                </Button>
+              </Tooltip>
             </Space.Compact>
 
             <List
               size="small"
               bordered
-              style={{ marginTop: 16, marginBottom: 24 }}
+              style={{
+                marginTop: 16,
+                marginBottom: 24,
+                backgroundColor: "#f6ffed",
+              }}
               dataSource={includes}
               renderItem={(item, index) => (
                 <List.Item
                   actions={[
-                    <Button
-                      type="text"
-                      danger
-                      icon={<DeleteOutlined />}
-                      onClick={() =>
-                        setincludes(includes.filter((_, i) => i !== index))
-                      }
-                    />,
+                    <Tooltip title="Remove">
+                      <Button
+                        type="text"
+                        danger
+                        icon={<DeleteOutlined />}
+                        onClick={() =>
+                          setIncludes(includes.filter((_, i) => i !== index))
+                        }
+                      />
+                    </Tooltip>,
                   ]}
                 >
-                  {item}
+                  <Space>
+                    <CheckCircleOutlined style={{ color: "#52c41a" }} />
+                    {item}
+                  </Space>
                 </List.Item>
               )}
+              locale={{ emptyText: "No inclusions added yet" }}
             />
 
-            <Divider orientation="left">excludes</Divider>
+            <Divider>
+              <Space>
+                <CloseCircleOutlined />
+                <span>What's Excluded</span>
+              </Space>
+            </Divider>
             <Space.Compact style={{ width: "100%" }}>
               <Input
-                value={newexcludes}
-                onChange={(e) => setNewexcludes(e.target.value)}
-                placeholder="Add an excludes"
-                onPressEnter={handleAddexcludes}
+                value={newExcludes}
+                onChange={(e) => setNewExcludes(e.target.value)}
+                placeholder="Add an exclusion (e.g., Airport transfers, Tips)"
+                onPressEnter={handleAddExcludes}
+                prefix={<CloseCircleOutlined style={{ color: "#ff4d4f" }} />}
               />
-              <Button
-                type="primary"
-                onClick={handleAddexcludes}
-                icon={<PlusOutlined />}
-              >
-                Add
-              </Button>
+              <Tooltip title="Add Exclusion">
+                <Button
+                  type="primary"
+                  onClick={handleAddExcludes}
+                  icon={<PlusOutlined />}
+                  danger
+                >
+                  Add
+                </Button>
+              </Tooltip>
             </Space.Compact>
 
             <List
               size="small"
               bordered
-              style={{ marginTop: 16, marginBottom: 24 }}
+              style={{
+                marginTop: 16,
+                marginBottom: 24,
+                backgroundColor: "#fff1f0",
+              }}
               dataSource={excludes}
               renderItem={(item, index) => (
                 <List.Item
                   actions={[
-                    <Button
-                      type="text"
-                      danger
-                      icon={<DeleteOutlined />}
-                      onClick={() =>
-                        setexcludes(excludes.filter((_, i) => i !== index))
-                      }
-                    />,
+                    <Tooltip title="Remove">
+                      <Button
+                        type="text"
+                        danger
+                        icon={<DeleteOutlined />}
+                        onClick={() =>
+                          setExcludes(excludes.filter((_, i) => i !== index))
+                        }
+                      />
+                    </Tooltip>,
                   ]}
                 >
-                  {item}
+                  <Space>
+                    <CloseCircleOutlined style={{ color: "#ff4d4f" }} />
+                    {item}
+                  </Space>
                 </List.Item>
               )}
+              locale={{ emptyText: "No exclusions added yet" }}
             />
 
-            <Divider orientation="left">Itinerary</Divider>
-            <Card size="small" style={{ marginBottom: 16 }}>
+            <Divider>
+              <Space>
+                <OrderedListOutlined />
+                <span>Itinerary</span>
+              </Space>
+            </Divider>
+            <Card
+              size="small"
+              style={{ marginBottom: 16 }}
+              title={
+                <Space>
+                  <CalendarOutlined />
+                  <span>Add Day to Itinerary</span>
+                </Space>
+              }
+            >
               <Space direction="vertical" style={{ width: "100%" }}>
                 <Input
-                  placeholder="Day title"
+                  placeholder="Day title (e.g., Arrival and Welcome Dinner)"
                   value={newItineraryEntry.title}
                   onChange={(e) =>
                     setNewItineraryEntry({
@@ -422,15 +664,16 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
                       title: e.target.value,
                     })
                   }
+                  prefix={<FileTextOutlined />}
                 />
                 <TextArea
                   rows={2}
-                  placeholder="Day description"
-                  value={newItineraryEntry.description}
+                  placeholder="Day activities and details"
+                  value={newItineraryEntry.activities}
                   onChange={(e) =>
                     setNewItineraryEntry({
                       ...newItineraryEntry,
-                      description: e.target.value,
+                      activities: e.target.value,
                     })
                   }
                 />
@@ -439,10 +682,11 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
                   onClick={handleAddItinerary}
                   icon={<PlusOutlined />}
                   disabled={
-                    !newItineraryEntry.title || !newItineraryEntry.description
+                    !newItineraryEntry.title || !newItineraryEntry.activities
                   }
+                  block
                 >
-                  Add Day
+                  Add Day to Itinerary
                 </Button>
               </Space>
             </Card>
@@ -451,22 +695,34 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
               <List
                 bordered
                 dataSource={itinerary}
+                style={{ backgroundColor: "#f0f5ff" }}
                 renderItem={(item, index) => (
                   <List.Item
                     actions={[
-                      <Button
-                        type="text"
-                        danger
-                        icon={<DeleteOutlined />}
-                        onClick={() =>
-                          setItinerary(itinerary.filter((_, i) => i !== index))
-                        }
-                      />,
+                      <Tooltip title="Remove Day">
+                        <Button
+                          type="text"
+                          danger
+                          icon={<DeleteOutlined />}
+                          onClick={() =>
+                            setItinerary(
+                              itinerary.filter((_, i) => i !== index)
+                            )
+                          }
+                        />
+                      </Tooltip>,
                     ]}
                   >
                     <List.Item.Meta
-                      title={`${item.day}: ${item.title}`}
-                      description={item.description}
+                      title={
+                        <Space>
+                          <CalendarOutlined />
+                          <span>
+                            {item.day}: {item.title}
+                          </span>
+                        </Space>
+                      }
+                      description={item.activities}
                     />
                   </List.Item>
                 )}
@@ -474,18 +730,23 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
             )}
           </Form>
         </div>
-
         <div style={footerStyle}>
           <Space>
-            <Button onClick={onClose} icon={<CloseOutlined />}>
+            <Button onClick={onClose} icon={<CloseOutlined />} size="large">
               Cancel
             </Button>
             <Button
               type="primary"
               onClick={form.submit}
               icon={<SaveOutlined />}
+              loading={submitting}
+              size="large"
             >
-              Save Package
+              {submitting
+                ? "Saving..."
+                : selectedPackage
+                ? "Update Package"
+                : "Save Package"}
             </Button>
           </Space>
         </div>
