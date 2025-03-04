@@ -9,7 +9,6 @@ const JWT_SECRET = process.env.JWT_SECRET || "default-secret";
 // Admin Login Route
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
-
   try {
     const admin = await Admin.findOne({ email });
     if (!admin) {

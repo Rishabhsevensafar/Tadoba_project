@@ -1,32 +1,45 @@
 import React, { useState } from "react";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
+import axios from "axios";
 import "./TourEnquiry.css"; // Add this CSS file to your project
 
-const TourEnquiryModal = ({ show, handleClose, hotel, onSubmit }) => {
+const TourEnquiryModal = ({ show, handleClose, hotel }) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     country: "",
     message: "",
+    hotelId: hotel?._id || "",
   });
-  
+
   const [isLoading, setIsLoading] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
-    
-    // Add slight delay to show loading animation
-    setTimeout(() => {
-      onSubmit(formData);
+    setSuccessMessage("");
+
+    try {
+      const response = await axios.post("http://localhost:5000/api/tour/tour-enquiry", formData);
+      if (response.data.success) {
+        setSuccessMessage("Your enquiry has been submitted successfully!");
+        setTimeout(() => {
+          setSuccessMessage("");
+          handleClose();
+        }, 2000);
+      }
+    } catch (error) {
+      console.error("Error submitting enquiry:", error);
+      setSuccessMessage("Failed to send enquiry. Please try again.");
+    } finally {
       setIsLoading(false);
-      handleClose();
-    }, 800);
+    }
   };
 
   return (
@@ -34,11 +47,13 @@ const TourEnquiryModal = ({ show, handleClose, hotel, onSubmit }) => {
       show={show} 
       onHide={handleClose} 
       centered 
-      className="tour-enquiry-modal"
       backdrop="static"
+      className="tour-enquiry-modal"
     >
       <Modal.Header className="modal-header-custom">
-        <Modal.Title className="w-100 text-center">Enquire: {hotel?.title}</Modal.Title>
+        <Modal.Title className="w-100 text-center">
+          Enquire About: {hotel?.title}
+        </Modal.Title>
         <Button 
           variant="link" 
           onClick={handleClose} 
@@ -51,84 +66,60 @@ const TourEnquiryModal = ({ show, handleClose, hotel, onSubmit }) => {
       
       <Modal.Body className="p-4">
         <Form onSubmit={handleSubmit}>
-          <Form.Group className="mb-3 form-group-animated">
+          <Form.Group className="mb-3">
             <Form.Label>Full Name</Form.Label>
-            <div className="input-icon-wrapper">
-              <Form.Control
-                type="text"
-                name="name"
-                required
-                value={formData.name}
-                onChange={handleChange}
-                placeholder="Enter your full name"
-                className="form-control-custom"
-              />
-              <span className="input-icon">
-                <i className="fas fa-user"></i>
-              </span>
-            </div>
+            <Form.Control
+              type="text"
+              name="name"
+              required
+              value={formData.name}
+              onChange={handleChange}
+              placeholder="Enter your full name"
+            />
           </Form.Group>
-          
+
           <Row>
             <Col md={6}>
-              <Form.Group className="mb-3 form-group-animated">
+              <Form.Group className="mb-3">
                 <Form.Label>Email</Form.Label>
-                <div className="input-icon-wrapper">
-                  <Form.Control
-                    type="email"
-                    name="email"
-                    required
-                    value={formData.email}
-                    onChange={handleChange}
-                    placeholder="Your email address"
-                    className="form-control-custom"
-                  />
-                  <span className="input-icon">
-                    <i className="fas fa-envelope"></i>
-                  </span>
-                </div>
+                <Form.Control
+                  type="email"
+                  name="email"
+                  required
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Your email address"
+                />
               </Form.Group>
             </Col>
             <Col md={6}>
-              <Form.Group className="mb-3 form-group-animated">
+              <Form.Group className="mb-3">
                 <Form.Label>Phone</Form.Label>
-                <div className="input-icon-wrapper">
-                  <Form.Control
-                    type="text"
-                    name="phone"
-                    required
-                    value={formData.phone}
-                    onChange={handleChange}
-                    placeholder="Your phone number"
-                    className="form-control-custom"
-                  />
-                  <span className="input-icon">
-                    <i className="fas fa-phone"></i>
-                  </span>
-                </div>
+                <Form.Control
+                  type="text"
+                  name="phone"
+                  required
+                  value={formData.phone}
+                  onChange={handleChange}
+                  placeholder="Your phone number"
+                />
               </Form.Group>
             </Col>
           </Row>
-          
-          <Form.Group className="mb-3 form-group-animated">
+
+          <Form.Group className="mb-3">
             <Form.Label>Country</Form.Label>
-            <div className="input-icon-wrapper">
-              <Form.Control
-                type="text"
-                name="country"
-                required
-                value={formData.country}
-                onChange={handleChange}
-                placeholder="Your country"
-                className="form-control-custom"
-              />
-              <span className="input-icon">
-                <i className="fas fa-globe"></i>
-              </span>
-            </div>
+            <Form.Control
+              type="text"
+              name="country"
+              required
+              value={formData.country}
+              onChange={handleChange}
+              placeholder="Your country"
+            />
           </Form.Group>
-          
-          <Form.Group className="mb-4 form-group-animated">
+
+          <Form.Group className="mb-4">
             <Form.Label>Message</Form.Label>
             <Form.Control
               as="textarea"
@@ -138,24 +129,18 @@ const TourEnquiryModal = ({ show, handleClose, hotel, onSubmit }) => {
               value={formData.message}
               onChange={handleChange}
               placeholder="Tell us about your requirements..."
-              className="form-control-custom"
             />
           </Form.Group>
-          
+
+          {successMessage && <p className="text-success">{successMessage}</p>}
+
           <Button 
             variant="primary" 
             type="submit" 
-            className="w-100 submit-button-animated"
+            className="w-100"
             disabled={isLoading}
           >
-            {isLoading ? (
-              <>
-                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                Sending...
-              </>
-            ) : (
-              'Send Enquiry'
-            )}
+            {isLoading ? "Sending..." : "Send Enquiry"}
           </Button>
         </Form>
       </Modal.Body>
