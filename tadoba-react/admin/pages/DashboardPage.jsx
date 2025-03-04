@@ -23,7 +23,7 @@ import {
   HomeOutlined,
   SettingOutlined,
 } from "@ant-design/icons";
-import { FaSafari } from "react-icons/fa";
+import { FaEnvelopeSquare, FaSafari } from "react-icons/fa";
 
 const { Header, Sider, Content } = Layout;
 const { Title } = Typography;
@@ -73,6 +73,11 @@ const DashboardPage = () => {
       key: "/admin/dashboard/settings",
       icon: <SettingOutlined style={{ fontSize: '20px' }}/>,
       label: "Settings",
+    },
+    {
+      key: "/admin/dashboard/tour-enquiry",
+      icon: <FaEnvelopeSquare style={{ fontSize: '20px' }}/>,
+      label: "TourEnquiry",
     },
   ];
 
