@@ -1,16 +1,17 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import axios from "axios";
 import "./TourEnquiry.css"; // Add this CSS file to your project
 
-const TourEnquiryModal = ({ show, handleClose, hotel }) => {
+const TourEnquiryModal = ({ show, handleClose, hotel, packageId }) => {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     country: "",
     message: "",
-    hotelId: hotel?._id || "",
+    hotelId: hotel?._id || "", // ✅ Ensure hotel ID is passed
+    packageId: packageId || "", // ✅ Ensure package ID is passed
   });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -19,14 +20,22 @@ const TourEnquiryModal = ({ show, handleClose, hotel }) => {
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
-
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      hotelId: hotel?._id || "", // ✅ Update hotelId when hotel changes
+    }));
+  }, [hotel]);
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setSuccessMessage("");
 
     try {
-      const response = await axios.post("http://localhost:5000/api/tour/tour-enquiry", formData);
+      const response = await axios.post(
+        "http://localhost:5000/api/tour/tour-enquiry",
+        formData
+      );
       if (response.data.success) {
         setSuccessMessage("Your enquiry has been submitted successfully!");
         setTimeout(() => {
@@ -43,105 +52,74 @@ const TourEnquiryModal = ({ show, handleClose, hotel }) => {
   };
 
   return (
-    <Modal 
-      show={show} 
-      onHide={handleClose} 
-      centered 
-      backdrop="static"
-      className="tour-enquiry-modal"
-    >
-      <Modal.Header className="modal-header-custom">
-        <Modal.Title className="w-100 text-center">
-          Enquire About: {hotel?.title}
-        </Modal.Title>
-        <Button 
-          variant="link" 
-          onClick={handleClose} 
-          className="close-button"
-          aria-label="Close"
-        >
-          <span aria-hidden="true">&times;</span>
-        </Button>
+    <Modal show={show} onHide={handleClose} centered>
+      <Modal.Header closeButton>
+        <Modal.Title>Enquire: {hotel?.title}</Modal.Title>
       </Modal.Header>
-      
-      <Modal.Body className="p-4">
+      <Modal.Body>
         <Form onSubmit={handleSubmit}>
-          <Form.Group className="mb-3">
+          <Form.Group>
             <Form.Label>Full Name</Form.Label>
             <Form.Control
               type="text"
               name="name"
               required
-              value={formData.name}
-              onChange={handleChange}
-              placeholder="Enter your full name"
+              onChange={(e) =>
+                setFormData({ ...formData, name: e.target.value })
+              }
             />
           </Form.Group>
 
-          <Row>
-            <Col md={6}>
-              <Form.Group className="mb-3">
-                <Form.Label>Email</Form.Label>
-                <Form.Control
-                  type="email"
-                  name="email"
-                  required
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="Your email address"
-                />
-              </Form.Group>
-            </Col>
-            <Col md={6}>
-              <Form.Group className="mb-3">
-                <Form.Label>Phone</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="phone"
-                  required
-                  value={formData.phone}
-                  onChange={handleChange}
-                  placeholder="Your phone number"
-                />
-              </Form.Group>
-            </Col>
-          </Row>
+          <Form.Group>
+            <Form.Label>Email</Form.Label>
+            <Form.Control
+              type="email"
+              name="email"
+              required
+              onChange={(e) =>
+                setFormData({ ...formData, email: e.target.value })
+              }
+            />
+          </Form.Group>
 
-          <Form.Group className="mb-3">
+          <Form.Group>
+            <Form.Label>Phone</Form.Label>
+            <Form.Control
+              type="text"
+              name="phone"
+              required
+              onChange={(e) =>
+                setFormData({ ...formData, phone: e.target.value })
+              }
+            />
+          </Form.Group>
+
+          <Form.Group>
             <Form.Label>Country</Form.Label>
             <Form.Control
               type="text"
               name="country"
               required
-              value={formData.country}
-              onChange={handleChange}
-              placeholder="Your country"
+              onChange={(e) =>
+                setFormData({ ...formData, country: e.target.value })
+              }
             />
           </Form.Group>
 
-          <Form.Group className="mb-4">
+          <Form.Group>
             <Form.Label>Message</Form.Label>
             <Form.Control
               as="textarea"
-              name="message"
               rows={3}
+              name="message"
               required
-              value={formData.message}
-              onChange={handleChange}
-              placeholder="Tell us about your requirements..."
+              onChange={(e) =>
+                setFormData({ ...formData, message: e.target.value })
+              }
             />
           </Form.Group>
 
-          {successMessage && <p className="text-success">{successMessage}</p>}
-
-          <Button 
-            variant="primary" 
-            type="submit" 
-            className="w-100"
-            disabled={isLoading}
-          >
-            {isLoading ? "Sending..." : "Send Enquiry"}
-          </Button>
+          <Button type="submit">Send Enquiry</Button>
         </Form>
       </Modal.Body>
     </Modal>

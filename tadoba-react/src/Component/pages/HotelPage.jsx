@@ -3,23 +3,26 @@ import { Link } from "react-router-dom";
 import hotelBanner1 from "../../assets/images/hotel-banner1.jpg";
 import hotelBanner2 from "../../assets/images/hotel-banner2.jpg";
 import hotelBanner3 from "../../assets/images/hotel-banner3.jpg";
-import tadobaHotel from "../../assets/images/caption.jpg";
+// import tadobaHotel from "../../assets/images/caption.jpg";
 import Header from "../Header";
+import axios from "axios";
 import ImportantLinks from "../ImportantLinks";
 import Footer from "../Footer";
 import { useState } from "react";
-import { FaLocationDot } from "react-icons/fa6";
-import { TiLocationArrow } from "react-icons/ti";
+import { FaBan, FaLocationDot, FaWifi } from "react-icons/fa6";
+// import { TiLocationArrow } from "react-icons/ti";
 import { FaStar } from "react-icons/fa";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useEffect } from "react";
+import defaultHotelImage from "../../assets/images/caption.jpg";
 
 function HotelPage() {
   const [date, setDate] = useState(new Date());
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
   const [count, setCount] = useState(0);
+  const [hotels, setHotels] = useState([]); // ✅ Store fetched hotels
 
   const increase = () => {
     setCount(count + 1);
@@ -30,8 +33,18 @@ function HotelPage() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
+    fetchHotels(); // ✅ Fetch hotels from API
   }, []);
-
+  const fetchHotels = async () => {
+    try {
+      const response = await axios.get(
+        "http://localhost:5000/api/hotel/hotel-packages"
+      ); // ✅ API Endpoint
+      setHotels(response.data.hotels);
+    } catch (error) {
+      console.error("Error fetching hotels:", error);
+    }
+  };
   return (
     <>
       <Header></Header>
@@ -85,7 +98,6 @@ function HotelPage() {
             </div>
           </div>
         </div>
-
         <div className="col-sm-12 col-md-2 col-lg-2 px-3">
           <div className="boxxSearch">
             <a href="#">Search</a>
@@ -303,268 +315,136 @@ function HotelPage() {
                 </div>
               </div>
             </div>
-            <div className="col-sm-12 col-md-9 col-lg-9 ">
-              {/* <p>5 Hotels Found</p> */}
-              <div className="hotel mt-3 allhoteldes">
-                <div>
-                  <img
-                    src={tadobaHotel}
-                    className="tadobahotelImg"
-                    alt="Tadoba hotel iamge"
-                  />
-                </div>
-                <div className="ps-4">
-                  <h5>
-                    <Link to="/hoteldetail"> Tiger Valley Resort, Tadoba</Link>{" "}
-                    
-                  </h5>
-                  <p>
-                    {" "}
-                    <FaLocationDot />
-                    Address: Tadoba National Park, Moharli Gate, Maharashtra
-                    442404
-                  </p>
-                  <ul>
-                    <li className="policy">Cancellation Policy</li>
-                    <li className="policy">Breakfast Included</li>
-                  </ul>
-                  <p className="">
-                    <TiLocationArrow />
-                    <span>Location: </span>Near Chandrapur (Moharli Zone),
-                    Nagpur
-                  </p>
-                </div>
-
-                <div className="ps-3 ms-auto hotelrightdiv">
-                    <div className="stardes">
-                      <FaStar style={{ color: "#FFD43B" }} />
-                      <FaStar style={{ color: "#FFD43B" }} />
-                      <FaStar style={{ color: "#FFD43B" }} />{" "}
+            {/* <p>5 Hotels Found</p> */}
+            <div className="col-sm-12 col-md-9">
+              {hotels.length > 0 ? (
+                hotels.map((hotel) => (
+                  <div key={hotel._id} className="hotel mt-3 allhoteldes">
+                    <div>
+                      <img
+                        src={
+                          hotel.images && hotel.images.length > 0
+                            ? `http://localhost:5000${hotel.images[0]}`
+                            : defaultHotelImage
+                        }
+                        className="tadobahotelImg"
+                        alt={hotel.title}
+                      />
                     </div>
-                  <p>
-                    <span>Excellent </span> <br />
-                    250 Review
-                  </p>
-                  <s>&#x20B9; 7650</s>
-                  <h4> &#x20B9; 6579</h4>
-                  <p>+ &#x20B9; 0 taxes & fees per night</p>
-                  <Link to="/hoteldetail">
-                    {" "}
-                    <button type="button" className="btn btn-success">
-                      More Room
-                    </button>
-                  </Link>
-                </div>
-              </div>
+                    <div className="ps-4">
+                      <h5>
+                        <Link to={`/hoteldetail/${hotel._id}`}>
+                          {hotel.title}
+                        </Link>
+                      </h5>
+                      <p>
+                        <FaLocationDot />
+                        <strong> Address: </strong>
+                        {hotel.location?.name ||
+                          "Location Not Available"} - {hotel.location?.pincode}
+                      </p>
 
-              <div className="hotel mt-3 allhoteldes">
-                <div>
-                  <img
-                    src={tadobaHotel}
-                    className="tadobahotelImg"
-                    alt="Tadoba hotel iamge"
-                  />
-                </div>
-                <div className="ps-4">
-                  <h5>
-                    <Link to="/hoteldetail"> Tiger Valley Resort, Tadoba</Link>{" "}
-                  
-                  </h5>
-                  <p>
-                    {" "}
-                    <FaLocationDot />
-                    Address: Tadoba National Park, Moharli Gate, Maharashtra
-                    442404
-                  </p>
-                  <ul>
-                    <li className="policy">Cancellation Policy</li>
-                    <li className="policy">Breakfast Included</li>
-                  </ul>
-                  <p className="">
-                    <TiLocationArrow />
-                    <span>Location: </span>Near Chandrapur (Moharli Zone),
-                    Nagpur
-                  </p>
-                </div>
+                      {/* ✅ Display only 3 amenities with title icon */}
+                      <p>
+                        <FaStar style={{ color: "#FFD43B" }} />
+                        <strong> Amenities: </strong>{" "}
+                        {hotel.amenities && hotel.amenities.length > 0 ? (
+                          <>
+                            {hotel.amenities
+                              .slice(0, 3)
+                              .map((amenity, index) => (
+                                <span
+                                  key={index}
+                                  className="badge bg-info me-1"
+                                >
+                                  {amenity}
+                                </span>
+                              ))}
+                            {hotel.amenities.length > 3 && (
+                              <span>
+                                ...{" "}
+                                <Link to={`/hoteldetail/${hotel._id}`}>
+                                  More
+                                </Link>
+                              </span>
+                            )}
+                          </>
+                        ) : (
+                          "No amenities available"
+                        )}
+                      </p>
 
-                <div className="ps-3 ms-auto hotelrightdiv">
-                    <div className="stardes">
-                      <FaStar style={{ color: "#FFD43B" }} />
-                      <FaStar style={{ color: "#FFD43B" }} />
-                      <FaStar style={{ color: "#FFD43B" }} />{" "}
+                      {/* ✅ Display only 3 facilities with title icon */}
+                      <p>
+                        <FaWifi style={{ color: "#28a745" }} />
+                        <strong> Facilities: </strong>{" "}
+                        {hotel.facilities && hotel.facilities.length > 0 ? (
+                          <>
+                            {hotel.facilities
+                              .slice(0, 3)
+                              .map((facility, index) => (
+                                <span
+                                  key={index}
+                                  className="badge bg-success me-1"
+                                >
+                                  {facility}
+                                </span>
+                              ))}
+                            {hotel.facilities.length > 3 && (
+                              <span>
+                                ...{" "}
+                                <Link to={`/hoteldetail/${hotel._id}`}>
+                                  More
+                                </Link>
+                              </span>
+                            )}
+                            <div>
+                              <p
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                }}
+                              >
+                                <FaBan />
+                                <Link
+                                  style={{
+                                    textDecoration: "none",
+                                    marginLeft: "3px",
+                                  }}
+                                >
+                                  Cancelation Policy
+                                </Link>
+                              </p>
+                            </div>
+                          </>
+                        ) : (
+                          "No facilities available"
+                        )}
+                      </p>
                     </div>
-                  <p>
-                    <span>Excellent </span> <br />
-                    250 Review
-                  </p>
-                  <s>&#x20B9; 7650</s>
-                  <h4> &#x20B9; 6579</h4>
-                  <p>+ &#x20B9; 0 taxes & fees per night</p>
-                  <Link to="/hoteldetail">
-                    {" "}
-                    <button type="button" className="btn btn-success">
-                      More Room
-                    </button>
-                  </Link>
-                </div>
-              </div>
 
-              <div className="hotel mt-3 allhoteldes">
-                <div>
-                  <img
-                    src={tadobaHotel}
-                    className="tadobahotelImg"
-                    alt="Tadoba hotel iamge"
-                  />
-                </div>
-                <div className="ps-4">
-                  <h5>
-                    <Link to="/hoteldetail"> Tiger Valley Resort, Tadoba</Link>{" "}
-                    
-                  </h5>
-                  <p>
-                    {" "}
-                    <FaLocationDot />
-                    Address: Tadoba National Park, Moharli Gate, Maharashtra
-                    442404
-                  </p>
-                  <ul>
-                    <li className="policy">Cancellation Policy</li>
-                    <li className="policy">Breakfast Included</li>
-                  </ul>
-                  <p className="">
-                    <TiLocationArrow />
-                    <span>Location: </span>Near Chandrapur (Moharli Zone),
-                    Nagpur
-                  </p>
-                </div>
-
-                <div className="ps-3 ms-auto hotelrightdiv">
-                    <div className="stardes">
-                      <FaStar style={{ color: "#FFD43B" }} />
-                      <FaStar style={{ color: "#FFD43B" }} />
-                      <FaStar style={{ color: "#FFD43B" }} />{" "}
+                    <div className="ps-3 ms-auto hotelrightdiv">
+                      <div className="stardes">
+                        {[...Array(hotel.number_of_stars || 3)].map(
+                          (_, index) => (
+                            <FaStar key={index} style={{ color: "#FFD43B" }} />
+                          )
+                        )}
+                      </div>
+                      <s>&#x20B9; {hotel.real_price || "N/A"}</s>
+                      <h4> &#x20B9; {hotel.discounted_price || "N/A"}</h4>
+                      <p>+ &#x20B9; 0 taxes & fees per night</p>
+                      <Link to={`/hoteldetail/${hotel._id}`}>
+                        <button type="button" className="btn btn-success">
+                          More Details
+                        </button>
+                      </Link>
                     </div>
-                  <p>
-                    <span>Excellent </span> <br />
-                    250 Review
-                  </p>
-                  <s>&#x20B9; 7650</s>
-                  <h4> &#x20B9; 6579</h4>
-                  <p>+ &#x20B9; 0 taxes & fees per night</p>
-                  <Link to="/hoteldetail">
-                    {" "}
-                    <button type="button" className="btn btn-success">
-                      More Room
-                    </button>
-                  </Link>
-                </div>
-              </div>
-
-              <div className="hotel mt-3 allhoteldes">
-                <div>
-                  <img
-                    src={tadobaHotel}
-                    className="tadobahotelImg"
-                    alt="Tadoba hotel iamge"
-                  />
-                </div>
-                <div className="ps-4">
-                  <h5>
-                    <Link to="/hoteldetail"> Tiger Valley Resort, Tadoba</Link>{" "}
-                    
-                  </h5>
-                  <p>
-                    {" "}
-                    <FaLocationDot />
-                    Address: Tadoba National Park, Moharli Gate, Maharashtra
-                    442404
-                  </p>
-                  <ul>
-                    <li className="policy">Cancellation Policy</li>
-                    <li className="policy">Breakfast Included</li>
-                  </ul>
-                  <p className="">
-                    <TiLocationArrow />
-                    <span>Location: </span>Near Chandrapur (Moharli Zone),
-                    Nagpur
-                  </p>
-                </div>
-
-                <div className="px-3 ms-auto hotelrightdiv">
-                    <div className="stardes">
-                      <FaStar style={{ color: "#FFD43B" }} />
-                      <FaStar style={{ color: "#FFD43B" }} />
-                      <FaStar style={{ color: "#FFD43B" }} />{" "}
-                    </div>
-                  <p>
-                    <span>Excellent </span> <br />
-                    250 Review
-                  </p>
-                  <s>&#x20B9; 7650</s>
-                  <h4> &#x20B9; 6579</h4>
-                  <p>+ &#x20B9; 0 taxes & fees per night</p>
-                  <Link to="/hoteldetail">
-                    {" "}
-                    <button type="button" className="btn btn-success">
-                      More Room
-                    </button>
-                  </Link>
-                </div>
-              </div>
-
-              <div className="hotel mt-3 allhoteldes">
-                <div>
-                  <img
-                    src={tadobaHotel}
-                    className="tadobahotelImg"
-                    alt="Tadoba hotel iamge"
-                  />
-                </div>
-                <div className="ps-4">
-                  <h5>
-                    <Link to="/hoteldetail"> Tiger Valley Resort, Tadoba</Link>{" "}
-                    
-                  </h5>
-                  <p>
-                    {" "}
-                    <FaLocationDot />
-                    Address: Tadoba National Park, Moharli Gate, Maharashtra
-                    442404
-                  </p>
-                  <ul>
-                    <li className="policy">Cancellation Policy</li>
-                    <li className="policy">Breakfast Included</li>
-                  </ul>
-                  <p className="">
-                    <TiLocationArrow />
-                    <span>Location: </span>Near Chandrapur (Moharli Zone),
-                    Nagpur
-                  </p>
-                </div>
-
-                <div className="ps-3 ms-auto hotelrightdiv">
-                    <div className="stardes">
-                      <FaStar style={{ color: "#FFD43B" }} />
-                      <FaStar style={{ color: "#FFD43B" }} />
-                      <FaStar style={{ color: "#FFD43B" }} />{" "}
-                    </div>
-                  <p>
-                    <span>Excellent </span>
-                    <br />
-                    250 Review
-                  </p>
-                  <s>&#x20B9; 7650</s>
-                  <h4> &#x20B9; 6579</h4>
-                  <p>+ &#x20B9; 0 taxes & fees per night</p>
-                  <Link to="/hoteldetail">
-                    {" "}
-                    <button type="button" className="btn btn-success">
-                      More Room
-                    </button>
-                  </Link>
-                </div>
-              </div>
+                  </div>
+                ))
+              ) : (
+                <p>No Hotels Found.</p>
+              )}
             </div>
           </div>
         </div>

@@ -1,231 +1,181 @@
-import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom"; // ✅ Get package ID from URL
-import axios from "axios";
-import Header from "../Header";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import ImportantLinks from "../ImportantLinks";
 import Footer from "../Footer";
+import Header from "../Header";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import tadobaHotel from "../../assets/images/tadoba1.jpeg";
-import day1package from "../../assets/images/navegaon.jpg";
-import day2package from "../../assets/images/morpen1.jpg";
-import { FaCarAlt, FaHome, FaStar } from "react-icons/fa";
-import { CiBeaker1 } from "react-icons/ci";
-import { MdOutlineWatchLater } from "react-icons/md";
-import { FaLocationArrow } from "react-icons/fa6";
+import { FaStar } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import Popup from "reactjs-popup";
+import "reactjs-popup/dist/index.css";
+import axios from "axios"; // ✅ Import axios for API calls
 
-function TestTourPackageDetail() {
-  const { id } = useParams(); // ✅ Get package ID from URL
-  const [packageDetails, setPackageDetails] = useState(null);
-  const [startDate, setStartDate] = useState();
-  const [endDate, setEndDate] = useState();
+function HotelDetails() {
+  const { id } = useParams(); // ✅ Get hotel ID from URL
+  const [hotel, setHotel] = useState(null); // ✅ Store hotel details
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    fetchPackageDetails();
+    fetchHotelDetails();
   }, []);
-
-  const fetchPackageDetails = async () => {
+  const fetchHotelDetails = async () => {
     try {
-      const response = await axios.get(
-        `http://localhost:5000/api/tourpackage/${id}`
-      );
-      setPackageDetails(response.data.package);
+      const response = await axios.get(`http://localhost:5000/api/hotel/hotel-packages/${id}`);
+      setHotel(response.data);
     } catch (error) {
-      console.error("Error fetching package details:", error);
+      console.error("Error fetching hotel details:", error);
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (!packageDetails) {
-    return <p className="text-center">Loading package details...</p>;
-  }
+  if (loading) return <p>Loading...</p>; // ✅ Show loading while fetching data
+  if (!hotel) return <p>Hotel not found.</p>; // ✅ Show message if hotel not found
 
   return (
     <>
       <Header />
-      <div className="row hotelback">
-        <div className="col-sm-12 col-md-3 col-lg-3 px-2">
-          <div className="boxx">
-            <select>
-              <option value="">Select</option>
-              <option value="">Tiger valley resort Tadoba</option>
-              <option value="">Tiger valley resort Tadoba</option>
-              <option value="">Tiger valley resort Tadoba</option>
-            </select>
-            <p>All Hotels in Tadoba</p>
-          </div>
-        </div>
-        <div className="col-sm-12 col-md-3 col-lg-3 px-2">
-          <div className="boxx">
-            <div className="dateFormat">
-              <DatePicker
-                className="date1"
-                placeholderText="Check In"
-                selectsStart
-                selected={startDate}
-                onChange={(date) => setStartDate(date)}
-                startDate={startDate}
-              />
-              <DatePicker
-                className="date1"
-                placeholderText="Check Out"
-                selectsEnd
-                selected={endDate}
-                onChange={(date) => setEndDate(date)}
-                endDate={endDate}
-                startDate={startDate}
-                minDate={startDate}
-              />
-            </div>
-            <p>Choose Date</p>
-          </div>
-        </div>
+
+      <div className="d-flex">
+        {/* ✅ Render Hotel Images */}
+        {hotel.images && hotel.images.length > 0 ? (
+          hotel.images.slice(0, 3).map((image, index) => (
+            <img key={index} src={`http://localhost:5000${image}`} className="tadobadetailImg pe-lg-1" alt="" />
+          ))
+        ) : (
+          <p>No images available</p>
+        )}
       </div>
 
-      <div className="container">
-        <section>
-          <h2>{packageDetails.title}</h2>
-          <p>{packageDetails.description}</p>
-        </section>
+      <section className="leaf pt-4">
+        <div className="container">
+          <div>
+            <h2 className="ms-2">
+              {hotel.title}{" "}
+              {[...Array(hotel.number_of_stars || 3)].map((_, index) => (
+                <FaStar key={index} style={{ color: "#FFD43B" }} className="mb-2" />
+              ))}
+            </h2>
+            <p className="ms-2">
+              Address: {hotel.location?.name || "Location Not Available"}, {hotel.location?.pincode}
+            </p>
+          </div>
 
-        <section>
-          <h5 className="ps-3">Hotels Included in this Package</h5>
-          {packageDetails.hotels && packageDetails.hotels.length > 0 ? (
-            packageDetails.hotels.map((hotel) => (
-              <div className="hotelTourPackages mt-3" key={hotel._id}>
-                <div>
-                  {/* ✅ Display the first image, if available */}
-                  <img
-                    src={
-                      hotel.images?.length > 0
-                        ? `http://localhost:5000${hotel.images[0]}`
-                        : tadobaHotel
-                    }
-                    className="tadobahotelImg"
-                    alt="Hotel"
-                  />
-                </div>
-                <div className="ps-4">
-                  <h5>{hotel.title || "Hotel Name Not Provided"}</h5>
-                  <p>
-                    <FaLocationArrow />{" "}
-                    {hotel.location?.name || "Location Not Provided"}
-                  </p>
-                  <p>
-                    <CiBeaker1 /> Facilities:{" "}
-                    {hotel.amenities?.length
-                      ? hotel.amenities.join(", ")
-                      : "Not Provided"}
-                  </p>
-                  <p>
-                    <MdOutlineWatchLater /> {packageDetails.duration} |{" "}
-                    <FaCarAlt /> 1 Jeep | <FaHome />{" "}
-                    {hotel.room_type || "Standard Room"}
-                  </p>
-                </div>
-                <div className="ps-5 ms-auto text-end tourhotside">
-                  <div>
-                    {[...Array(hotel.number_of_stars || 3)].map((_, index) => (
-                      <FaStar key={index} className="stardes" />
-                    ))}
-                  </div>
-                  <s>&#x20B9; {hotel.real_price || "N/A"}</s>
-                  <h4> &#x20B9; {hotel.discounted_price || "N/A"}</h4>
-                  <p>+ &#x20B9; 0 taxes & fees per night</p>
-                  <button type="button" className="btn btn-dark">
-                    Book Now
-                  </button>
-                </div>
-              </div>
-            ))
-          ) : (
-            <p>No hotels added to this package.</p>
-          )}
-        </section>
+          <div className="hotelDetailDiscription">
+            <div>
+              <h4>Description</h4>
+              <p>{hotel.description}</p>
+            </div>
+            <div>
+              {hotel.images && hotel.images.slice(0, 2).map((image, index) => (
+                <img key={index} src={`http://localhost:5000${image}`} className="imgHotelDetail" alt="" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
-        {/* ✅ Itinerary Section */}
-        <section>
-          <h2>Tour Itinerary</h2>
-          {packageDetails.itinerary && packageDetails.itinerary.length > 0 ? (
-            packageDetails.itinerary.map((day, index) => (
-              <div className="day1Border day1Tadoba mt-3" key={index}>
-                <div>
-                  <h4>{day.title}</h4>
-                  <p>{day.activities}</p>
-                </div>
-                <img
-                  src={index % 2 === 0 ? day1package : day2package}
-                  className="day1package"
-                  alt=""
-                />
-              </div>
-            ))
-          ) : (
-            <p>No itinerary available.</p>
-          )}
-        </section>
+      {/* ✅ Available Rooms Section */}
+      <section className="pb-5">
+        <div className="container">
+          <div>
+            <h4>Available Rooms</h4>
+            <table className="table mt-3">
+              <thead className="thead-light">
+                <tr className="tableborder">
+                  <th>Room Type</th>
+                  <th>Meal Plan</th>
+                  <th>Price</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="tableborder">
+                    <h4 className="m-2 delux">{hotel.room_type}</h4>
+                    <ul className="d-flex">
+                      <div>
+                        {hotel.amenities && hotel.amenities.slice(0, 3).map((amenity, index) => (
+                          <li key={index}>{amenity}</li>
+                        ))}
+                        <Popup
+                          className="policy mt-3"
+                          trigger={<button className="popupbutton1">More Detail</button>}
+                          position="right center"
+                        >
+                          <div className="popupBox1">
+                            <h4>{hotel.room_type}</h4>
+                            <hr />
+                            <h6>Room Amenities</h6>
+                            <hr />
+                            <ul>
+                              {hotel.amenities?.map((amenity, index) => (
+                                <li key={index}>{amenity}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        </Popup>
+                      </div>
+                    </ul>
+                  </td>
+                  <td className="tableborder">
+                    <h6>Accomodation with Free Breakfast</h6>
+                    <ul>
+                      <li>Welcome drink on arrival</li>
+                      <li>Early check-in, subject to availability</li>
+                    </ul>
+                  </td>
+                  <td className="tableborder">
+                    <div className="ps-5 ms-auto">
+                      <s>&#x20B9; {hotel.real_price || "N/A"}</s>
+                      <h4> &#x20B9; {hotel.discounted_price || "N/A"}</h4>
+                      <p>+ &#x20B9; 0 taxes & fees per night</p>
+                      <Link to="/reviewbookinghotel">
+                        <button type="button" className="btn btn-success">Book Now</button>
+                      </Link>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-        {/* ✅ Includes & Excludes */}
-        <section>
-          <div className="day1Border mt-3">
-            <div className="d-flex">
+          {/* ✅ Facilities Section */}
+          <h4>Facilities</h4>
+          <div className="availableRoom mt-3">
+            <div className="facilities">
               <ul>
-                <h4>Inclusions</h4>
-                {packageDetails.includes &&
-                packageDetails.includes.length > 0 ? (
-                  packageDetails.includes.map((item, index) => (
-                    <li key={index}>{item}</li>
-                  ))
-                ) : (
-                  <li>No inclusions specified</li>
-                )}
-              </ul>
-              <ul>
-                <h4>Exclusions</h4>
-                {packageDetails.excludes &&
-                packageDetails.excludes.length > 0 ? (
-                  packageDetails.excludes.map((item, index) => (
-                    <li key={index}>{item}</li>
-                  ))
-                ) : (
-                  <li>No exclusions specified</li>
-                )}
+                {hotel.facilities && hotel.facilities.map((facility, index) => (
+                  <li key={index}>{facility}</li>
+                ))}
               </ul>
             </div>
           </div>
-        </section>
 
-        {/* ✅ Terms & Conditions */}
-        <section>
-          <div className="day1Border mt-3">
-            <h4>Terms & Conditions</h4>
-            <ul>
-              <li>All hotels provide base category rooms.</li>
-              <li>Check-in: 12:00 noon, Check-out: 11:00 AM.</li>
-              <li>
-                Any changes in govt. taxes will be informed before the travel
-                date.
-              </li>
-              <li>
-                Company is not responsible for any accidents, loss, or damages.
-              </li>
-            </ul>
+          {/* ✅ Location Section */}
+          <div>
+            <h4>Location</h4>
+            <div className="availableRoom mt-3">
+              <p>Address: {hotel.location?.name}, {hotel.location?.pincode}</p>
+              <iframe src={hotel.map_location} allowFullScreen loading="lazy"></iframe>
+            </div>
           </div>
-        </section>
 
-        {/* ✅ Cancellation Policy */}
-        <section>
-          <div className="day1Border mt-3">
-            <h4>Cancellation Policy</h4>
-            <ul>
-              <li>30 days prior: 10% of tour cost.</li>
-              <li>15-29 days prior: 30% of tour cost.</li>
-              <li>2-6 days prior: 50% of tour cost.</li>
-              <li>Less than 48 hours: No refund.</li>
-            </ul>
+          {/* ✅ Booking Policy Section */}
+          <div>
+            <h4>Booking Policy</h4>
+            <div className="availableRoom mt-3">
+              <ul>
+                <li>As per government regulations, every guest must carry a valid Photo ID.</li>
+                <li>Early check-in is subject to availability.</li>
+                <li>Check-in/check-out time may vary as per the hotel.</li>
+                <li>Extra services not mentioned in booking voucher will be charged by the hotel.</li>
+              </ul>
+            </div>
           </div>
-        </section>
-      </div>
+        </div>
+      </section>
 
       <ImportantLinks />
       <Footer />
@@ -233,4 +183,4 @@ function TestTourPackageDetail() {
   );
 }
 
-export default TestTourPackageDetail;
+export default HotelDetails;
