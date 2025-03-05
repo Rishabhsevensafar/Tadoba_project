@@ -175,7 +175,11 @@ function SafariBooking() {
                     />
                   </div>
                 </div>
-                <div className="row calenderForm">
+                <div className="calenderForm row"
+                style={{
+                  marginLeft:'0px'
+                }}
+                >
                   <div className="col-sm-12 col-md-6 col-lg-6">
                     <div className=" ">
                       <select

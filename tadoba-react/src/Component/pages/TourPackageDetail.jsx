@@ -1,6 +1,6 @@
 import React from "react";
 import Header from "../Header";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import ImportantLinks from "../ImportantLinks";
@@ -28,6 +28,7 @@ function TourPackageDetail() {
   const [endDate, setEndDate] = useState();
   const [showEnquiryModal, setShowEnquiryModal] = useState(false);
   const [selectedHotel, setSelectedHotel] = useState(null);
+  const navigate = useNavigate();
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchPackageDetails();
@@ -47,7 +48,9 @@ function TourPackageDetail() {
     setSelectedHotel(hotel);
     setShowEnquiryModal(true);
   };
-  
+  const handleBookNow = (hotel) => {
+    navigate(`/booking/${packageDetails._id}`, { state: { hotel } }); // ✅ Passing hotel data
+  };
 
   const handleCloseEnquiryModal = () => setShowEnquiryModal(false);
 
@@ -280,15 +283,20 @@ function TourPackageDetail() {
                             gap: "20px",
                           }}
                         >
-                          <button type="button" className="btn btn-dark">
+                          <button
+                            type="button"
+                            className="btn btn-dark"
+                            onClick={() => handleBookNow(hotel)} // ✅ Ensure hotel is passed
+                          >
                             Book Now
                           </button>
-                          <button
-                            className="btn btn-dark"
-                            onClick={() => handleOpenEnquiryModal(hotel)}
-                          >
-                            Send Enquiry
-                          </button>
+                     
+                            <button
+                              className="btn btn-dark"
+                              onClick={() => handleOpenEnquiryModal(hotel)}
+                            >
+                              Send Enquiry
+                            </button>
                         </div>
                       </div>
                     </div>

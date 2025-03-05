@@ -58,7 +58,7 @@ function TourPackage() {
           </div>
         </div>
       </div>
-      <div className="row hotelback ">
+      {/* <div className="row hotelback ">
         <div className="col-sm-12 col-md-3 col-lg-3 px-2">
           <div className="boxx">
             <select>
@@ -119,7 +119,7 @@ function TourPackage() {
         <div className="col-sm-12 col-md-2 col-lg-2  px-2">
           <button className="boxxSearch">Search</button>
         </div>{" "}
-      </div>
+      </div> */}
       <section className="packagelisting leaf">
         <div className="container">
           <div className="row">

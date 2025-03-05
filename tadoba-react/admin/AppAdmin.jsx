@@ -11,6 +11,7 @@ import AdminBookings from "./pages/AdminBookings";
 import HotelManager from "./pages/HotelManager";
 import SafariBookingReport from "./pages/safariBookingReport";
 import AdminTourEnquiries from "./pages/AdminTourEnquiry";
+import AdminEnquiries from "./pages/AdminEnquires";
 
 const AppAdmin = () => {
   return (
@@ -27,6 +28,7 @@ const AppAdmin = () => {
           <Route path="hotel-manager" element={<HotelManager/>}/>
           <Route path="safari-booking-report" element={<SafariBookingReport/>}/>
           <Route path="tour-enquiry" element={<AdminTourEnquiries/>}/>
+          <Route path="hotel-enquiry" element={<AdminEnquiries/>}/>
         </Route>
         <Route path="*" element={<div>404 Not Found</div>} />
       </Routes>
