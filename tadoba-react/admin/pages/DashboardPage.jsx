@@ -57,7 +57,7 @@ const DashboardPage = () => {
     {
       key: "/admin/dashboard/Packages",
       icon: <GiftOutlined style={{ fontSize: '20px' }}/>,
-      label: "Packages",
+      label: "Tour Manager",
     },
     {
       key: "/admin/dashboard/hotel-manager",
@@ -77,7 +77,12 @@ const DashboardPage = () => {
     {
       key: "/admin/dashboard/tour-enquiry",
       icon: <FaEnvelopeSquare style={{ fontSize: '20px' }}/>,
-      label: "TourEnquiry",
+      label: "Tour Enquiry",
+    },
+    {
+      key: "/admin/dashboard/hotel-enquiry",
+      icon: <FaEnvelopeSquare style={{ fontSize: '20px' }}/>,
+      label: "Hotel Enquiry",
     },
   ];
 

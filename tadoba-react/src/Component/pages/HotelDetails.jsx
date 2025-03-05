@@ -15,9 +15,10 @@ import { useEffect } from "react";
 import "reactjs-popup/dist/index.css";
 import { CheckCircleOutlined } from "@ant-design/icons";
 import axios from "axios";
+import HotelEnquiry from "../HotelEnquiry";
 const convertToEmbedURL = (url) => {
   if (!url) return "";
-  
+
   // Already an embed URL, return as is
   if (url.includes("embed")) return url;
 
@@ -26,9 +27,13 @@ const convertToEmbedURL = (url) => {
     const pathParts = urlObj.pathname.split("/");
 
     if (url.includes("/maps/place/")) {
-      return `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d0!2d${urlObj.searchParams.get("q")}`;
+      return `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d0!2d${urlObj.searchParams.get(
+        "q"
+      )}`;
     } else if (url.includes("/maps/dir/")) {
-      return `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d0!2d${urlObj.searchParams.get("dir")}`;
+      return `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d0!2d${urlObj.searchParams.get(
+        "dir"
+      )}`;
     }
   } catch (error) {
     console.error("Invalid Google Maps URL:", error);
@@ -66,9 +71,9 @@ function HotelDetails() {
       <div className="flex justify-center items-center h-screen">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
       </div>
-    );  
+    );
   if (!hotel) return <p>Hotel not found.</p>; // ✅ Show message if hotel not found
-  
+
   return (
     <>
       <Header></Header>
@@ -187,27 +192,25 @@ function HotelDetails() {
                     </ul>
                   </td>
                   <td className="tableborder">
-                    <div className="ps-5 ms-auto">
-                      <s>&#x20B9; {hotel.real_price || "N/A"}</s>
-                      <h4> &#x20B9; {hotel.discounted_price || "N/A"}</h4>
-                      <p>+ &#x20B9; 0 taxes & fees per night</p>
-                      <Link to="/reviewbookinghotel">
-                        <button type="button" className="btn btn-success">
-                          Book Now
-                        </button>
-                      </Link>
-                      <Link
-                        to="/reviewbookinghotel"
-                        style={{
-                          marginLeft: "10px",
-                        }}
-                      >
-                        <button type="button" className="btn btn-success">
-                          Send Enquiry
-                        </button>
-                      </Link>
-                    </div>
-                  </td>
+  <div className="ps-5 ms-auto">
+    <s>&#x20B9; {hotel.real_price || "N/A"}</s>
+    <h4> &#x20B9; {hotel.discounted_price || "N/A"}</h4>
+    <p>+ &#x20B9; 0 taxes & fees per night</p>
+    
+    {/* ✅ Book Now Button */}
+    <Link to="/reviewbookinghotel">
+      <button type="button" className="btn btn-success">
+        Book Now
+      </button>
+    </Link>
+
+    {/* ✅ Enquiry Popup Component */}
+    <div style={{ marginTop: "10px" }}>
+      <HotelEnquiry hotelId={hotel._id} />
+    </div>
+  </div>
+</td>
+
                 </tr>
               </tbody>
             </table>

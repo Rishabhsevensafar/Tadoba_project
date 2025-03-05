@@ -247,7 +247,7 @@ const PackageManager = () => {
       title: "Actions",
       key: "actions",
       fixed: 'right',
-      width: 180,
+      width: 140,
       render: (_, record) => (
         <Space size="small">
           <Tooltip title={record.isActive ? "Deactivate Package" : "Activate Package"}>
@@ -342,36 +342,6 @@ const PackageManager = () => {
             bordered
             style={{ background: "#fff", borderRadius: "8px", overflow: "hidden" }}
             rowClassName={(record, index) => (index % 2 === 0 ? "table-row-light" : "table-row-dark")}
-            expandable={{
-              expandedRowRender: record => (
-                <div style={{ padding: "16px" }}>
-                  <Title level={5}>Package Details</Title>
-                  <Space direction="vertical" style={{ width: '100%' }}>
-                    <Row gutter={32}>
-                      <Col span={8}>
-                        <Text type="secondary"><EnvironmentOutlined /> Location:</Text>
-                        <div>{record.location || 'Not specified'}</div>
-                      </Col>
-                      <Col span={8}>
-                        <Text type="secondary"><TeamOutlined /> Available Seats:</Text>
-                        <div>{record.totalSeats || 0}</div>
-                      </Col>
-                      <Col span={8}>
-                        <Text type="secondary"><DollarOutlined /> Pricing:</Text>
-                        <div>₹ {record.price?.toLocaleString() || 'Not specified'}</div>
-                      </Col>
-                    </Row>
-                    {record.description && (
-                      <div style={{ marginTop: 16 }}>
-                        <Text type="secondary">Description:</Text>
-                        <div>{record.description}</div>
-                      </div>
-                    )}
-                  </Space>
-                </div>
-              ),
-              expandRowByClick: true
-            }}
           />
 
           <div
