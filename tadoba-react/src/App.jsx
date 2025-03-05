@@ -84,9 +84,9 @@ function App() {
         <Route path="/tourpackage" element={<TourPackage />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path='/tourpackagedetail/:id'element={<TourPackageDetail/>}/>
-        <Route path='/testtourdetails/:id' element={<TestTourPackageDetail/>}/>
-        <Route path="/hoteldetail" element={<HotelDetails />} />
-        <Route path="/hotelpage" element={<HotelPage />} />
+        {/* <Route path='/testtourdetails' element={<HotelDetails/>}/> */}
+        <Route path="/hoteldetail/:id" element={<HotelDetails />} />
+        <Route path="/hotelpage" element={<HotelPage/>} />
         <Route path="/paymentpage" element={<PaymentPage/>}/>
         <Route path="/reviewbookinghotel"element={<ReviewBookingHotel/>}/>
         <Route path="/booking" element={<ReviewBookingTour/>}/>

@@ -6,131 +6,131 @@ import Header from "../Header";
 import tadobaHotel from "../../assets/images/tadoba1.jpeg";
 import tadobaHotel2 from "../../assets/images/tadoba2.jpeg";
 import hotelTadobaDetail from "../../assets/images/hotel-tadoba-detail.jpeg";
-import DatePicker from "react-datepicker";
+import { useParams } from "react-router-dom";
 import "react-datepicker/dist/react-datepicker.css";
 import { FaStar } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import Popup from "reactjs-popup";
 import { useEffect } from "react";
 import "reactjs-popup/dist/index.css";
+import { CheckCircleOutlined } from "@ant-design/icons";
+import axios from "axios";
+const convertToEmbedURL = (url) => {
+  if (!url) return "";
+  
+  // Already an embed URL, return as is
+  if (url.includes("embed")) return url;
+
+  try {
+    const urlObj = new URL(url);
+    const pathParts = urlObj.pathname.split("/");
+
+    if (url.includes("/maps/place/")) {
+      return `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d0!2d${urlObj.searchParams.get("q")}`;
+    } else if (url.includes("/maps/dir/")) {
+      return `https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d0!2d${urlObj.searchParams.get("dir")}`;
+    }
+  } catch (error) {
+    console.error("Invalid Google Maps URL:", error);
+    return "";
+  }
+
+  return url; // Return original if can't parse
+};
 function HotelDetails() {
   const [date, setDate] = useState(new Date());
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
+  const { id } = useParams(); // ✅ Get hotel ID from URL
+  const [hotel, setHotel] = useState(null); // ✅ Store hotel details
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     window.scrollTo(0, 0);
+    fetchHotelDetails();
   }, []);
+  const fetchHotelDetails = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/api/hotel/hotel-packages/${id}`
+      );
+      setHotel(response.data);
+    } catch (error) {
+      console.error("Error fetching hotel details:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+      </div>
+    );  
+  if (!hotel) return <p>Hotel not found.</p>; // ✅ Show message if hotel not found
+  
   return (
     <>
       <Header></Header>
-      {/* <div className="row hotelback">
-        <div className="col-sm-12 col-md-3 col-lg-3 px-3 ">
-          <div className="boxx">
-            <select>
-              <option value="">Select</option>
-              <option value="">Tiger valley resort Tdaoba</option>
-              <option value="">Tiger valley resort Tdaoba</option>
-              <option value="">Tiger valley resort Tdaoba</option>
-            </select>
-            <p>All Hotels in tadoba</p>
-          </div>
-        </div>
-        <div className="col-sm-12 col-md-3 col-lg-3 px-3">
-          <div className="boxx">
-            <div className="dateFormat">
-              <DatePicker
-                className="date1"
-                placeholderText="Check In"
-                selectsStart
-                selected={startDate}
-                onChange={(date) => setStartDate(date)}
-                startDate={startDate}
-              />
-              <DatePicker
-                className="date1"
-                placeholderText="Check Out"
-                selectsEnd
-                selected={endDate}
-                onChange={(date) => setEndDate(date)}
-                endDate={endDate}
-                startDate={startDate}
-                minDate={startDate}
-              />
-            </div>
-            <p>Choose Date</p>
-          </div>
-        </div>
-        <div className="col-sm-12 col-md-3 col-lg-3 px-3">
-          <div className="boxx">
-            <select>
-              <option value="">Select</option>
-              <option value="">Tiger valley resort Tdaoba</option>
-              <option value="">Tiger valley resort Tdaoba</option>
-              <option value="">Tiger valley resort Tdaoba</option>
-            </select>
-            <p>All Hotels in tadoba</p>
-          </div>
-        </div>
-        <div className="col-sm-12 col-md-3 col-lg-3 px-3">
-          <div className="boxxSearch">
-            <p>Search</p>
-          </div>
-        </div>{" "}
-      </div> */}
-
       <div className="d-flex">
-        <img src={tadobaHotel} className="tadobadetailImg m1 pe-lg-1" alt="" />
-        <img src={tadobaHotel2} className="tadobadetailImg pe-lg-1" alt="" />
-        <img src={tadobaHotel} className="tadobadetailImg " alt="" />
+        {/* ✅ Render Hotel Images */}
+        {hotel.images && hotel.images.length > 0 ? (
+          hotel.images
+            .slice(0, 3)
+            .map((image, index) => (
+              <img
+                key={index}
+                src={`http://localhost:5000${image}`}
+                className="tadobadetailImg pe-lg-1"
+                alt=""
+              />
+            ))
+        ) : (
+          <p>No images available</p>
+        )}
       </div>
       <section className="leaf pt-4">
         <div className="container">
           <div>
             <h2 className="ms-2">
-              Tiger Valley Resort, Tadoba{" "}
-              <FaStar style={{ color: "#FFD43B" }} className="mb-2" />
-              <FaStar style={{ color: "#FFD43B" }} className="mb-2" />
-              <FaStar style={{ color: "#FFD43B" }} className="mb-2" />
+              {hotel.title}{" "}
+              {[...Array(hotel.number_of_stars || 3)].map((_, index) => (
+                <FaStar
+                  key={index}
+                  style={{ color: "#FFD43B" }}
+                  className="mb-2"
+                />
+              ))}
             </h2>
             <p className="ms-2">
-              Address: Tadoba National Park, Moharli Gate, Maharashtra 442404
+              Address: {hotel.location?.name || "Location Not Available"},{" "}
+              {hotel.location?.pincode}
             </p>
           </div>
+
           <div className="hotelDetailDiscription">
             <div>
               <h4>Description</h4>
-              <p>
-                Tiger Valley Resort in Tadoba National Park is a premium
-                accommodation option designed to offer guests an immersive
-                wildlife experience. Located near the heart of the park, this
-                resort provides easy access to the rich biodiversity and
-                picturesque landscapes of Tadoba. The resort features
-                well-appointed cottages and tents, blending modern comforts with
-                a rustic charm. Each unit is thoughtfully designed to ensure a
-                cosy stay, equipped with amenities like air conditioning,
-                en-suite bathrooms, and private verandas. Guests can enjoy
-                delicious meals at the on-site restaurant which offers a variety
-                of local and international dishes. One of the highlights of
-                Tiger Valley Resort is its proximity to the park’s key wildlife
-                zones, making it an ideal base for safari adventures. The resort
-                organizes guided jeep safaris, allowing visitors to explore
-                Tadoba’s dense forests and encounter its famous residents,
-                including tigers, leopards, and a range of bird species. The
-                property also emphasizes sustainability and conservation, with
-                efforts to minimize its environmental impact while enhancing the
-                guest experience. Overall, Tiger Valley Resort is a top choice
-                for travellers seeking a comfortable and memorable stay in the
-                heart of Tadoba National Park.
-              </p>
+              <p>{hotel.description}</p>
             </div>
             <div>
-              <img src={tadobaHotel} className="imgHotelDetail" alt="" />
-              <img src={tadobaHotel2} className="imgHotelDetail" alt="" />
+              {hotel.images &&
+                hotel.images
+                  .slice(0, 2)
+                  .map((image, index) => (
+                    <img
+                      key={index}
+                      src={`http://localhost:5000${image}`}
+                      className="imgHotelDetail"
+                      alt=""
+                    />
+                  ))}
             </div>
           </div>
         </div>
       </section>
+
+      {/* ✅ Available Rooms Section */}
       <section className="pb-5">
         <div className="container">
           <div>
@@ -138,28 +138,25 @@ function HotelDetails() {
             <table className="table mt-3">
               <thead className="thead-light">
                 <tr className="tableborder">
-                  <th scope="col tableborder">Room Type</th>
-                  <th scope="col tableborder">Meal Plan</th>
-                  <th scope="col tableborder">Price</th>
+                  <th>Room Type</th>
+                  <th>Meal Plan</th>
+                  <th>Price</th>
                 </tr>
               </thead>
               <tbody>
                 <tr>
                   <td className="tableborder">
-                    <img
-                      src={hotelTadobaDetail}
-                      className="hotelTadobaDetail mt-2"
-                      alt=""
-                    />
-                    <h4 className="m-2 delux">Super Delux</h4>
+                    <h4 className="m-2 delux">{hotel.room_type}</h4>
                     <ul className="d-flex">
                       <div>
-                        <li>Wake-up call</li>
-                        <li>Flat Tv</li>
-                        <li>Internet-wifi</li>
-
+                        {hotel.amenities &&
+                          hotel.amenities
+                            .slice(0, 3)
+                            .map((amenity, index) => (
+                              <li key={index}>{amenity}</li>
+                            ))}
                         <Popup
-                          className="policy mt-3 "
+                          className="policy mt-3"
                           trigger={
                             <button className="popupbutton1">
                               More Detail
@@ -168,138 +165,45 @@ function HotelDetails() {
                           position="right center"
                         >
                           <div className="popupBox1">
-                            <h4>Super Delux</h4>
+                            <h4>{hotel.room_type}</h4>
                             <hr />
                             <h6>Room Amenities</h6>
                             <hr />
                             <ul>
-                              <li>Wake-up call</li>
-                              <li>Internet – Wifi</li>
-                              <li> Breakfast, lunch & dinner included</li>
-                              <li>Flat Tv</li>
-                              <li> Coffee and tea</li>
+                              {hotel.amenities?.map((amenity, index) => (
+                                <li key={index}>{amenity}</li>
+                              ))}
                             </ul>
                           </div>
                         </Popup>
                       </div>
-                      <div>
-                        <span className="checkinout">Check-In:</span> 12:00 PM
-                        <p>
-                          <span className="checkinout">Check-Out:</span> 12:00
-                          PM
-                        </p>
-                      </div>
                     </ul>
                   </td>
-                  <td className="tableborder mt-2">
-                    <input type="radio" className="mt-2" /> Room Only <br />
-                    <input type="radio" /> Free Breakfast <br />
-                    <input type="radio" /> Breakfast & Lunch/Dinner <br />
-                    <input type="radio" /> Breakfast, Lunch & Dinner
-                    <h6 className="mt-4">Accomodation with Free Breakfast</h6>
+                  <td className="tableborder">
+                    <h6>Accomodation with Free Breakfast</h6>
                     <ul>
                       <li>Welcome drink on arrival</li>
                       <li>Early check-in, subject to availability</li>
                     </ul>
-                    <Popup
-                      className="policy mt-3 "
-                      trigger={
-                        <button className="popupbutton">
-                          {" "}
-                          Cancellation Policy
-                        </button>
-                      }
-                      position="right center"
-                    >
-                      <div className="popupBox">
-                        <h4>Cancellation Policy</h4>
-                        <hr />
-                        <p>
-                          Free Cancellation(100% refund) if you cancel this
-                          booking before 5 days
-                        </p>
-                        <hr />
-                        <h6>
-                          Cancellations post that will be subject to a fee as
-                          follows
-                        </h6>
-                        <hr />
-                        <table className="border">
-                          <th>
-                            <td> </td>
-                            <td colspan="2">FEE</td>
-                          </th>
-                          <tr scope="row">
-                            {" "}
-                            <td
-                              className="border"
-                              style={{ width: "200px", height: "40px" }}
-                            >
-                              Before 5 days
-                            </td>
-                            <td className="border" style={{ width: "250px" }}>
-                              0.0% of booking amount
-                            </td>
-                          </tr>
-                          <tr scope="row">
-                            {" "}
-                            <td
-                              className="border"
-                              style={{ width: "200px", height: "40px" }}
-                            >
-                              After Booking
-                            </td>
-                            <td
-                              className="border"
-                              style={{ width: "200px", height: "40px" }}
-                            >
-                              100.0% of booking amount
-                            </td>
-                          </tr>
-                          <tr scope="row">
-                            {" "}
-                            <td
-                              className="border"
-                              style={{ width: "200px", height: "40px" }}
-                            >
-                              Before 2 days
-                            </td>
-                            <td
-                              className="border"
-                              style={{ width: "200px", height: "40px" }}
-                            >
-                              50% of booking amount
-                            </td>
-                          </tr>
-                        </table>
-                        <ul>
-                          <li className="mt-2">
-                            Cancellations are only allowed before the Check-In
-                            Time. All time mentioned above is in Destination
-                            Time.
-                          </li>
-                          <li className="mt-2">
-                            Complimentary Breakfast is available.
-                          </li>
-                        </ul>
-                      </div>
-                    </Popup>
                   </td>
                   <td className="tableborder">
                     <div className="ps-5 ms-auto">
-                      <p className="mt-2">
-                        <span>Promo Code Applied 3: Todobadis (₹306) </span>
-                      </p>
-                      <s>&#x20B9; 7650</s>
-                      <h4> &#x20B9; 6579</h4>
-                      <p>
-                        + &#x20B9; 0 taxes & fees <br />
-                        per night
-                      </p>
+                      <s>&#x20B9; {hotel.real_price || "N/A"}</s>
+                      <h4> &#x20B9; {hotel.discounted_price || "N/A"}</h4>
+                      <p>+ &#x20B9; 0 taxes & fees per night</p>
                       <Link to="/reviewbookinghotel">
-                        {" "}
                         <button type="button" className="btn btn-success">
                           Book Now
+                        </button>
+                      </Link>
+                      <Link
+                        to="/reviewbookinghotel"
+                        style={{
+                          marginLeft: "10px",
+                        }}
+                      >
+                        <button type="button" className="btn btn-success">
+                          Send Enquiry
                         </button>
                       </Link>
                     </div>
@@ -308,57 +212,62 @@ function HotelDetails() {
               </tbody>
             </table>
           </div>
+
           <h4>Facilities</h4>
           <div className="availableRoom mt-3">
             <div className="facilities">
-              <ul>
-                <li> Restaurant</li>
-                <li className="mt-1"> Room Service on Request</li>
-                <li className="mt-1"> House Keeping</li>
-                <li className="mt-1"> Refrigerator</li>
-                <li className="mt-1"> Indoor Games</li>
-                <li className="mt-1"> Jungle Safari</li>
-                <li className="mt-1"> Free Parking</li>
-                <li className="mt-1"> Air Conditioning</li>
-              </ul>
-              <ul className="list-group">
-                <li className="mt-1"> Dinning Area</li>
-                <li className="mt-1"> Lawn</li>
-                <li className="mt-1"> CCTV</li>
-                <li className="mt-1"> Fire Extinguishers</li>
-                <li className="mt-1"> First Aid Services</li>
-                <li className="mt-1"> Wake Up Call</li>
-                <li className="mt-1"> Reception (Front Desk)</li>
-                <li className="mt-1"> Security Guard</li>
-              </ul>
-              <ul className="list-group">
-                <li className="mt-1"> Restaurant</li>
-                <li className="mt-1"> Room Service on Request</li>
-                <li className="mt-1"> House Keeping</li>
-                <li className="mt-1"> Refrigerator</li>
-                <li className="mt-1"> Indoor Games</li>
-                <li className="mt-1"> Jungle Safari</li>
-                <li className="mt-1"> Free Parking</li>
-                <li className="mt-1"> Air Conditioning</li>
-              </ul>
+              {hotel.facilities && hotel.facilities.length > 0 ? (
+                <div className="facility-container">
+                  {hotel.facilities
+                    .reduce((acc, curr, index) => {
+                      const rowIndex = Math.floor(index / 5); // Group into rows of 5
+                      if (!acc[rowIndex]) acc[rowIndex] = [];
+                      acc[rowIndex].push(curr);
+                      return acc;
+                    }, [])
+                    .map((row, rowIndex) => (
+                      <div key={rowIndex} className="facility-row">
+                        {row.map((facility, index) => (
+                          <span key={index} className="facility-item">
+                            <CheckCircleOutlined
+                              style={{ color: "#28a745", marginRight: "5px" }}
+                            />
+                            {facility}
+                          </span>
+                        ))}
+                      </div>
+                    ))}
+                </div>
+              ) : (
+                <p>No facilities available.</p>
+              )}
             </div>
           </div>
+
+          {/* ✅ Location Section */}
           <div>
             <h4>Location</h4>
             <div className="availableRoom mt-3">
               <p>
-                {" "}
-                Address: Tadoba National Park, Moharli Gate, Maharashtra 442404
+                Address: {hotel.location?.name}, {hotel.location?.pincode}
               </p>
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d119761.46955152467!2d79.30514183235007!3d20.277658278629513!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3a2ccd16b6538703%3A0x418b2e1575b004d1!2sTadoba-Andhari%20Tiger%20Reserve!5e0!3m2!1sen!2sin!4v1737453014317!5m2!1sen!2sin"
-                allowfullscreen=""
-                loading="lazy"
-                referrerpolicy="no-referrer-when-downgrade"
-              ></iframe>
+              {hotel.map_location ? (
+                <iframe
+                  src={convertToEmbedURL(hotel.map_location)}
+                  width="100%"
+                  height="300"
+                  style={{ border: 0 }}
+                  allowFullScreen=""
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                ></iframe>
+              ) : (
+                <p className="text-gray-500">No map location available.</p>
+              )}
             </div>
           </div>
 
+          {/* ✅ Booking Policy Section */}
           <div>
             <h4>Booking Policy</h4>
             <div className="availableRoom mt-3">

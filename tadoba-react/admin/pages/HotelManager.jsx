@@ -39,13 +39,25 @@ const HotelManager = () => {
         setLoading(true);
         try {
             const response = await getAllHotels();
-            setHotels(response.data);
+            console.log("Full API Response:", response.data); // Debug API response
+    
+            // Ensure hotels is always an array
+            if (Array.isArray(response.data)) {
+                setHotels(response.data);
+            } else if (response.data.hotels && Array.isArray(response.data.hotels)) {
+                setHotels(response.data.hotels);
+            } else {
+                console.error("Unexpected API response format:", response.data);
+                setHotels([]); // Set empty array to avoid crashes
+            }
         } catch (error) {
             message.error("Failed to load hotels");
+            setHotels([]); // Prevent crashing
         } finally {
             setLoading(false);
         }
     };
+    
 
     const handleDelete = async (id) => {
         try {
@@ -74,33 +86,35 @@ const HotelManager = () => {
                 formData.append(key, values[key]);
             }
         });
-
-        // Add amenities array
+    
         amenities.forEach((item, index) => {
             formData.append(`amenities[${index}]`, item);
         });
-
-        // Add facilities array
+    
         facilities.forEach((item, index) => {
             formData.append(`facilities[${index}]`, item);
         });
-
+    
         images.forEach((file) => {
             if (file.originFileObj) {
                 formData.append('images', file.originFileObj);
             }
         });
-
+    
         try {
             setLoading(true);
+            let response;
+    
             if (isEditMode) {
-                await updateHotel(editingHotelId, formData);
+                response = await updateHotel(editingHotelId, formData);
                 message.success("Hotel updated successfully");
             } else {
-                await createHotel(formData);
+                response = await createHotel(formData);
                 message.success("Hotel created successfully");
             }
-
+    
+            console.log("API Response:", response); // ✅ Log full response
+    
             fetchHotels();
             setIsModalOpen(false);
             form.resetFields();
@@ -110,11 +124,13 @@ const HotelManager = () => {
             setIsEditMode(false);
             setEditingHotelId(null);
         } catch (error) {
-            message.error("Failed to save hotel");
+            console.error("Failed to save hotel:", error.response?.data || error);
+            message.error(`Error: ${error.response?.data?.error || "Something went wrong"}`);
         } finally {
             setLoading(false);
         }
     };
+    
 
     const handleEdit = (hotel) => {
         setIsEditMode(true);
@@ -231,11 +247,16 @@ const HotelManager = () => {
             title: <><CoffeeOutlined /> Amenities</>,
             dataIndex: 'amenities',
             key: 'amenities',
-            render: amenities => (
+            render: (amenities, record) => (
                 <Space wrap>
-                    {amenities.map(item => (
-                        <Tag key={item} color="green">{item}</Tag>
+                    {amenities.slice(0, 1).map((item, index) => (
+                        <Tag key={index} color="green">{item}</Tag>
                     ))}
+                    {amenities.length > 3 && (
+                        <Text type="secondary">
+                            ... <a href={`/hoteldetail/${record._id}`}>More</a>
+                        </Text>
+                    )}
                 </Space>
             )
         },
@@ -243,32 +264,19 @@ const HotelManager = () => {
             title: <><WifiOutlined /> Facilities</>,
             dataIndex: 'facilities',
             key: 'facilities',
-            render: facilities => (
+            render: (facilities, record) => (
                 <Space wrap>
-                    {facilities.map(item => (
-                        <Tag key={item} color="purple">{item}</Tag>
+                    {facilities.slice(0, 1).map((item, index) => (
+                        <Tag key={index} color="purple">{item}</Tag>
                     ))}
+                    {facilities.length > 3 && (
+                        <Text type="secondary">
+                            ... <a href={`/hoteldetail/${record._id}`}>More</a>
+                        </Text>
+                    )}
                 </Space>
             )
         },
-        // {
-        //     title: <><GlobalOutlined /> Map</>,
-        //     dataIndex: 'map_location',
-        //     key: 'map_location',
-        //     width: 100,
-        //     render: link => (
-        //         link ? 
-        //         <Button 
-        //             type="link" 
-        //             href={link} 
-        //             target="_blank" 
-        //             icon={<EyeOutlined />}
-        //         >
-        //             View
-        //         </Button> : 
-        //         <Text type="secondary">Not Available</Text>
-        //     )
-        // },
         {
             title: 'Actions',
             key: 'actions',

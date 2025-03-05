@@ -43,9 +43,11 @@ function TourPackageDetail() {
     }
   };
   const handleOpenEnquiryModal = (hotel) => {
+    console.log("Selected Hotel:", hotel); // ✅ Debugging: Check if hotel object is correct
     setSelectedHotel(hotel);
     setShowEnquiryModal(true);
   };
+  
 
   const handleCloseEnquiryModal = () => setShowEnquiryModal(false);
 
@@ -281,9 +283,12 @@ function TourPackageDetail() {
                           <button type="button" className="btn btn-dark">
                             Book Now
                           </button>
-                          <button className="btn btn-dark" onClick={() => handleOpenEnquiryModal(hotel)}>
-                    Send Enquiry
-                  </button>
+                          <button
+                            className="btn btn-dark"
+                            onClick={() => handleOpenEnquiryModal(hotel)}
+                          >
+                            Send Enquiry
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -486,7 +491,12 @@ function TourPackageDetail() {
 
       <ImportantLinks></ImportantLinks>
       <Footer></Footer>
-      <TourEnquiryModal show={showEnquiryModal} handleClose={handleCloseEnquiryModal} hotel={selectedHotel} />
+      <TourEnquiryModal
+        show={showEnquiryModal}
+        handleClose={handleCloseEnquiryModal}
+        hotel={selectedHotel}
+        packageId={packageDetails._id}
+      />
     </>
   );
 }
