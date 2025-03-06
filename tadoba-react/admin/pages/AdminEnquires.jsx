@@ -1,13 +1,35 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { 
-  Table, Button, Modal, Form, Input, Select, Tag, Space, Typography, Card, Badge, 
-  message, Divider, Popconfirm, Descriptions
+import {
+  Table,
+  Button,
+  Modal,
+  Form,
+  Input,
+  Select,
+  Tag,
+  Space,
+  Typography,
+  Card,
+  Badge,
+  message,
+  Divider,
+  Popconfirm,
+  Descriptions,
 } from "antd";
-import { 
-  EyeOutlined, CheckCircleOutlined, CloseCircleOutlined, HourglassOutlined, 
-  QuestionCircleOutlined, TagOutlined, DeleteOutlined, ReloadOutlined,
-  HomeOutlined, MailOutlined, PhoneOutlined, UserOutlined
+import {
+  EyeOutlined,
+  CheckCircleOutlined,
+  CloseCircleOutlined,
+  HourglassOutlined,
+  QuestionCircleOutlined,
+  TagOutlined,
+  DeleteOutlined,
+  ReloadOutlined,
+  HomeOutlined,
+  MailOutlined,
+  PhoneOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
 
@@ -30,7 +52,9 @@ const AdminHotelEnquiries = () => {
   const fetchEnquiries = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:5000/api/hotelenquiry");
+      const response = await axios.get(
+        "http://localhost:5000/api/hotelenquiry"
+      );
       setEnquiries(response.data);
       message.success("Enquiries loaded successfully");
     } catch (error) {
@@ -45,28 +69,28 @@ const AdminHotelEnquiries = () => {
   const getStatusInfo = (status) => {
     switch (status) {
       case "pending":
-        return { 
-          color: "red", 
-          icon: <HourglassOutlined />, 
-          text: "Pending"
+        return {
+          color: "red",
+          icon: <HourglassOutlined />,
+          text: "Pending",
         };
       case "resolved":
-        return { 
-          color: "green", 
-          icon: <CheckCircleOutlined />, 
-          text: "Resolved"
+        return {
+          color: "green",
+          icon: <CheckCircleOutlined />,
+          text: "Resolved",
         };
       case "rejected":
-        return { 
-          color: "orange", 
-          icon: <CloseCircleOutlined />, 
-          text: "Rejected"
+        return {
+          color: "orange",
+          icon: <CloseCircleOutlined />,
+          text: "Rejected",
         };
       default:
-        return { 
-          color: "blue", 
-          icon: <TagOutlined />, 
-          text: status
+        return {
+          color: "blue",
+          icon: <TagOutlined />,
+          text: status,
         };
     }
   };
@@ -84,9 +108,23 @@ const AdminHotelEnquiries = () => {
 
   const handleUpdateEnquiry = async () => {
     try {
-      await axios.put(`http://localhost:5000/api/hotelenquiry/${selectedEnquiry._id}`, { status, remark });
-      message.success("Enquiry updated successfully!");
-      fetchEnquiries();
+      if (status && status !== selectedEnquiry.status) {
+        await axios.put(
+          `http://localhost:5000/api/hotelenquiry/${selectedEnquiry._id}/status`,
+          { status }
+        );
+        message.success("Status updated successfully!");
+      }
+
+      if (remark && remark !== selectedEnquiry.remark) {
+        await axios.put(
+          `http://localhost:5000/api/hotelenquiry/${selectedEnquiry._id}/remark`,
+          { remark }
+        );
+        message.success("Remark updated successfully!");
+      }
+
+      fetchEnquiries(); // Refresh data after update
       setIsModalVisible(false);
     } catch (error) {
       console.error("Error updating enquiry:", error);
@@ -141,13 +179,24 @@ const AdminHotelEnquiries = () => {
       key: "phone",
     },
     {
+      title: "Remark",
+      dataIndex: "remark",
+      key: "remark",
+      render: (remark) => <Text>{remark ? remark : "No remark added"}</Text>,
+    },
+    {
       title: "Status",
       dataIndex: "status",
       key: "status",
       render: (status) => {
         const { color, icon, text } = getStatusInfo(status);
-        return <Tag color={color} icon={icon}>{text}</Tag>;
+        return (
+          <Tag color={color} icon={icon}>
+            {text}
+          </Tag>
+        );
       },
+
       filters: [
         { text: "Pending", value: "pending" },
         { text: "Resolved", value: "resolved" },
@@ -159,9 +208,9 @@ const AdminHotelEnquiries = () => {
       title: "Action",
       key: "action",
       render: (_, record) => (
-        <Button 
-          type="primary" 
-          icon={<EyeOutlined />} 
+        <Button
+          type="primary"
+          icon={<EyeOutlined />}
           onClick={() => showModal(record)}
         >
           View
@@ -171,16 +220,16 @@ const AdminHotelEnquiries = () => {
   ];
 
   return (
-    <Card 
+    <Card
       title={
         <Title level={4} style={{ margin: 0 }}>
           <HomeOutlined /> Hotel Enquiries Management
         </Title>
       }
       extra={
-        <Button 
-          type="primary" 
-          icon={<ReloadOutlined />} 
+        <Button
+          type="primary"
+          icon={<ReloadOutlined />}
           onClick={fetchEnquiries}
           loading={loading}
         >
@@ -194,14 +243,16 @@ const AdminHotelEnquiries = () => {
         dataSource={enquiries}
         rowKey="_id"
         loading={loading}
-        pagination={{ 
+        pagination={{
           pageSize: 10,
           showSizeChanger: true,
-          showTotal: (total) => `Total ${total} enquiries`
+          showTotal: (total) => `Total ${total} enquiries`,
         }}
         bordered
         size="middle"
-        rowClassName={(record, index) => index % 2 === 0 ? "table-row-light" : "table-row-dark"}
+        rowClassName={(record, index) =>
+          index % 2 === 0 ? "table-row-light" : "table-row-dark"
+        }
       />
 
       {/* Detailed Modal with all information and actions */}
@@ -242,9 +293,9 @@ const AdminHotelEnquiries = () => {
       >
         {selectedEnquiry && (
           <>
-            <Descriptions 
-              title="Customer Information" 
-              bordered 
+            <Descriptions
+              title="Customer Information"
+              bordered
               column={{ xs: 1, sm: 2 }}
               style={{ marginBottom: "24px" }}
             >
@@ -258,13 +309,14 @@ const AdminHotelEnquiries = () => {
                 <PhoneOutlined className="mr-2" /> {selectedEnquiry.phone}
               </Descriptions.Item>
               <Descriptions.Item label="Hotel">
-                <HomeOutlined className="mr-2" /> {selectedEnquiry.hotelId?.title || "N/A"}
+                <HomeOutlined className="mr-2" />{" "}
+                {selectedEnquiry.hotelId?.title || "N/A"}
               </Descriptions.Item>
             </Descriptions>
 
-            <Descriptions 
-              title="Enquiry Details" 
-              bordered 
+            <Descriptions
+              title="Enquiry Details"
+              bordered
               column={1}
               style={{ marginBottom: "24px" }}
             >
@@ -284,11 +336,11 @@ const AdminHotelEnquiries = () => {
             </Descriptions>
 
             <Divider style={{ margin: "16px 0" }} />
-            
+
             <Form layout="vertical">
               <Form.Item label="Update Status" required>
-                <Select 
-                  value={status} 
+                <Select
+                  value={status}
                   onChange={(value) => setStatus(value)}
                   style={{ width: "100%" }}
                 >
@@ -329,5 +381,4 @@ const AdminHotelEnquiries = () => {
     </Card>
   );
 };
-
 export default AdminHotelEnquiries;
