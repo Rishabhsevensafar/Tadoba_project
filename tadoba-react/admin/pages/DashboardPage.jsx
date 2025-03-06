@@ -84,6 +84,11 @@ const DashboardPage = () => {
       icon: <FaEnvelopeSquare style={{ fontSize: '20px' }}/>,
       label: "Hotel Enquiry",
     },
+    {
+      key: "/admin/dashboard/tour-booking",
+      icon: <FaEnvelopeSquare style={{ fontSize: '20px' }}/>,
+      label: "Tour Booking Report",
+    },
   ];
 
   const userMenu = [
