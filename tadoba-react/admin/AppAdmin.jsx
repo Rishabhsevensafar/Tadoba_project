@@ -12,6 +12,7 @@ import HotelManager from "./pages/HotelManager";
 import SafariBookingReport from "./pages/safariBookingReport";
 import AdminTourEnquiries from "./pages/AdminTourEnquiry";
 import AdminEnquiries from "./pages/AdminEnquires";
+import AdminTourBookings from "./pages/AdminTourBooking";
 
 const AppAdmin = () => {
   return (
@@ -29,6 +30,7 @@ const AppAdmin = () => {
           <Route path="safari-booking-report" element={<SafariBookingReport/>}/>
           <Route path="tour-enquiry" element={<AdminTourEnquiries/>}/>
           <Route path="hotel-enquiry" element={<AdminEnquiries/>}/>
+          <Route path="tour-booking" element={<AdminTourBookings/>}/>
         </Route>
         <Route path="*" element={<div>404 Not Found</div>} />
       </Routes>
