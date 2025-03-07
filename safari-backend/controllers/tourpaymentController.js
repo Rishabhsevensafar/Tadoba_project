@@ -1,11 +1,11 @@
 const Razorpay = require("razorpay");
 const Booking = require("../models/tourbooking");
 
+// ✅ Load environment variables
 const razorpay = new Razorpay({
-  key_id: "YOUR_RAZORPAY_KEY",
-  key_secret: "YOUR_RAZORPAY_SECRET",
-});
-
+    key_id: process.env.RAZORPAY_KEY,
+    key_secret: process.env.RAZORPAY_SECRET,
+  });
 // ✅ Initiate a payment
 exports.createOrder = async (req, res) => {
   try {

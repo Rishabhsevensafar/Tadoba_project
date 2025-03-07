@@ -3,7 +3,7 @@ const {
   createTourEnquiry, 
   getAllTourEnquiries, 
   updateEnquiry 
-} = require("../controllers/tourenquirycontroller");
+} = require("../controllers/tourenquiryController");
 
 const router = express.Router();
 

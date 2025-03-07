@@ -13,51 +13,52 @@ function SafariBooking() {
     name: "",
     email: "",
     phone: "",
-    safariZone: "", // 🛠 FIXED: Ensuring safariZone is set
+    safariZone: "",
     vehicleType: "Jeep",
-    safariTime: "", // 🛠 FIXED: Ensuring safariTime is set
+    safariTime: "",
     children: 0,
     adults: 1,
-    amountPaid: 6100, // 🛠 FIXED: Default value to avoid missing field
   });
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  // Handle input change
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleBooking = async () => {
+  const handleEnquiry = async () => {
     try {
-      const payload = { ...formData, date: date.toISOString() };
-      console.log("Sending booking request with data:", payload);
+      let enquiryData = { ...formData, date: date.toISOString() };
   
-      const response = await fetch("http://localhost:5000/api/booking/book", {
+      // ✅ Remove empty keys dynamically
+      enquiryData = Object.fromEntries(
+        Object.entries(enquiryData).filter(([key, value]) => key.trim() !== "" && value !== "")
+      );
+  
+      console.log("Cleaned Enquiry Data:", enquiryData); // Debug after cleaning
+  
+      const response = await fetch("http://localhost:5000/api/safarienquiry/create", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(enquiryData),
       });
   
       const data = await response.json();
-      console.log("Server Response:", data);
+      console.log("Enquiry Response:", data);
   
-      if (response.ok && data.booking) {
-        localStorage.setItem("booking", JSON.stringify(data.booking));
-  
-        console.log("Navigating with Booking ID:", data.booking.bookingId || data.booking._id);
-  
-        navigate(`/travellerdetail`, { state: { booking: data.booking } });
+      if (response.ok) {
+        alert("Enquiry submitted successfully! Admin will contact you soon.");
       } else {
-        alert(data.error || "Booking failed.");
+        alert(data.error || "Failed to submit enquiry.");
       }
     } catch (error) {
-      console.error("Booking error:", error);
+      console.error("Enquiry submission error:", error);
     }
   };
+  
   
 
   return (
@@ -183,7 +184,7 @@ function SafariBooking() {
                   <div className="col-sm-12 col-md-6 col-lg-6">
                     <div className=" ">
                       <select
-                        name=""
+                        naGbme=""
                         className="optionValue"
                         id=""
                         onChange={handleChange}
@@ -273,9 +274,12 @@ function SafariBooking() {
                       onChange={handleChange}
                     />
                   </div>
-
+{/* 
                   <button className="btnbooking" onClick={handleBooking}>
                     <span>Book Now</span>
+                  </button> */}
+                  <button className="btnbooking" onClick={handleEnquiry}>
+                    <span>Enquiry Now</span>
                   </button>
                 </div>
               </div>

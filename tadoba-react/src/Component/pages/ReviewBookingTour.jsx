@@ -139,19 +139,18 @@ const ReviewBookingTour = () => {
           bookingId,
         }
       );
-
+  
       if (response.data.success) {
         const { order } = response.data;
-
+  
         var options = {
-          key: "YOUR_RAZORPAY_KEY",
+          key: "rzp_test_MFLhROUXtI492b", // ✅ Use your Razorpay Key ID
           amount: order.amount,
           currency: "INR",
           name: "Tour Booking",
           description: "Complete your payment",
           order_id: order.id,
           handler: async function (response) {
-            // Payment successful
             await axios.post(
               "http://localhost:5000/api/tourpayment/verify-payment",
               {
@@ -160,18 +159,25 @@ const ReviewBookingTour = () => {
               }
             );
             alert("Payment Successful!");
-            window.location.href = "/booking-success"; // Redirect to success page
+            window.location.href = "/booking-success"; // ✅ Redirect on success
           },
         };
-
-        var rzp1 = new Razorpay(options);
-        rzp1.open();
+  
+        // ✅ Check if Razorpay exists before opening payment
+        if (typeof window !== "undefined" && window.Razorpay) {
+          const rzp1 = new window.Razorpay(options);
+          rzp1.open();
+        } else {
+          console.error("Razorpay is not available.");
+          alert("Razorpay is not loaded. Please try again.");
+        }
       }
     } catch (error) {
       console.error("Payment initiation failed:", error);
       alert("Payment initiation failed.");
     }
   };
+  
 
   return (
     <>

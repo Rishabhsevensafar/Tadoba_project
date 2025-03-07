@@ -89,6 +89,11 @@ const DashboardPage = () => {
       icon: <FaEnvelopeSquare style={{ fontSize: '20px' }}/>,
       label: "Tour Booking Report",
     },
+    {
+      key: "/admin/dashboard/safari-enquiry",
+      icon: <FaEnvelopeSquare style={{ fontSize: '20px' }}/>,
+      label: "Safari Booking Report",
+    },
   ];
 
   const userMenu = [
