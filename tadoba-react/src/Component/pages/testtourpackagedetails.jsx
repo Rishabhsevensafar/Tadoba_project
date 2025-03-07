@@ -20,6 +20,7 @@ function HotelDetails() {
     window.scrollTo(0, 0);
     fetchHotelDetails();
   }, []);
+  
   const fetchHotelDetails = async () => {
     try {
       const response = await axios.get(`http://localhost:5000/api/hotel/hotel-packages/${id}`);

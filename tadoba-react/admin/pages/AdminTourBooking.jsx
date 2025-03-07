@@ -14,7 +14,7 @@ const AdminTourBookings = () => {
   const fetchBookings = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:5000/api/bookings");
+      const response = await axios.get("http://localhost:5000/api/tourbooking");
       setBookings(response.data.bookings);
     } catch (error) {
       console.error("Error fetching bookings:", error);
@@ -25,7 +25,7 @@ const AdminTourBookings = () => {
 
   const updateBookingStatus = async (id, newStatus) => {
     try {
-      await axios.put(`http://localhost:5000/api/bookings/${id}/status`, { paymentStatus: newStatus });
+      await axios.put(`http://localhost:5000/api/tourbooking/${id}/status`, { paymentStatus: newStatus });
       message.success("Booking status updated!");
       fetchBookings();
     } catch (error) {
@@ -100,8 +100,6 @@ const AdminTourBookings = () => {
       ),
     },
   ];
-  
-
   return (
     <div>
       <h2>Booking Reports</h2>
