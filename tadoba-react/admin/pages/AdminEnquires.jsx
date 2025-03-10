@@ -56,7 +56,7 @@ const AdminHotelEnquiries = () => {
         "http://localhost:5000/api/hotelenquiry"
       );
       setEnquiries(response.data);
-      message.success("Enquiries loaded successfully");
+      // message.success("Enquiries loaded successfully");
     } catch (error) {
       console.error("Error fetching enquiries:", error);
       message.error("Failed to load enquiries");

@@ -84,15 +84,25 @@ const DashboardPage = () => {
       icon: <FaEnvelopeSquare style={{ fontSize: '20px' }}/>,
       label: "Hotel Enquiry",
     },
-    {
-      key: "/admin/dashboard/tour-booking",
-      icon: <FaEnvelopeSquare style={{ fontSize: '20px' }}/>,
-      label: "Tour Booking Report",
-    },
+    // {
+    //   key: "/admin/dashboard/tour-booking",
+    //   icon: <FaEnvelopeSquare style={{ fontSize: '20px' }}/>,
+    //   label: "Tour Booking Report",
+    // },
     {
       key: "/admin/dashboard/safari-enquiry",
       icon: <FaEnvelopeSquare style={{ fontSize: '20px' }}/>,
       label: "Safari Booking Report",
+    },
+    {
+      key: "/admin/dashboard/contact-enquiry",
+      icon: <FaEnvelopeSquare style={{ fontSize: '20px' }}/>,
+      label: "Contact Enquiry Form",
+    },
+    {
+      key: "/admin/dashboard/blogs",
+      icon: <FaEnvelopeSquare style={{ fontSize: '20px' }}/>,
+      label: "Blogs",
     },
   ];
 

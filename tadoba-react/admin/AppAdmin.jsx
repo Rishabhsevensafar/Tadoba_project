@@ -14,6 +14,9 @@ import AdminTourEnquiries from "./pages/AdminTourEnquiry";
 import AdminEnquiries from "./pages/AdminEnquires";
 import AdminTourBookings from "./pages/AdminTourBooking";
 import AdminSafariEnquiries from "./pages/AdminSafariEnquiry";
+import AdminContactEnquiries from "./pages/AdminContactEnquiry";
+import AdminBlogs from "./pages/AdminBlogs";
+import AdminQuickPaymentReports from "./pages/AdminQuickPayment";
 
 const AppAdmin = () => {
   return (
@@ -33,6 +36,9 @@ const AppAdmin = () => {
           <Route path="hotel-enquiry" element={<AdminEnquiries/>}/>
           <Route path="tour-booking" element={<AdminTourBookings/>}/>
           <Route path="safari-enquiry" element={<AdminSafariEnquiries/>}/>
+          <Route path="contact-enquiry" element={<AdminContactEnquiries/>}/>
+          <Route path="blogs" element={<AdminBlogs/>}/>
+          <Route path="quick-payment" element={<AdminQuickPaymentReports/>}/>
         </Route>
         <Route path="*" element={<div>404 Not Found</div>} />
       </Routes>

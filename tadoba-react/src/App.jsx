@@ -35,14 +35,13 @@ import SafariBooking from './Component/pages/SafariBooking';
 import TravellerDetails from './Component/pages/TravellerDetails';
 import TourPackage from './Component/pages/TourPackage';
 import PaymentSuccess from './Component/Paymentsucessful';
-// import Test from './Component/Test';
 import TourPackageDetail from './Component/pages/TourPackageDetail';
 import HotelPage from './Component/pages/HotelPage';
 import HotelDetails from './Component/pages/HotelDetails';
 import ReviewBookingHotel from './Component/pages/ReviewBookingHotel';
 import PaymentPage from "./Component/pages/PaymentPage";
 import ReviewBookingTour from "./Component/pages/ReviewBookingTour";
-import TestTourPackageDetail from './Component/pages/testtourpackagedetails';
+import ContactUs from './Component/pages/ContactUs';
 
 function App() {
  
@@ -77,19 +76,17 @@ function App() {
         <Route path="/map" element={<TadobaMap />}/>
         <Route path="/flora" element={<TadobaFlora />}/>
         <Route path="/fauna" element={<TadobaFauna />}/>
-
-
         <Route path="/safaribooking" element={<SafariBooking />} />
         <Route path="/travellerdetail" element={<TravellerDetails />} />
         <Route path="/tourpackage" element={<TourPackage />} />
         <Route path="/payment-success" element={<PaymentSuccess />} />
         <Route path='/tourpackagedetail/:id'element={<TourPackageDetail/>}/>
-        {/* <Route path='/testtourdetails' element={<HotelDetails/>}/> */}
         <Route path="/hoteldetail/:id" element={<HotelDetails />} />
         <Route path="/hotelpage" element={<HotelPage/>} />
         <Route path="/paymentpage" element={<PaymentPage/>}/>
         <Route path="/reviewbookinghotel"element={<ReviewBookingHotel/>}/>
         <Route path="/booking/:id" element={<ReviewBookingTour/>}/>
+        <Route path="/contactus" element={<ContactUs/>}/>
     </Routes>
   </BrowserRouter>
   </>
