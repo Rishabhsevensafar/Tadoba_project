@@ -30,27 +30,29 @@ const LoginPage = () => {
         "http://localhost:5000/api/admin/auth/login", 
         values
       );
-      localStorage.setItem("adminToken", response.data.token);
+  
+      console.log("Token received from API:", response.data.token);  // ✅ Debug API Token
+  
+      localStorage.setItem("adminToken", response.data.token); // ✅ Fix: Ensure correct key is used
+  
+      console.log("Token stored in localStorage:", localStorage.getItem("adminToken"));  // ✅ Debug Stored Token
+  
       message.success({
         content: "Login successful!",
         duration: 2,
       });
+  
       navigate("/admin/dashboard");
     } catch (error) {
       message.error({
         content: error.response?.data?.message || "Invalid email or password",
         duration: 3,
       });
-      form.setFields([
-        {
-          name: "password",
-          errors: [""],
-        },
-      ]);
     } finally {
       setLoading(false);
     }
   };
+  
 
   const contentStyle = {
     minHeight: "100vh",
