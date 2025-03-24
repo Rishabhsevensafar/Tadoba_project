@@ -42,6 +42,8 @@ import ReviewBookingHotel from './Component/pages/ReviewBookingHotel';
 import PaymentPage from "./Component/pages/PaymentPage";
 import ReviewBookingTour from "./Component/pages/ReviewBookingTour";
 import ContactUs from './Component/pages/ContactUs';
+import TestTailwind from './Component/tailwindtest';
+import NewsBlogDetail from './Component/pages/NewsBlogDetail';
 
 function App() {
  
@@ -87,6 +89,8 @@ function App() {
         <Route path="/reviewbookinghotel"element={<ReviewBookingHotel/>}/>
         <Route path="/booking/:id" element={<ReviewBookingTour/>}/>
         <Route path="/contactus" element={<ContactUs/>}/>
+        <Route path='/tailwindtest' element={<TestTailwind/>}/>
+        <Route path="/News&blogs" element={<NewsBlogDetail/>}/>
     </Routes>
   </BrowserRouter>
   </>

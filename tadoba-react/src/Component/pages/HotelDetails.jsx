@@ -16,6 +16,9 @@ import "reactjs-popup/dist/index.css";
 import { CheckCircleOutlined } from "@ant-design/icons";
 import axios from "axios";
 import HotelEnquiry from "../HotelEnquiry";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 const convertToEmbedURL = (url) => {
   if (!url) return "";
 
@@ -72,28 +75,59 @@ function HotelDetails() {
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
       </div>
     );
-  if (!hotel) return <p>Hotel not found.</p>; // ✅ Show message if hotel not found
+  if (!hotel) return <p>Hotel not found.</p>;
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,  // 2 seconds per slide
+    arrows: true,
+    pauseOnHover: false,
+    pauseOnFocus: false,
+  };
 
   return (
     <>
       <Header></Header>
-      <div className="d-flex">
-        {/* ✅ Render Hotel Images */}
+      <div className="hotel-images">
         {hotel.images && hotel.images.length > 0 ? (
-          hotel.images
-            .slice(0, 3)
-            .map((image, index) => (
-              <img
-                key={index}
-                src={`http://localhost:5000${image}`}
-                className="tadobadetailImg pe-lg-1"
-                alt=""
-              />
-            ))
+          <>
+            {/* Desktop View - Static Images */}
+            <div className="d-none d-lg-flex">
+              {hotel.images.slice(0, 3).map((image, index) => (
+                <img
+                  key={index}
+                  src={`http://localhost:5000${image}`}
+                  className="tadobadetailImg pe-lg-1"
+                  alt={`Hotel Image ${index + 1}`}
+                />
+              ))}
+            </div>
+
+            {/* Mobile View - React Slick Slider */}
+            <div className="d-lg-none" style={{ width: "100%" }}>
+              <Slider {...sliderSettings}>
+                {hotel.images.map((image, index) => (
+                  <div key={index}>
+                    <img
+                      src={`http://localhost:5000${image}`}
+                      className="tadobadetailImg"
+                      alt={`Hotel Image ${index + 1}`}
+                      style={{ width: "100%", height: "auto" }}
+                    />
+                  </div>
+                ))}
+              </Slider>
+            </div>
+          </>
         ) : (
           <p>No images available</p>
         )}
       </div>
+
       <section className="leaf pt-4">
         <div className="container">
           <div>
@@ -138,82 +172,71 @@ function HotelDetails() {
       {/* ✅ Available Rooms Section */}
       <section className="pb-5">
         <div className="container">
-          <div>
-            <h4>Available Rooms</h4>
-            <table className="table mt-3">
-              <thead className="thead-light">
-                <tr className="tableborder">
-                  <th>Room Type</th>
-                  <th>Meal Plan</th>
-                  <th>Price</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td className="tableborder">
-                    <h4 className="m-2 delux">{hotel.room_type}</h4>
-                    <ul className="d-flex">
-                      <div>
-                        {hotel.amenities &&
-                          hotel.amenities
-                            .slice(0, 3)
-                            .map((amenity, index) => (
-                              <li key={index}>{amenity}</li>
-                            ))}
-                        <Popup
-                          className="policy mt-3"
-                          trigger={
-                            <button className="popupbutton1">
-                              More Detail
-                            </button>
-                          }
-                          position="right center"
-                        >
-                          <div className="popupBox1">
-                            <h4>{hotel.room_type}</h4>
-                            <hr />
-                            <h6>Room Amenities</h6>
-                            <hr />
-                            <ul>
-                              {hotel.amenities?.map((amenity, index) => (
-                                <li key={index}>{amenity}</li>
-                              ))}
-                            </ul>
-                          </div>
-                        </Popup>
-                      </div>
-                    </ul>
-                  </td>
-                  <td className="tableborder">
-                    <h6>Accomodation with Free Breakfast</h6>
+          <div className="room-container">
+            <h4 className="room-title">Available Rooms</h4>
+
+            <div className="room-card">
+              {/* Room Type Section */}
+              <div className="room-info">
+                <h4 className="room-name">{hotel.room_type}</h4>
+                <ul className="room-amenities">
+                  {hotel.amenities?.slice(0, 3).map((amenity, index) => (
+                    <li key={index}>{amenity}</li>
+                  ))}
+                </ul>
+                <Popup
+                  className="popup-container"
+                  trigger={
+                    <button className="btn-details">More Details</button>
+                  }
+                  position="right center"
+                >
+                  <div className="popup-box">
+                    <h4>{hotel.room_type}</h4>
+                    <hr />
+                    <h6>Room Amenities</h6>
+                    <hr />
                     <ul>
-                      <li>Welcome drink on arrival</li>
-                      <li>Early check-in, subject to availability</li>
+                      {hotel.amenities?.map((amenity, index) => (
+                        <li key={index}>{amenity}</li>
+                      ))}
                     </ul>
-                  </td>
-                  <td className="tableborder">
-  <div className="ps-5 ms-auto">
-    <s>&#x20B9; {hotel.real_price || "N/A"}</s>
-    <h4> &#x20B9; {hotel.discounted_price || "N/A"}</h4>
-    <p>+ &#x20B9; 0 taxes & fees per night</p>
-    
-    {/* ✅ Book Now Button */}
-    <Link to="/reviewbookinghotel">
-      <button type="button" className="btn btn-success">
-        Book Now
-      </button>
-    </Link>
+                  </div>
+                </Popup>
+              </div>
 
-    {/* ✅ Enquiry Popup Component */}
-    <div style={{ marginTop: "10px" }}>
-      <HotelEnquiry hotelId={hotel._id} />
-    </div>
-  </div>
-</td>
+              {/* Meal Plan Section */}
+              <div className="meal-plan">
+                <h6>Accommodation with Free Breakfast</h6>
+                <ul>
+                  <li>Welcome drink on arrival</li>
+                  <li>Early check-in, subject to availability</li>
+                </ul>
+              </div>
 
-                </tr>
-              </tbody>
-            </table>
+              {/* Pricing & Actions Section */}
+              <div className="price-actions">
+                <s className="old-price">
+                  &#x20B9; {hotel.real_price || "N/A"}
+                </s>
+                <h4 className="new-price">
+                  &#x20B9; {hotel.discounted_price || "N/A"}
+                </h4>
+                <p className="taxes-info">
+                  + &#x20B9; 0 taxes & fees per night
+                </p>
+
+                {/* Book Now Button
+          <Link to="/reviewbookinghotel">
+            <button className="btn-book">Book Now</button>
+          </Link> */}
+
+                {/* Enquiry Popup */}
+                <div className="enquiry-section">
+                  <HotelEnquiry hotelId={hotel._id} />
+                </div>
+              </div>
+            </div>
           </div>
 
           <h4>Facilities</h4>

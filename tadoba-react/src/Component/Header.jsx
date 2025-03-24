@@ -1,83 +1,59 @@
-import React from "react";
-import { useEffect } from "react";
-import logo from "../assets/images/logo.png";
+import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import logo from "../assets/images/logo.png";
+
 function Header() {
-  useEffect(() => {
-    window.scrollTo(0,0);
-  }, []);
+  const [isOpen, setIsOpen] = useState(false);
+
+  const toggleNavbar = () => {
+    setIsOpen(!isOpen);
+  };
+
   return (
-    <>
-      <div>
-        <header className="sectionNavbar">
-          <div className="container-fluid">
-            <nav className="navbar navbar-expand-lg navbar-light">
-              <img src={logo} alt="Logo" />
-              <button
-                className="navbar-toggler"
-                type="button"
-                data-toggle="collapse"
-                data-target="#navbarNav"
-                aria-controls="navbarNav"
-                aria-expanded="false"
-                aria-label="Toggle navigation"
-              >
-                <span className="navbar-toggler-icon"></span>
-              </button>
-              <div
-                className="collapse navbar-collapse navBarContaioner"
-                id="navbarNav"
-              >
-                <ul className="navbar-nav">
-                  <li className="nav-item active">
-                    {/* <a className="nav-link" href="#">Home </a> */}
-                    <Link className="nav-link" to="/">
-                      Home{" "}
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    {/* <a className="nav-link" href="#">About</a> */}
-                    <Link className="nav-link" to="/about">
-                      About
-                    </Link>
-                  </li>
-                  <li className="nav-item">
-                    <a className="nav-link" href="/safaribooking">
-                      Online Safari Booking
-                    </a>
-                  </li>
-                  <li className="nav-item">
-                    <a className="nav-link" href="/tourpackage">
-                      Tour Package
-                    </a>
-                  </li>
-                  <li className="nav-item">
-                    <a className="nav-link" href="/hotelpage">
-                      Hotel in Tadoba
-                    </a>
-                  </li>
-                  <li className="nav-item">
-                    <a className="nav-link" href="/paymentpage">
-                      Payment
-                    </a>
-                  </li>
-                  <li className="nav-item">
-                    <a className="nav-link" href="/contactus">
-                      Contact Us
-                    </a>
-                  </li>
-                  <li className="nav-item">
-                    <a className="nav-link" href="#">
-                      +91-7982653974 | +91-7982653974
-                    </a>
-                  </li>
-                </ul>
-              </div>
-            </nav>
-          </div>
-        </header>
+    <header className="navbar-container">
+      <div className="navbar">
+        {/* Logo */}
+        <img src={logo} alt="Logo" className="logo" />
+
+        {/* Desktop Navbar Links */}
+        <nav className="nav-links">
+          <Link to="/">Home</Link>
+          <Link to="/about">About</Link>
+          <a href="/safaribooking">Online Safari Booking</a>
+          <a href="/tourpackage">Tour Package</a>
+          <a href="/hotelpage">Hotel in Tadoba</a>
+          <a href="/paymentpage">Payment</a>
+          <a href="/contactus">Contact Us</a>
+          <a href="#" className="contact-number">+91-7982653974 | +91-7982653974</a>
+        </nav>
+
+        {/* Mobile Toggle Button */}
+        <button className="toggle-btn" onClick={toggleNavbar}>
+          ☰
+        </button>
       </div>
-    </>
+
+      {/* Overlay Background */}
+      <div className={`overlay ${isOpen ? "overlay-show" : ""}`} onClick={() => setIsOpen(false)}></div>
+
+      {/* Mobile Sidebar Navigation */}
+      <nav className={`mobile-nav ${isOpen ? "slide-in" : "slide-out"}`}>
+        {/* Header with Logo & Close Button */}
+        <div className="mobile-header">
+          <img src={logo} alt="Logo" className="mobile-logo" />
+          <button className="close-btn" onClick={toggleNavbar}>✖</button>
+        </div>
+
+        <Link to="/" onClick={toggleNavbar}>Home</Link>
+        <Link to="/about" onClick={toggleNavbar}>About</Link>
+        <a href="/safaribooking" onClick={toggleNavbar}>Online Safari Booking</a>
+        <a href="/tourpackage" onClick={toggleNavbar}>Tour Package</a>
+        <a href="/hotelpage" onClick={toggleNavbar}>Hotel in Tadoba</a>
+        <a href="/paymentpage" onClick={toggleNavbar}>Payment</a>
+        <a href="/contactus" onClick={toggleNavbar}>Contact Us</a>
+        <a href="#" className="contact-number" onClick={toggleNavbar}>+91-7982653974 | +91-7982653974</a>
+      </nav>
+    </header>
   );
 }
 

@@ -3,6 +3,7 @@ import Header from "../Header";
 import ImportantLinks from "../ImportantLinks";
 import Footer from "../Footer";
 import contactBanner from "../../assets/images/contact-banner.jpg";
+import "../../styles/ContactUS.css"; // Import the CSS file for styling
 
 function ContactUs() {
   useEffect(() => {
@@ -49,38 +50,36 @@ function ContactUs() {
   return (
     <>
       <Header />
-      <div>
-        <img src={contactBanner} alt="Contact page banner" />
+      <div className="contact-banner">
+        <img src={contactBanner} alt="Contact page banner" className="banner-image" />
       </div>
-      <section className="leaf">
-        <div className="container">
-          <div className="row">
-          <div className="col-sm-12 col-md-6 col-lg-6">
-              <div className="addressBox">
-                <h5>Branch Office</h5>
-                <p>
-                  15/8, Block -15, Near <br />
-                  Exide Battery, Geeta Colony, <br />
-                  East Delhi, New Delhi - 110031
-                </p>
-                <h6>Email</h6>
-                <p>contact@tadobanationalparkonline.in </p>
-                <h6>Registered Office-</h6>
-                <p>
-                  15/8, Block -15, Near Battery, Geeta Colony, East Delhi, New
-                  Delhi - 110031
-                </p>
-                <h6>Phone-</h6>
-                <p>+91-7982653974</p>
-              </div>
+      <section className="contact-section">
+        <div className="contact-container">
+          <div className="contact-row">
+            <div className="contact-info">
+              <h5 className="info-title">Branch Office</h5>
+              <p className="info-text">
+                15/8, Block -15, Near <br />
+                Exide Battery, Geeta Colony, <br />
+                East Delhi, New Delhi - 110031
+              </p>
+              <h6 className="info-subtitle">Email</h6>
+              <p className="info-text">contact@tadobanationalparkonline.in</p>
+              <h6 className="info-subtitle">Registered Office</h6>
+              <p className="info-text">
+                15/8, Block -15, Near Battery, Geeta Colony, East Delhi, New
+                Delhi - 110031
+              </p>
+              <h6 className="info-subtitle">Phone</h6>
+              <p className="info-text">+91-7982653974</p>
             </div>
-            <div className="col-md-6">
-              <h4>Contact Us</h4>
+            <div className="contact-form">
+              <h4 className="form-title">Contact Us</h4>
               <input
                 type="text"
                 name="name"
                 value={formData.name}
-                className="contactInput"
+                className="form-input"
                 placeholder="Enter Your Name"
                 onChange={handleChange}
               />
@@ -88,7 +87,7 @@ function ContactUs() {
                 type="email"
                 name="email"
                 value={formData.email}
-                className="contactInput"
+                className="form-input"
                 placeholder="Enter Your Email"
                 onChange={handleChange}
               />
@@ -96,18 +95,23 @@ function ContactUs() {
                 type="number"
                 name="phone"
                 value={formData.phone}
-                className="contactInput"
+                className="form-input"
                 placeholder="Enter Your Number"
                 onChange={handleChange}
               />
               <textarea
                 name="message"
                 value={formData.message}
-                className="contactarea"
+                className="form-textarea"
                 placeholder="Enter Your Message"
                 onChange={handleChange}
               />
-              <button type="button" className="btn btn-primary contactInput" onClick={handleSubmit} disabled={loading}>
+              <button
+                type="button"
+                className="form-button"
+                onClick={handleSubmit}
+                disabled={loading}
+              >
                 {loading ? "Sending..." : "Send Now"}
               </button>
             </div>

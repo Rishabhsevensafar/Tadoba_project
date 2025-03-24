@@ -213,7 +213,7 @@ const AdminHotelEnquiries = () => {
           icon={<EyeOutlined />}
           onClick={() => showModal(record)}
         >
-          View
+
         </Button>
       ),
     },

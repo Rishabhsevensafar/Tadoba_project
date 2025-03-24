@@ -32,23 +32,28 @@ function SafariBooking() {
   const handleEnquiry = async () => {
     try {
       let enquiryData = { ...formData, date: date.toISOString() };
-  
+
       // ✅ Remove empty keys dynamically
       enquiryData = Object.fromEntries(
-        Object.entries(enquiryData).filter(([key, value]) => key.trim() !== "" && value !== "")
+        Object.entries(enquiryData).filter(
+          ([key, value]) => key.trim() !== "" && value !== ""
+        )
       );
-  
+
       console.log("Cleaned Enquiry Data:", enquiryData); // Debug after cleaning
-  
-      const response = await fetch("http://localhost:5000/api/safarienquiry/create", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(enquiryData),
-      });
-  
+
+      const response = await fetch(
+        "http://localhost:5000/api/safarienquiry/create",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(enquiryData),
+        }
+      );
+
       const data = await response.json();
       console.log("Enquiry Response:", data);
-  
+
       if (response.ok) {
         alert("Enquiry submitted successfully! Admin will contact you soon.");
       } else {
@@ -58,8 +63,6 @@ function SafariBooking() {
       console.error("Enquiry submission error:", error);
     }
   };
-  
-  
 
   return (
     <>
@@ -67,6 +70,129 @@ function SafariBooking() {
       <section className="safaritable">
         <div className="container">
           <div className="row">
+          <div className="col-sm-12 col-md-5 col-lg-5">
+              <div>
+                <div className="booking-des">
+                  <h3>Tadoba National Park Booking</h3>
+                  {/* <h4 className="text-xl font-bold mb-4">Select Date</h4> */}
+                  <div className="">
+                    <Calendar
+                      onChange={setDate}
+                      value={date}
+                      className="border rounded-lg p-2 shadow-md calender react-calendar"
+                    />
+                  </div>
+                </div>
+                <div
+                  className="calenderForm row"
+                  style={{
+                    marginLeft: "0px",
+                    height: "auto",
+                  }}
+                >
+                  <div className="col-sm-12 col-md-6 col-lg-6">
+                    <div className=" ">
+                      <select
+                        naGbme=""
+                        className="optionValue"
+                        id=""
+                        onChange={handleChange}
+                      >
+                        <option value="">Select vehical</option>
+                        <option value="">Jeep</option>
+                      </select>
+                      <select
+                        name="safariTime"
+                        className="optionValue"
+                        onChange={handleChange}
+                        required
+                      >
+                        <option value="">Select Safari Time</option>
+                        <option value="6-10 AM">6-10 AM</option>
+                        <option value="2-6 PM">2-6 PM</option>
+                      </select>
+
+                      <select
+                        name="children"
+                        className="optionValue"
+                        onChange={handleChange}
+                      >
+                        <option value="0">No Child</option>
+                        {[...Array(12)].map((_, i) => (
+                          <option key={i + 1} value={i + 1}>
+                            {i + 1}
+                          </option>
+                        ))}
+                      </select>
+                      <input
+                        type="number"
+                        name="phone"
+                        id=""
+                        className="optionValue"
+                        placeholder="Enter Your Mobile"
+                        onChange={handleChange}
+                      />
+                    </div>
+                  </div>
+                  <div className="col-sm-12 col-md-6 col-lg-6">
+                    <select
+                      name="safariZone"
+                      className="optionValue"
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="">Select Zone</option>
+                      <option value="Moharli/Mamla/Agarzari/Adegaon/Junona/Devada">
+                        Moharli/Mamla/Agarzari/Adegaon/Junona/Devada
+                      </option>
+                      <option value="Kolara/Alizanza/Madnapur/Palasgaon/Shirkheda Belara">
+                        Kolara/Alizanza/Madnapur/Palasgaon/Shirkheda Belara{" "}
+                      </option>
+                      <option value="Navegaon/Ramdegi/Nimdela">
+                        Navegaon/Ramdegi/Nimdela
+                      </option>
+                      <option value="Kesalaghat/Pangadi/Pangadi Aswal Chuha/Zari Peth">
+                        Kesalaghat/Pangadi/Pangadi Aswal Chuha/Zari Peth
+                      </option>
+                    </select>
+                    <select
+                      name="adults"
+                      className="optionValue"
+                      onChange={handleChange}
+                    >
+                      {[...Array(8)].map((_, i) => (
+                        <option key={i + 1} value={i + 1}>
+                          {i + 1}
+                        </option>
+                      ))}
+                    </select>
+                    <input
+                      type="text"
+                      name="name"
+                      id=""
+                      className="optionValue"
+                      placeholder="Enter Your Name"
+                      onChange={handleChange}
+                    />
+                    <input
+                      type="email"
+                      name="email"
+                      id=""
+                      className="optionValue"
+                      placeholder="Enter Your Email"
+                      onChange={handleChange}
+                    />
+                  </div>
+                  {/* 
+                  <button className="btnbooking" onClick={handleBooking}>
+                    <span>Book Now</span>
+                  </button> */}
+                  <button className="btnbooking" onClick={handleEnquiry}>
+                    <span>Enquiry Now</span>
+                  </button>
+                </div>
+              </div>
+            </div>
             <div className="col-sm-12 col-md-7 col-lg-7">
               {/* <h2>Tadoba Jeep Safari Details</h2> */}
               <table className="table table-bordered">
@@ -163,127 +289,7 @@ function SafariBooking() {
                 </tbody>
               </table>
             </div>
-            <div className="col-sm-12 col-md-5 col-lg-5">
-              <div>
-                <div className="booking-des">
-                  <h3>Tadoba National Park Booking</h3>
-                  {/* <h4 className="text-xl font-bold mb-4">Select Date</h4> */}
-                  <div className="">
-                    <Calendar
-                      onChange={setDate}
-                      value={date}
-                      className="border rounded-lg p-2 shadow-md calender react-calendar"
-                    />
-                  </div>
-                </div>
-                <div className="calenderForm row"
-                style={{
-                  marginLeft:'0px'
-                }}
-                >
-                  <div className="col-sm-12 col-md-6 col-lg-6">
-                    <div className=" ">
-                      <select
-                        naGbme=""
-                        className="optionValue"
-                        id=""
-                        onChange={handleChange}
-                      >
-                        <option value="">Select vehical</option>
-                        <option value="">Jeep</option>
-                      </select>
-                      <select
-                        name="safariTime"
-                        className="optionValue"
-                        onChange={handleChange}
-                        required
-                      >
-                        <option value="">Select Safari Time</option>
-                        <option value="6-10 AM">6-10 AM</option>
-                        <option value="2-6 PM">2-6 PM</option>
-                      </select>
 
-                      <select
-                        name="children"
-                        className="optionValue"
-                        onChange={handleChange}
-                      >
-                        <option value="0">No Child</option>
-                        {[...Array(12)].map((_, i) => (
-                          <option key={i + 1} value={i + 1}>
-                            {i + 1}
-                          </option>
-                        ))}
-                      </select>
-                      <input
-                        type="number"
-                        name="phone"
-                        id=""
-                        className="optionValue"
-                        placeholder="Enter Your Mobile"
-                        onChange={handleChange}
-                      />
-                    </div>
-                  </div>
-                  <div className="col-sm-12 col-md-6 col-lg-6">
-                    <select
-                      name="safariZone"
-                      className="optionValue"
-                      onChange={handleChange}
-                      required
-                    >
-                      <option value="">Select Zone</option>
-                      <option value="Moharli/Mamla/Agarzari/Adegaon/Junona/Devada">
-                        Moharli/Mamla/Agarzari/Adegaon/Junona/Devada
-                      </option>
-                      <option value="Kolara/Alizanza/Madnapur/Palasgaon/Shirkheda Belara">
-                        Kolara/Alizanza/Madnapur/Palasgaon/Shirkheda Belara{" "}
-                      </option>
-                      <option value="Navegaon/Ramdegi/Nimdela">
-                        Navegaon/Ramdegi/Nimdela
-                      </option>
-                      <option value="Kesalaghat/Pangadi/Pangadi Aswal Chuha/Zari Peth">
-                        Kesalaghat/Pangadi/Pangadi Aswal Chuha/Zari Peth
-                      </option>
-                    </select>
-                    <select
-                      name="adults"
-                      className="optionValue"
-                      onChange={handleChange}
-                    >
-                      {[...Array(8)].map((_, i) => (
-                        <option key={i + 1} value={i + 1}>
-                          {i + 1}
-                        </option>
-                      ))}
-                    </select>
-                    <input
-                      type="text"
-                      name="name"
-                      id=""
-                      className="optionValue"
-                      placeholder="Enter Your Name"
-                      onChange={handleChange}
-                    />
-                    <input
-                      type="email"
-                      name="email"
-                      id=""
-                      className="optionValue"
-                      placeholder="Enter Your Email"
-                      onChange={handleChange}
-                    />
-                  </div>
-{/* 
-                  <button className="btnbooking" onClick={handleBooking}>
-                    <span>Book Now</span>
-                  </button> */}
-                  <button className="btnbooking" onClick={handleEnquiry}>
-                    <span>Enquiry Now</span>
-                  </button>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>

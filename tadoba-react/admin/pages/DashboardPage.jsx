@@ -64,11 +64,11 @@ const DashboardPage = () => {
       icon: <HomeOutlined style={{ fontSize: '20px' }}/>,
       label: "Hotel Manager",
     },
-    {
-      key: "/admin/dashboard/safari-booking-report",
-      icon: <FaSafari size={'20'}/>,
-      label: "Safari Booking",
-    },
+    // {
+    //   key: "/admin/dashboard/safari-booking-report",
+    //   icon: <FaSafari size={'20'}/>,
+    //   label: "Safari Booking",
+    // },
     {
       key: "/admin/dashboard/settings",
       icon: <SettingOutlined style={{ fontSize: '20px' }}/>,
@@ -84,6 +84,11 @@ const DashboardPage = () => {
       icon: <FaEnvelopeSquare style={{ fontSize: '20px' }}/>,
       label: "Hotel Enquiry",
     },
+    {
+      key: "/admin/dashboard/quick-payment",
+      icon: <FaEnvelopeSquare style={{ fontSize: '20px' }}/>,
+      label: "Qucik Payments",
+    },
     // {
     //   key: "/admin/dashboard/tour-booking",
     //   icon: <FaEnvelopeSquare style={{ fontSize: '20px' }}/>,
@@ -92,12 +97,12 @@ const DashboardPage = () => {
     {
       key: "/admin/dashboard/safari-enquiry",
       icon: <FaEnvelopeSquare style={{ fontSize: '20px' }}/>,
-      label: "Safari Booking Report",
+      label: "Safari Enquiry",
     },
     {
       key: "/admin/dashboard/contact-enquiry",
       icon: <FaEnvelopeSquare style={{ fontSize: '20px' }}/>,
-      label: "Contact Enquiry Form",
+      label: "Contact Enquiry",
     },
     {
       key: "/admin/dashboard/blogs",

@@ -16,6 +16,9 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useEffect } from "react";
 import defaultHotelImage from "../../assets/images/caption.jpg";
+import Slider from "react-slick";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 function HotelPage() {
   const [date, setDate] = useState(new Date());
@@ -23,6 +26,15 @@ function HotelPage() {
   const [endDate, setEndDate] = useState();
   const [count, setCount] = useState(0);
   const [hotels, setHotels] = useState([]); // ✅ Store fetched hotels
+  const [filters, setFilters] = useState({
+    stars: [],
+    facilities: [],
+    locations: [],
+  });
+  const [priceRange, setPriceRange] = useState([0, 100000]);
+  const [showFilters, setShowFilters] = useState(false);
+  const [allHotels, setAllHotels] = useState([]); // Store all hotels initially
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   const increase = () => {
     setCount(count + 1);
@@ -33,37 +45,160 @@ function HotelPage() {
 
   useEffect(() => {
     window.scrollTo(0, 0);
-    fetchHotels(); // ✅ Fetch hotels from API
-  }, []);
+    fetchHotels();
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []); 
+  
+  // Update your fetchHotels function to store all hotels
   const fetchHotels = async () => {
     try {
       const response = await axios.get(
         "http://localhost:5000/api/hotel/hotel-packages"
-      ); // ✅ API Endpoint
-      setHotels(response.data.hotels);
+      );
+      setAllHotels(response.data.hotels); // Store all hotels
+      setHotels(response.data.hotels); // Display all hotels initially
     } catch (error) {
       console.error("Error fetching hotels:", error);
     }
   };
+  // Add this function to handle filter changes
+  const handleFilterChange = (filterType, value) => {
+    setFilters((prevFilters) => {
+      const updatedFilters = { ...prevFilters };
+
+      if (filterType === "stars") {
+        if (updatedFilters.stars.includes(value)) {
+          updatedFilters.stars = updatedFilters.stars.filter(
+            (item) => item !== value
+          );
+        } else {
+          updatedFilters.stars = [...updatedFilters.stars, value];
+        }
+      } else if (filterType === "facilities") {
+        if (updatedFilters.facilities.includes(value)) {
+          updatedFilters.facilities = updatedFilters.facilities.filter(
+            (item) => item !== value
+          );
+        } else {
+          updatedFilters.facilities = [...updatedFilters.facilities, value];
+        }
+      } else if (filterType === "locations") {
+        if (updatedFilters.locations.includes(value)) {
+          updatedFilters.locations = updatedFilters.locations.filter(
+            (item) => item !== value
+          );
+        } else {
+          updatedFilters.locations = [...updatedFilters.locations, value];
+        }
+      }
+
+      return updatedFilters;
+    });
+  };
+  // Function to apply filters - separate from handleFilterChange
+  const applyFilters = () => {
+    const filteredHotels = allHotels.filter((hotel) => {
+      // Filter by stars - only filter if some stars are selected
+      if (
+        filters.stars.length > 0 &&
+        !filters.stars.includes(hotel.number_of_stars)
+      ) {
+        return false;
+      }
+
+      // Filter by facilities - only if some facilities are selected
+      if (filters.facilities.length > 0) {
+        const hasAllFacilities = filters.facilities.every(
+          (facility) => hotel.facilities && hotel.facilities.includes(facility)
+        );
+        if (!hasAllFacilities) return false;
+      }
+
+      // Filter by location - only if some locations are selected
+      if (filters.locations.length > 0) {
+        if (
+          !hotel.location ||
+          !filters.locations.includes(hotel.location.name)
+        ) {
+          return false;
+        }
+      }
+
+      // Filter by price
+      if (
+        hotel.discounted_price < priceRange[0] ||
+        hotel.discounted_price > priceRange[1]
+      ) {
+        return false;
+      }
+
+      return true;
+    });
+
+    setHotels(filteredHotels);
+    setShowFilters(false); // Hide filters after applying on mobile
+  };
+
+  // Function to clear all filters
+  const clearAllFilters = () => {
+    setFilters({
+      stars: [],
+      facilities: [],
+      locations: [],
+    });
+    setPriceRange([0, 100000]);
+    setHotels(allHotels); // Restore all hotels
+  };
+    // Slider settings
+    const sliderSettings = {
+      dots: true,
+      infinite: true,
+      speed: 500,
+      slidesToShow: 1,
+      slidesToScroll: 1,
+      autoplay: true,
+      autoplaySpeed: 3000,
+    };
   return (
     <>
       <Header></Header>
 
-      <div className="">
-        <div className="row">
-          <div className="col-sm-12 col-md-4 col-md-4 pe-lg-1">
-            <img className="hotelBannerImg" src={hotelBanner1} alt="" />
+      <div >
+        {isMobile ? (
+          <Slider {...sliderSettings}>
+            <div
+            >
+              <img src={hotelBanner1} className="tourPackageImg" alt="Tour Package 1" />
+            </div>
+            <div>
+              <img src={hotelBanner2} className="tourPackageImg" alt="Tour Package 2" />
+            </div>
+            <div>
+              <img src={hotelBanner3} className="tourPackageImg" alt="Tour Package 3" />
+            </div>
+          </Slider>
+        ) : (
+          <div className="row">
+            <div className="col-sm-12 col-md-4 col-lg-4 p-0">
+              <img src={hotelBanner1} className="tourPackageImg pe-lg-1" alt="Tour Package 1" />
+            </div>
+            <div className="col-sm-12 col-md-4 col-lg-4 p-0">
+              <img src={hotelBanner2} className="tourPackageImg pe-lg-1" alt="Tour Package 2" />
+            </div>
+            <div className="col-sm-12 col-md-4 col-lg-4 p-0">
+              <img src={hotelBanner3} className="tourPackageImg" alt="Tour Package 3" />
+            </div>
           </div>
-          <div className="col-sm-12 col-md-4 col-md-4 pe-lg-1">
-            <img className="hotelBannerImg" src={hotelBanner2} alt="" />
-          </div>
-          <div className="col-sm-12 col-md-4 col-md-4">
-            <img className="hotelBannerImg" src={hotelBanner3} alt="" />
-          </div>
-        </div>
+        )}
       </div>
 
-      <div className="row hotelback hotelpagefilter">
+      {/* <div className="row hotelback hotelpagefilter">
         <div className="col-sm-12 col-md-5 col-lg-5 px-3">
           <div className="boxx">
             <select>
@@ -103,218 +238,167 @@ function HotelPage() {
             <a href="#">Search</a>
           </div>
         </div>{" "}
-      </div>
+      </div> */}
       <section className="leaf">
         <div className="container">
           <div className="row">
+            {/* Filter */}
             <div className="col-sm-12 col-md-3 col-lg-3">
-              <h5 className="ps-3">FILTER BY</h5>
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <h5 className="ps-3">FILTER BY</h5>
+                <button
+                  className="btn btn-sm btn-outline-secondary d-md-none"
+                  onClick={() => setShowFilters(!showFilters)}
+                >
+                  {showFilters ? "Hide Filters" : "Show Filters"}
+                </button>
+              </div>
 
-              <div className="filterBar ps-3 ">
+              <div
+                className={`filterBar ps-3 ${
+                  showFilters ? "d-block" : "d-none d-md-block"
+                }`}
+              >
+                <div className="d-md-none d-flex justify-content-between mb-2">
+                  <button
+                    className="btn btn-sm btn-primary"
+                    onClick={applyFilters}
+                  >
+                    Apply Filters
+                  </button>
+                  <button
+                    className="btn btn-sm btn-outline-danger"
+                    onClick={clearAllFilters}
+                  >
+                    Clear All
+                  </button>
+                </div>
+
                 <h6>Filter price</h6>
+                <hr />
+                <div className="mb-3">
+                  <label htmlFor="priceRange" className="form-label">
+                    Price Range: ₹{priceRange[0]} - ₹{priceRange[1]}
+                  </label>
+                  <input
+                    type="range"
+                    className="form-range"
+                    min="0"
+                    max="100000"
+                    step="1000"
+                    value={priceRange[1]}
+                    onChange={(e) =>
+                      setPriceRange([priceRange[0], parseInt(e.target.value)])
+                    }
+                    id="priceRange"
+                  />
+                </div>
                 <hr />
                 <div>
                   <h6>Hotel Star</h6>
-                  <p>
-                    {" "}
-                    <input type="checkbox" />
-                    <FaStar
-                      className="mb-1 ms-1 "
-                      style={{ color: "#FFD43B" }}
-                    />{" "}
-                    <FaStar
-                      className="mb-1 ms-1 "
-                      style={{ color: "#FFD43B" }}
-                    />
-                    <FaStar
-                      className="mb-1 ms-1 "
-                      style={{ color: "#FFD43B" }}
-                    />
-                    <FaStar
-                      style={{ color: "#FFD43B" }}
-                      className="mb-1 ms-1"
-                    />
-                    <FaStar
-                      style={{ color: "#FFD43B" }}
-                      className="mb-1 ms-1"
-                    />
-                    <br />
-                  </p>
-                  <p>
-                    {" "}
-                    <input type="checkbox" />
-                    <FaStar
-                      style={{ color: "#FFD43B" }}
-                      className="mb-1 ms-1 "
-                    />
-                    <FaStar
-                      style={{ color: "#FFD43B" }}
-                      className="mb-1 ms-1"
-                    />
-                    <FaStar
-                      style={{ color: "#FFD43B" }}
-                      className="mb-1 ms-1 "
-                    />
-                    <FaStar
-                      style={{ color: "#FFD43B" }}
-                      className="mb-1 ms-1 "
-                    />
-                    <br />
-                  </p>
-                  <p>
-                    {" "}
-                    <input type="checkbox" />
-                    <FaStar
-                      style={{ color: "#FFD43B" }}
-                      className="mb-1 ms-1 "
-                    />
-                    <FaStar
-                      style={{ color: "#FFD43B" }}
-                      className="mb-1 ms-1 "
-                    />
-                    <FaStar
-                      style={{ color: "#FFD43B" }}
-                      className="mb-1 ms-1 "
-                    />
-                    <br />
-                  </p>
-                  <p>
-                    <input type="checkbox" />
-                    <FaStar
-                      style={{ color: "#FFD43B" }}
-                      className="mb-1 ms-1 "
-                    />
-                    <FaStar
-                      style={{ color: "#FFD43B" }}
-                      className="mb-1 ms-1 "
-                    />
-                    <br />
-                  </p>
-                  <p>
-                    {" "}
-                    <input type="checkbox" />
-                    <FaStar
-                      style={{ color: "#FFD43B" }}
-                      className="mb-1 ms-1 "
-                    />
-                    <br />
-                  </p>
+                  {[5, 4, 3, 2, 1].map((starCount) => (
+                    <p key={`star-${starCount}`}>
+                      <input
+                        type="checkbox"
+                        id={`star-${starCount}`}
+                        checked={filters.stars.includes(starCount)}
+                        onChange={() => handleFilterChange("stars", starCount)}
+                        className="me-2"
+                      />
+                      {[...Array(starCount)].map((_, index) => (
+                        <FaStar
+                          key={index}
+                          className="mb-1 ms-1"
+                          style={{ color: "#FFD43B" }}
+                        />
+                      ))}
+                      <br />
+                    </p>
+                  ))}
                 </div>
                 <hr />
                 <div>
                   <h6>Facilities</h6>
-                  <div>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Swimming Pool
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Power Backup
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Restaurant
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Room Service on Request
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      House Keeping
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Refrigerator
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Indoor Games
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Kids Play Area
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Jungle Safari
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Free Parking
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Air Conditioning
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Bonfire
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Dinning Area
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      CCTV
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Fire Extinguishers
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Jacuzzi
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      First Aid Services
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Activity Centre
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Pool Towels
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Wake Up Call
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Outdoor Sports
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Lawn
-                    </p>
+                  <div
+                    className="facilities-list"
+                    style={{ maxHeight: "200px", overflowY: "auto" }}
+                  >
+                    {[
+                      "Swimming Pool",
+                      "Power Backup",
+                      "Restaurant",
+                      "Room Service",
+                      "House Keeping",
+                      "Refrigerator",
+                      "Indoor Games",
+                      "Kids Play Area",
+                      "Jungle Safari",
+                      "Free Parking",
+                      "Air Conditioning",
+                      "Bonfire",
+                      "Dinning Area",
+                      "CCTV",
+                      "Fire Extinguishers",
+                      "Jacuzzi",
+                      "First Aid Services",
+                      "Activity Centre",
+                      "Pool Towels",
+                      "Wake Up Call",
+                      "Outdoor Sports",
+                      "Lawn",
+                    ].map((facility) => (
+                      <p key={facility}>
+                        <input
+                          type="checkbox"
+                          id={`facility-${facility}`}
+                          checked={filters.facilities.includes(facility)}
+                          onChange={() =>
+                            handleFilterChange("facilities", facility)
+                          }
+                          className="me-2"
+                        />
+                        {facility}
+                      </p>
+                    ))}
                   </div>
                 </div>
                 <hr />
-
                 <div>
                   <h6>Location</h6>
                   <div>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Chandrapur
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Nagpur
-                    </p>
-                    <p>
-                      <input type="checkbox" className="me-2" />
-                      Chimur
-                    </p>
+                    {["Chandrapur", "Nagpur", "Chimur"].map((location) => (
+                      <p key={location}>
+                        <input
+                          type="checkbox"
+                          id={`location-${location}`}
+                          checked={filters.locations.includes(location)}
+                          onChange={() =>
+                            handleFilterChange("locations", location)
+                          }
+                          className="me-2"
+                        />
+                        {location}
+                      </p>
+                    ))}
                   </div>
+                </div>
+                <div className="text-center my-3 d-none d-md-block">
+                  <button
+                    className="btn btn-primary me-2"
+                    onClick={applyFilters}
+                  >
+                    Apply Filters
+                  </button>
+                  <button
+                    className="btn btn-outline-danger"
+                    onClick={clearAllFilters}
+                  >
+                    Clear All
+                  </button>
                 </div>
               </div>
             </div>
+
             {/* <p>5 Hotels Found</p> */}
             <div className="col-sm-12 col-md-9">
               {hotels.length > 0 ? (
@@ -423,7 +507,7 @@ function HotelPage() {
                       </p>
                     </div>
 
-                    <div className="ps-3 ms-auto hotelrightdiv">
+                    <div className="ps-3 ms-0 ms-md-auto hotelrightdiv">
                       <div className="stardes">
                         {[...Array(hotel.number_of_stars || 3)].map(
                           (_, index) => (
