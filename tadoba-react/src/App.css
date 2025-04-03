@@ -1,10 +1,14 @@
+
 /* @import 'bootstrap/scss/bootstrap'; */
 /* @import "tailwindcss"; */
 .row {
   --bs-gutter-x: unset !important;
 }
-/* Navbar Container */
-/* Navbar Container */
+.container{
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 10px;
+}
 .navbar-container {
   background-color: #fff;
   box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
@@ -31,6 +35,7 @@
 .nav-links {
   display: flex;
   gap: 20px;
+  align-items: center;
 }
 
 .nav-links a {
@@ -151,16 +156,18 @@
     display: block;
   }
 }
-
+.aboutImages{
+  padding: 0px;
+}
 .aboutImages img {
   width: 100%;
   height: 200px;
-  padding: 10px;
+  padding: 5px;
   object-fit: cover;
 }
-.aboutImage3 {
+/* .aboutImage3 {
   margin-top: 20px;
-}
+} */
 .imageBox {
   height: 500px;
   width: 100%;
@@ -170,7 +177,10 @@
 
 .tadobaZones {
   background-color: #f6f2f1;
-  padding: 30px !important;
+  /* padding: 30px !important; */
+    margin-top: 30px !important; 
+    margin-bottom: 30px;
+    padding: 0 20px 10px 20px !important;
 }
 
 .bannersection .slick-slide img {
@@ -197,7 +207,7 @@ header {
   border: 1px solid rgb(197, 196, 194);
   padding: 10px;
   margin: 10px;
-  margin-bottom: 20px;
+  margin-bottom: 0px;
 }
 .sectionTadoba .row {
   --bs-gutter-x: unset;
@@ -227,7 +237,7 @@ header {
 .chronoImg {
   width: 100%;
   height: 300px;
-  padding: 0px 30px;
+  padding: 0px  0px;
 }
 
 .chronoRow {
@@ -244,6 +254,11 @@ header {
   border: 1px solid rgb(197, 196, 194);
   border-radius: 10px;
   margin-bottom: 20px;
+}
+@media (max-width:925px){
+  .packagebox{
+    flex-direction: column;
+  }
 }
 .package {
   padding: 0px 10px;
@@ -283,8 +298,9 @@ header {
   padding: 8px 0px;
 }
 .wildImg {
+  margin-top: -50px;
   width: 100%;
-  height: 180px;
+  height: 235px;
   border-radius: 10px;
 }
 .row {
@@ -574,21 +590,21 @@ footer p {
   background-color: #ffffffdb;
 }
 
-.safaritable td,
+/* .safaritable td,
 th {
   background-color: #ffffffdb !important;
-}
+} */
 thead,
 tbody,
 tfoot,
 tr,
 td,
 th {
-  border-color: #606060 !important;
+  border-color: #000000 ;
   padding: 5px !important;
 }
 .react-calendar__tile:enabled:hover,
-.react-calendar__tile:enabled:focus {
+.react-calendar__tile:enabled:focus { 
   background-color: #cbcbcb;
 }
 abbr[title] {
@@ -1486,7 +1502,7 @@ input {
   padding: 0;
   margin: 0;
   display: flex;
-  gap: 20px;
+  gap: 40px;
 }
 
 .link-list li {
@@ -1754,4 +1770,27 @@ input {
 
 .slick-track {
   display: flex;
+}
+.payment-processing {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 70vh;
+  text-align: center;
+}
+
+.payment-processing .loader {
+  border: 5px solid #f3f3f3;
+  border-top: 5px solid #4BB543;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

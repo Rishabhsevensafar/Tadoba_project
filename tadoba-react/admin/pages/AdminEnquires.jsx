@@ -16,6 +16,10 @@ import {
   Divider,
   Popconfirm,
   Descriptions,
+  Tooltip,
+  Row,
+  Col,
+  DatePicker
 } from "antd";
 import {
   EyeOutlined,
@@ -30,24 +34,42 @@ import {
   MailOutlined,
   PhoneOutlined,
   UserOutlined,
+  DownloadOutlined,
+  FilterOutlined,
+  ClearOutlined
 } from "@ant-design/icons";
 import moment from "moment";
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
+const { RangePicker } = DatePicker;
 
 const AdminHotelEnquiries = () => {
   const [enquiries, setEnquiries] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [selectedEnquiry, setSelectedEnquiry] = useState(null);
   const [remark, setRemark] = useState("");
   const [status, setStatus] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
+  
+  // Filter states
+  const [filterName, setFilterName] = useState("");
+  const [filterEmail, setFilterEmail] = useState("");
+  const [filterPhone, setFilterPhone] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const [filterDateRange, setFilterDateRange] = useState(null);
+  const [filterHotel, setFilterHotel] = useState("");
 
   useEffect(() => {
     fetchEnquiries();
   }, []);
+  
+  useEffect(() => {
+    applyFilters();
+  }, [enquiries, filterName, filterEmail, filterPhone, filterStatus, filterDateRange, filterHotel]);
 
   const fetchEnquiries = async () => {
     setLoading(true);
@@ -56,7 +78,7 @@ const AdminHotelEnquiries = () => {
         "http://localhost:5000/api/hotelenquiry"
       );
       setEnquiries(response.data);
-      // message.success("Enquiries loaded successfully");
+      setFilteredData(response.data);
     } catch (error) {
       console.error("Error fetching enquiries:", error);
       message.error("Failed to load enquiries");
@@ -144,8 +166,122 @@ const AdminHotelEnquiries = () => {
     }
   };
 
+  // Apply filters to the data
+  const applyFilters = () => {
+    let results = [...enquiries];
+    
+    if (filterName) {
+      results = results.filter(item => 
+        item.name.toLowerCase().includes(filterName.toLowerCase())
+      );
+    }
+    
+    if (filterEmail) {
+      results = results.filter(item => 
+        item.email.toLowerCase().includes(filterEmail.toLowerCase())
+      );
+    }
+    
+    if (filterPhone) {
+      results = results.filter(item => 
+        item.phone.includes(filterPhone)
+      );
+    }
+    
+    if (filterStatus) {
+      results = results.filter(item => item.status === filterStatus);
+    }
+    
+    if (filterHotel) {
+      results = results.filter(item => 
+        item.hotelId && item.hotelId.title && 
+        item.hotelId.title.toLowerCase().includes(filterHotel.toLowerCase())
+      );
+    }
+    
+    if (filterDateRange && filterDateRange[0] && filterDateRange[1]) {
+      const startDate = filterDateRange[0].startOf('day');
+      const endDate = filterDateRange[1].endOf('day');
+      
+      results = results.filter(item => {
+        const itemDate = moment(item.createdAt);
+        return itemDate.isSameOrAfter(startDate) && itemDate.isSameOrBefore(endDate);
+      });
+    }
+    
+    setFilteredData(results);
+  };
+
+  // Reset all filters
+  const clearFilters = () => {
+    setFilterName("");
+    setFilterEmail("");
+    setFilterPhone("");
+    setFilterStatus("");
+    setFilterHotel("");
+    setFilterDateRange(null);
+  };
+
+  // Download CSV function
+  const downloadCSV = () => {
+    // Define which columns to include in the CSV
+    const csvColumns = [
+      "Date & Time", "Name", "Email", "Phone Number", 
+      "Hotel Name", "Message", "Remark", "Status"
+    ];
+    
+    // Format data for CSV
+    const csvData = filteredData.map(item => ({
+      "Date & Time": moment(item.createdAt).format("DD-MM-YYYY hh:mm A"),
+      "Name": item.name,
+      "Email": item.email,
+      "Phone Number": item.phone,
+      "Hotel Name": item.hotelId?.title || "N/A",
+      "Message": item.message,
+      "Remark": item.remark || "N/A",
+      "Status": getStatusInfo(item.status).text
+    }));
+    
+    // Convert to CSV format
+    const header = csvColumns.join(',');
+    const rows = csvData.map(row => 
+      csvColumns.map(col => {
+        let value = row[col] || '';
+        // Escape commas and quotes
+        if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+          value = `"${value.replace(/"/g, '""')}"`;
+        }
+        return value;
+      }).join(',')
+    );
+    
+    const csv = [header, ...rows].join('\n');
+    
+    // Create and download the file
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `hotel_enquiries_${moment().format('YYYY-MM-DD')}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    message.success("CSV file has been downloaded");
+  };
+
   // Table columns
   const columns = [
+    {
+      title: "Name",
+      dataIndex: "name",
+      key: "name",
+      render: (text) => <Text>{text}</Text>,
+      sorter: (a, b) => a.name.localeCompare(b.name),
+    },
     {
       title: "Date & Time",
       dataIndex: "createdAt",
@@ -156,19 +292,6 @@ const AdminHotelEnquiries = () => {
       sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
     },
     {
-      title: "Hotel Name",
-      dataIndex: ["hotelId", "title"],
-      key: "hotel",
-      render: (text) => <Text strong>{text}</Text>,
-    },
-    {
-      title: "Name",
-      dataIndex: "name",
-      key: "name",
-      render: (text) => <Text>{text}</Text>,
-      sorter: (a, b) => a.name.localeCompare(b.name),
-    },
-    {
       title: "Email",
       dataIndex: "email",
       key: "email",
@@ -177,6 +300,12 @@ const AdminHotelEnquiries = () => {
       title: "Phone Number",
       dataIndex: "phone",
       key: "phone",
+    },
+    {
+      title: "Hotel Name",
+      dataIndex: ["hotelId", "title"],
+      key: "hotel",
+      render: (text) => <Text strong>{text}</Text>,
     },
     {
       title: "Remark",
@@ -196,13 +325,6 @@ const AdminHotelEnquiries = () => {
           </Tag>
         );
       },
-
-      filters: [
-        { text: "Pending", value: "pending" },
-        { text: "Resolved", value: "resolved" },
-        { text: "Rejected", value: "rejected" },
-      ],
-      onFilter: (value, record) => record.status === value,
     },
     {
       title: "Action",
@@ -213,7 +335,6 @@ const AdminHotelEnquiries = () => {
           icon={<EyeOutlined />}
           onClick={() => showModal(record)}
         >
-
         </Button>
       ),
     },
@@ -227,20 +348,135 @@ const AdminHotelEnquiries = () => {
         </Title>
       }
       extra={
-        <Button
-          type="primary"
-          icon={<ReloadOutlined />}
-          onClick={fetchEnquiries}
-          loading={loading}
-        >
-          Refresh
-        </Button>
+        <Space>
+          <Tooltip title="Toggle Filter Panel">
+            <Button 
+              type={isFilterVisible ? "primary" : "default"}
+              icon={<FilterOutlined />} 
+              onClick={() => setIsFilterVisible(!isFilterVisible)}
+            >
+              Filter
+            </Button>
+          </Tooltip>
+          <Tooltip title="Download as CSV">
+            <Button 
+              icon={<DownloadOutlined />} 
+              onClick={downloadCSV}
+              disabled={filteredData.length === 0}
+            >
+              Export CSV
+            </Button>
+          </Tooltip>
+          <Button
+            type="primary"
+            icon={<ReloadOutlined />}
+            onClick={fetchEnquiries}
+            loading={loading}
+          >
+            Refresh
+          </Button>
+        </Space>
       }
       style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.05)" }}
     >
+      {/* Filter Panel */}
+      {isFilterVisible && (
+        <Card 
+          size="small" 
+          style={{ marginBottom: 16, background: "#f9f9f9" }}
+          title="Filter Options"
+          extra={
+            <Button 
+              icon={<ClearOutlined />} 
+              onClick={clearFilters}
+              size="small"
+            >
+              Clear Filters
+            </Button>
+          }
+        >
+          <Row gutter={[16, 16]}>
+            <Col xs={24} sm={12} md={6} lg={6}>
+              <Form.Item label="Name" style={{ marginBottom: 0 }}>
+                <Input 
+                  placeholder="Filter by name" 
+                  value={filterName} 
+                  onChange={e => setFilterName(e.target.value)}
+                  allowClear
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6} lg={6}>
+              <Form.Item label="Email" style={{ marginBottom: 0 }}>
+                <Input 
+                  placeholder="Filter by email" 
+                  value={filterEmail} 
+                  onChange={e => setFilterEmail(e.target.value)}
+                  allowClear
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6} lg={6}>
+              <Form.Item label="Phone" style={{ marginBottom: 0 }}>
+                <Input 
+                  placeholder="Filter by phone" 
+                  value={filterPhone} 
+                  onChange={e => setFilterPhone(e.target.value)}
+                  allowClear
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6} lg={6}>
+              <Form.Item label="Status" style={{ marginBottom: 0 }}>
+                <Select 
+                  placeholder="Filter by status" 
+                  value={filterStatus} 
+                  onChange={value => setFilterStatus(value)}
+                  allowClear
+                  style={{ width: '100%' }}
+                >
+                  <Option value="pending">Pending</Option>
+                  <Option value="resolved">Resolved</Option>
+                  <Option value="rejected">Rejected</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6} lg={6}>
+              <Form.Item label="Hotel" style={{ marginBottom: 0 }}>
+                <Input 
+                  placeholder="Filter by hotel name" 
+                  value={filterHotel} 
+                  onChange={e => setFilterHotel(e.target.value)}
+                  allowClear
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={12} lg={12}>
+              <Form.Item label="Date Range" style={{ marginBottom: 0 }}>
+                <RangePicker 
+                  value={filterDateRange}
+                  onChange={dates => setFilterDateRange(dates)}
+                  style={{ width: '100%' }}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Card>
+      )}
+
+      {/* Results Info */}
+      <div style={{ marginBottom: 16 }}>
+        <Text type="secondary">
+          {filteredData.length === enquiries.length 
+            ? `Showing all ${filteredData.length} enquiries` 
+            : `Found ${filteredData.length} matching enquiries out of ${enquiries.length} total`
+          }
+        </Text>
+      </div>
+
       <Table
         columns={columns}
-        dataSource={enquiries}
+        dataSource={filteredData}
         rowKey="_id"
         loading={loading}
         pagination={{

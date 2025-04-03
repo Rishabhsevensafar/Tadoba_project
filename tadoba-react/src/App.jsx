@@ -44,6 +44,8 @@ import ReviewBookingTour from "./Component/pages/ReviewBookingTour";
 import ContactUs from './Component/pages/ContactUs';
 import TestTailwind from './Component/tailwindtest';
 import NewsBlogDetail from './Component/pages/NewsBlogDetail';
+import SafariBookingSuccess from './Component/pages/SafariBookingSuccess';
+// import HeroSection from './Component/HeroSection';
 
 function App() {
  
@@ -90,7 +92,10 @@ function App() {
         <Route path="/booking/:id" element={<ReviewBookingTour/>}/>
         <Route path="/contactus" element={<ContactUs/>}/>
         <Route path='/tailwindtest' element={<TestTailwind/>}/>
-        <Route path="/News&blogs" element={<NewsBlogDetail/>}/>
+        <Route path="/news-blog-detail/:id" element={<NewsBlogDetail/>}/>
+        <Route path="/booking-success/:bookingId" element={<SafariBookingSuccess />} />
+
+        {/* <Route path="/Route-hero" element= {<HeroSection/>}/> */}
     </Routes>
   </BrowserRouter>
   </>

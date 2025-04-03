@@ -11,12 +11,14 @@ exports.createOrder = async (req, res) => {
         }
 
         const options = {
-            amount: amount * 100, // Razorpay expects amount in paise
+            amount: amount * 100, // Razorpay expects paise
             currency: "INR",
             receipt: `quick_payment_${Date.now()}`,
         };
 
         const order = await razorpay.orders.create(options);
+
+        const bookingId = `BOOK${Date.now()}`; // Generate a booking ID
 
         const newPayment = new QuickPayment({
             name,
@@ -26,13 +28,19 @@ exports.createOrder = async (req, res) => {
             zip,
             amount,
             status: "Pending",
-            bookingId: `BOOK${Date.now()}`, // Generate a unique booking ID
-            paymentId: "", // Initially empty, updated after payment
+            bookingId, 
+            orderId: order.id,  // ✅ Store `orderId` internally for verification
         });
 
         await newPayment.save();
 
-        res.status(200).json({ success: true, order, key_id: process.env.RAZORPAY_KEY_ID, bookingId: newPayment.bookingId });
+        res.status(200).json({ 
+            success: true, 
+            order, 
+            key_id: process.env.RAZORPAY_KEY_ID, 
+            bookingId // ✅ Return only `bookingId` to frontend
+        });
+
     } catch (error) {
         res.status(500).json({ success: false, message: "Payment initiation failed", error: error.message });
     }
@@ -40,33 +48,31 @@ exports.createOrder = async (req, res) => {
 
 exports.verifyPayment = async (req, res) => {
     try {
-        const { booking_id, payment_id, signature } = req.body; // ✅ Changed from order_id to booking_id
+        const { order_id, booking_id, payment_id, signature } = req.body;
 
-        if (!booking_id || !payment_id || !signature) {
+        if (!booking_id || !payment_id || !signature || !order_id) {
             return res.status(400).json({ success: false, message: "Missing parameters" });
-        }
-
-        // Fetch order details from DB using **bookingId**
-        const payment = await QuickPayment.findOne({ bookingId: booking_id });
-
-        if (!payment) {
-            return res.status(404).json({ success: false, message: "Booking not found" });
         }
 
         // Verify Razorpay Signature
         const secret = process.env.RAZORPAY_SECRET;
         const generated_signature = crypto
             .createHmac("sha256", secret)
-            .update(booking_id + "|" + payment_id)
+            .update(order_id + "|" + payment_id)
             .digest("hex");
 
         if (generated_signature !== signature) {
             return res.status(400).json({ success: false, message: "Invalid signature" });
         }
 
-        // ✅ Update Payment in Database
+        // Find and update payment in Database
+        const payment = await QuickPayment.findOne({ bookingId: booking_id });
+        if (!payment) {
+            return res.status(404).json({ success: false, message: "Booking not found" });
+        }
+
         payment.paymentId = payment_id;
-        payment.status = "Success"; // Mark as successful
+        payment.status = "Success";
         await payment.save();
 
         res.status(200).json({ success: true, message: "Payment Verified Successfully!", payment });
@@ -75,6 +81,7 @@ exports.verifyPayment = async (req, res) => {
         res.status(500).json({ success: false, message: "Server error while verifying payment" });
     }
 };
+
 
 // ✅ Fetch all payments for Admin Panel
 exports.getAllPayments = async (req, res) => {
@@ -97,7 +104,41 @@ exports.getAllPayments = async (req, res) => {
         res.status(500).json({ success: false, message: "Error fetching payments" });
     }
 };
+// Add this new function to your backend controller:
 
+exports.getPaymentStatusByBookingId = async (req, res) => {
+    try {
+      const { booking_id } = req.body;
+  
+      if (!booking_id) {
+        return res.status(400).json({ success: false, message: "Missing booking ID" });
+      }
+  
+      // Just fetch the payment status from the database
+      const payment = await QuickPayment.findOne({ bookingId: booking_id });
+  
+      if (!payment) {
+        return res.status(404).json({ success: false, message: "Booking not found" });
+      }
+  
+      // Return payment details
+      res.status(200).json({ 
+        success: payment.status === "Success", 
+        message: payment.status === "Success" ? "Payment confirmed" : "Payment not confirmed",
+        payment: {
+          name: payment.name,
+          email: payment.email,
+          amount: payment.amount,
+          status: payment.status,
+          date: payment.createdAt
+        }
+      });
+      
+    } catch (error) {
+      console.error("Error fetching payment status:", error);
+      res.status(500).json({ success: false, message: "Server error while checking payment status" });
+    }
+  };
 exports.updatePaymentStatus = async (req, res) => {
     try {
         const { id } = req.params;

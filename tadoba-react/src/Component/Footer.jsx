@@ -15,7 +15,7 @@ function Footer() {
                     </div>
                     <div className='col-lg-3 col-md-3 col-sm-12 ps-lg-5'>
                         <p className='foothead'>Useful Links</p>
-                        <ul>
+                        <ul style={{padding:'0px'}}>
                             <li>About</li>
                             <li>Contact Us</li>
                             <li>Tour Packages</li>

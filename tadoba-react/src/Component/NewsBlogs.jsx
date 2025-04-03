@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import '../styles/NewsBlogs.css'; // Import your CSS file
+import { Link } from 'react-router-dom';
 
 function NewsBlogs() {
   const [blogs, setBlogs] = useState([]);
@@ -40,7 +41,8 @@ function NewsBlogs() {
                 <p className="blog-meta">By Admin on {new Date(blog.createdAt).toLocaleDateString()}</p>
                 <h3 className="blog-title">{blog.title}</h3>
                 {/* <p className="blog-description">{blog.content.substring(0, 100)}...</p> */}
-                <button className="read-more-btn">Read More...</button>
+                <Link to={`/news-blog-detail/${blog._id}`}>
+                <button className="read-more-btn">Read More</button></Link>
               </div>
             </div>
           ))}

@@ -16,6 +16,9 @@ import {
   Divider,
   Badge,
   DatePicker,
+  Row,
+  Col,
+  Tooltip,
 } from "antd";
 import {
   EyeOutlined,
@@ -24,10 +27,13 @@ import {
   CheckCircleOutlined,
   CloseCircleOutlined,
   ExclamationCircleOutlined,
+  DownloadOutlined,
+  FilterOutlined,
+  ClearOutlined,
 } from "@ant-design/icons";
 import moment from "moment";
 
-const { Title } = Typography;
+const { Title, Text } = Typography;
 const { Option } = Select;
 const { TextArea } = Input;
 const { RangePicker } = DatePicker;
@@ -40,12 +46,22 @@ const AdminContactEnquiries = () => {
   const [status, setStatus] = useState("");
   const [remark, setRemark] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [statusFilter, setStatusFilter] = useState(null);
-  const [dateRange, setDateRange] = useState(null);
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
+  
+  // Filter states
+  const [filterName, setFilterName] = useState("");
+  const [filterEmail, setFilterEmail] = useState("");
+  const [filterPhone, setFilterPhone] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const [filterDateRange, setFilterDateRange] = useState(null);
 
   useEffect(() => {
     fetchContacts();
   }, []);
+
+  useEffect(() => {
+    applyFilters();
+  }, [contacts, filterName, filterEmail, filterPhone, filterStatus, filterDateRange]);
 
   const fetchContacts = async () => {
     setLoading(true);
@@ -104,8 +120,8 @@ const AdminContactEnquiries = () => {
     switch (status) {
       case "Pending":
         return <Tag color="red"><ExclamationCircleOutlined /> Pending</Tag>;
-      case "Success":
-        return <Tag color="green"><CheckCircleOutlined /> Success</Tag>;
+      case "Resolved":
+        return <Tag color="green"><CheckCircleOutlined /> Resolved</Tag>;
       case "Not Intrested":
         return <Tag color="orange"><CloseCircleOutlined /> Not Intrested</Tag>;
       case "No Response":
@@ -115,25 +131,104 @@ const AdminContactEnquiries = () => {
     }
   };
 
-  // ✅ Filter Contacts Based on Status and Date    
-  useEffect(() => {
-    let filteredData = contacts;
-
-    if (statusFilter) {
-      filteredData = filteredData.filter((contact) => contact.status === statusFilter);
-    }
-
-    if (dateRange && dateRange.length === 2) {
-      const [start, end] = dateRange;
-      filteredData = filteredData.filter((contact) =>
-        moment(contact.createdAt).isBetween(start, end, "day", "[]")
+  // Apply filters to the data
+  const applyFilters = () => {
+    let results = [...contacts];
+    
+    if (filterName) {
+      results = results.filter(item => 
+        item.name?.toLowerCase().includes(filterName.toLowerCase())
       );
     }
+    
+    if (filterEmail) {
+      results = results.filter(item => 
+        item.email?.toLowerCase().includes(filterEmail.toLowerCase())
+      );
+    }
+    
+    if (filterPhone) {
+      results = results.filter(item => 
+        item.phone?.includes(filterPhone)
+      );
+    }
+    
+    if (filterStatus) {
+      results = results.filter(item => item.status === filterStatus);
+    }
+    
+    if (filterDateRange && filterDateRange[0] && filterDateRange[1]) {
+      const startDate = filterDateRange[0].startOf('day');
+      const endDate = filterDateRange[1].endOf('day');
+      
+      results = results.filter(item => {
+        const itemDate = moment(item.createdAt);
+        return itemDate.isSameOrAfter(startDate) && itemDate.isSameOrBefore(endDate);
+      });
+    }
+    
+    setFilteredContacts(results);
+  };
 
-    setFilteredContacts(filteredData);
-  }, [statusFilter, dateRange, contacts]);
+  // Reset all filters
+  const clearFilters = () => {
+    setFilterName("");
+    setFilterEmail("");
+    setFilterPhone("");
+    setFilterStatus("");
+    setFilterDateRange(null);
+  };
 
-  // ✅ Table Columns
+  // Download CSV function
+  const downloadCSV = () => {
+    // Define columns to include in CSV
+    const csvColumns = [
+      "Date & Time", "Name", "Email", "Phone", "Message", "Status", "Remark"
+    ];
+    
+    // Format data for CSV
+    const csvData = filteredContacts.map(item => ({
+      "Date & Time": moment(item.createdAt).format("DD-MM-YYYY hh:mm A"),
+      "Name": item.name || "N/A",
+      "Email": item.email || "N/A",
+      "Phone": item.phone || "N/A",
+      "Message": item.message || "N/A",
+      "Status": item.status || "Pending",
+      "Remark": item.remark || "N/A"
+    }));
+    
+    // Convert to CSV format
+    const header = csvColumns.join(',');
+    const rows = csvData.map(row => 
+      csvColumns.map(col => {
+        let value = row[col] || '';
+        // Escape commas and quotes
+        if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+          value = `"${value.replace(/"/g, '""')}"`;
+        }
+        return value;
+      }).join(',')
+    );
+    
+    const csv = [header, ...rows].join('\n');
+    
+    // Create and download the file
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `contact_enquiries_${moment().format('YYYY-MM-DD')}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    message.success("CSV file has been downloaded");
+  };
+
+  // Table Columns
   const columns = [
     {
       title: "Date",
@@ -146,6 +241,8 @@ const AdminContactEnquiries = () => {
       title: "Name",
       dataIndex: "name",
       key: "name",
+      render: (text) => <Text strong>{text}</Text>,
+      sorter: (a, b) => a.name.localeCompare(b.name),
     },
     {
       title: "Email",
@@ -192,33 +289,121 @@ const AdminContactEnquiries = () => {
     <Card
       title={<Title level={4}>Admin Contact Enquiries</Title>}
       extra={
-        <Button type="primary" icon={<ReloadOutlined />} onClick={fetchContacts} loading={loading}>
-          Refresh
-        </Button>
+        <Space>
+          <Tooltip title="Toggle Filter Panel">
+            <Button 
+              type={isFilterVisible ? "primary" : "default"}
+              icon={<FilterOutlined />} 
+              onClick={() => setIsFilterVisible(!isFilterVisible)}
+            >
+              Filter
+            </Button>
+          </Tooltip>
+          <Tooltip title="Download as CSV">
+            <Button 
+              icon={<DownloadOutlined />} 
+              onClick={downloadCSV}
+              disabled={filteredContacts.length === 0}
+            >
+              Export CSV
+            </Button>
+          </Tooltip>
+          <Button 
+            type="primary" 
+            icon={<ReloadOutlined />} 
+            onClick={fetchContacts} 
+            loading={loading}
+          >
+            Refresh
+          </Button>
+        </Space>
       }
+      style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.05)" }}
     >
-      {/* Filters */}
-      <div className="flex gap-4 mb-4">
-        {/* Status Filter */}
-        <Select
-          placeholder="Filter by Status"
-          value={statusFilter}
-          onChange={setStatusFilter}
-          allowClear
-          className="w-48"
+      {/* Filter Panel */}
+      {isFilterVisible && (
+        <Card 
+          size="small" 
+          style={{ marginBottom: 16, background: "#f9f9f9" }}
+          title="Filter Options"
+          extra={
+            <Button 
+              icon={<ClearOutlined />} 
+              onClick={clearFilters}
+              size="small"
+            >
+              Clear Filters
+            </Button>
+          }
         >
-          <Option value="Pending">Pending</Option>
-          <Option value="Resolved">Success</Option>
-          <Option value="Not Intrested">Not Intrested</Option>
-          <Option value="No Response">No Response</Option>
-        </Select>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} sm={12} md={6} lg={6}>
+              <Form.Item label="Name" style={{ marginBottom: 0 }}>
+                <Input 
+                  placeholder="Filter by name" 
+                  value={filterName} 
+                  onChange={e => setFilterName(e.target.value)}
+                  allowClear
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6} lg={6}>
+              <Form.Item label="Email" style={{ marginBottom: 0 }}>
+                <Input 
+                  placeholder="Filter by email" 
+                  value={filterEmail} 
+                  onChange={e => setFilterEmail(e.target.value)}
+                  allowClear
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6} lg={6}>
+              <Form.Item label="Phone" style={{ marginBottom: 0 }}>
+                <Input 
+                  placeholder="Filter by phone" 
+                  value={filterPhone} 
+                  onChange={e => setFilterPhone(e.target.value)}
+                  allowClear
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6} lg={6}>
+              <Form.Item label="Status" style={{ marginBottom: 0 }}>
+                <Select 
+                  placeholder="Filter by status" 
+                  value={filterStatus} 
+                  onChange={value => setFilterStatus(value)}
+                  allowClear
+                  style={{ width: '100%' }}
+                >
+                  <Option value="Pending">Pending</Option>
+                  <Option value="Resolved">Resolved</Option>
+                  <Option value="Not Intrested">Not Intrested</Option>
+                  <Option value="No Response">No Response</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={12} lg={12}>
+              <Form.Item label="Date Range" style={{ marginBottom: 0 }}>
+                <RangePicker 
+                  value={filterDateRange}
+                  onChange={dates => setFilterDateRange(dates)}
+                  style={{ width: '100%' }}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Card>
+      )}
 
-        {/* Date Filter */}
-        <RangePicker
-          onChange={(dates) => setDateRange(dates)}
-          format="DD-MM-YYYY"
-          className="w-60"
-        />
+      {/* Results Info */}
+      <div style={{ marginBottom: 16 }}>
+        <Text type="secondary">
+          {filteredContacts.length === contacts.length 
+            ? `Showing all ${filteredContacts.length} contacts` 
+            : `Found ${filteredContacts.length} matching contacts out of ${contacts.length} total`
+          }
+        </Text>
       </div>
 
       {/* Contact Table */}
@@ -227,47 +412,118 @@ const AdminContactEnquiries = () => {
         dataSource={filteredContacts}
         rowKey="_id"
         loading={loading}
-        pagination={{ pageSize: 10 }}
+        pagination={{ 
+          pageSize: 10,
+          showSizeChanger: true,
+          showTotal: (total) => `Total ${total} contacts`
+        }}
         bordered
         size="middle"
+        rowClassName={(record, index) => index % 2 === 0 ? "table-row-light" : "table-row-dark"}
       />
 
       {/* Contact Details Modal */}
       <Modal
-        title="Contact Details"
+        title={
+          <Space>
+            <EyeOutlined />
+            <span>Contact Details</span>
+          </Space>
+        }
         open={isModalVisible}
         onCancel={() => setIsModalVisible(false)}
         footer={[
-          <Button key="cancel" onClick={() => setIsModalVisible(false)}>Cancel</Button>,
-          <Button key="update" type="primary" onClick={handleUpdate}>Update</Button>,
+          <Popconfirm
+            key="delete"
+            title="Are you sure you want to delete this contact?"
+            onConfirm={() => handleDelete(selectedContact?._id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button danger icon={<DeleteOutlined />}>
+              Delete Contact
+            </Button>
+          </Popconfirm>,
+          <Button key="cancel" onClick={() => setIsModalVisible(false)}>
+            Cancel
+          </Button>,
+          <Button
+            key="update"
+            type="primary"
+            icon={<CheckCircleOutlined />}
+            onClick={handleUpdate}
+          >
+            Save Changes
+          </Button>,
         ]}
+        width={600}
       >
         {selectedContact && (
           <>
-            <p><strong>Name:</strong> {selectedContact.name}</p>
-            <p><strong>Email:</strong> {selectedContact.email}</p>
-            <p><strong>Phone:</strong> {selectedContact.phone}</p>
-            <p><strong>Message:</strong> {selectedContact.message}</p>
-            <p><strong>Date:</strong> {moment(selectedContact.createdAt).format("DD-MM-YYYY hh:mm A")}</p>
+            <div className="contact-info-section">
+              <p><strong>Name:</strong> {selectedContact.name}</p>
+              <p><strong>Email:</strong> {selectedContact.email}</p>
+              <p><strong>Phone:</strong> {selectedContact.phone}</p>
+              <p><strong>Date:</strong> {moment(selectedContact.createdAt).format("DD-MM-YYYY hh:mm A")}</p>
+              <p><strong>Message:</strong> {selectedContact.message}</p>
+
+              <Divider />
+
+              <p>
+                <strong>Current Status:</strong>{" "}
+                {getStatusTag(selectedContact.status || "Pending")}
+              </p>
+              <p>
+                <strong>Current Remark:</strong>{" "}
+                {selectedContact.remark || "No remark added"}
+              </p>
+            </div>
 
             <Divider />
 
             <Form layout="vertical">
-              <Form.Item label="Update Status">
+              <Form.Item label="Update Status" required>
                 <Select value={status} onChange={setStatus} className="w-full">
-                  <Option value="Pending">Pending</Option>
-                  <Option value="Resolved">Success</Option>
-                  <Option value="Not Intrested"> Not Intrested</Option>
-                  <Option value="No Response"> No Response</Option>
+                  <Option value="Pending">
+                    <Badge status="error" text="Pending" />
+                  </Option>
+                  <Option value="Resolved">
+                    <Badge status="success" text="Resolved" />
+                  </Option>
+                  <Option value="Not Intrested">
+                    <Badge status="warning" text="Not Intrested" />
+                  </Option>
+                  <Option value="No Response">
+                    <Badge status="default" text="No Response" />
+                  </Option>
                 </Select>
               </Form.Item>
               <Form.Item label="Remark">
-                <TextArea rows={3} value={remark} onChange={(e) => setRemark(e.target.value)} placeholder="Enter remark or notes" />
+                <TextArea 
+                  rows={4} 
+                  value={remark} 
+                  onChange={(e) => setRemark(e.target.value)} 
+                  placeholder="Enter remark or notes"
+                  showCount
+                  maxLength={500}
+                />
               </Form.Item>
             </Form>
           </>
         )}
       </Modal>
+
+      <style jsx>{`
+        .table-row-light {
+          background-color: #ffffff;
+        }
+        .table-row-dark {
+          background-color: #fafafa;
+        }
+        .contact-info-section p {
+          margin-bottom: 8px;
+        }
+      `}</style>
     </Card>
   );
 };
