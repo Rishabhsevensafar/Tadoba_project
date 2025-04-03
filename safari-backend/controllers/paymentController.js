@@ -1,118 +1,107 @@
+const Razorpay = require('razorpay');
 const axios = require("axios");
 require("dotenv").config();
+const crypto = require("crypto");
+const SafariBooking = require("../models/safaribooking");
 
-const BASE_URL =
-  process.env.CASHFREE_ENV === "PROD"
-    ? "https://api.cashfree.com/pg"
-    : "https://sandbox.cashfree.com/pg";
+const razorpayInstance = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY,   // Your Razorpay Key ID
+  key_secret: process.env.RAZORPAY_SECRET // Your Razorpay Secret Key
+});
 
-const headers = {
-  "Content-Type": "application/json",
-  "x-client-id": process.env.CASHFREE_APP_ID?.trim(),  // Ensure no whitespace issues
-  "x-client-secret": process.env.CASHFREE_SECRET_KEY?.trim(),
-  "x-api-version": "2022-09-01",
-};
-
-
+// **Create an order with Razorpay**
 const createOrder = async (req, res) => {
   try {
-    const { amount, orderId, customerId,customerName, customerEmail, customerPhone } = req.body;
+    const { amount, customerId } = req.body; // customerId = Booking ID
 
     const orderData = {
-      order_id: orderId,
-      order_amount: amount,
-      order_currency: "INR",
-      order_note: "Payment for tour package",
-      customer_details: {
-        customer_id: customerId,
-        customer_name: customerName,
-        customer_email: customerEmail,
-        customer_phone: customerPhone,
-      },
-      order_meta: {
-        return_url: `http://localhost:5173/payment-success?order_id=${orderId}`,
-        notify_url: "http://localhost:5000/webhook",
-      },
+      amount: amount * 100,
+      currency: "INR",
+      receipt: `safari_booking_${customerId}`,
+      payment_capture: 1,
     };
 
-    const response = await axios.post(`${BASE_URL}/orders`, orderData, { headers });
+    const order = await razorpayInstance.orders.create(orderData);
 
-    console.log("Cashfree Response:", response.data);
-    console.log("Using API ID:", process.env.CASHFREE_APP_ID);
-    console.log("Using API Secret:", process.env.CASHFREE_SECRET_KEY);
-    console.log("Using API Version:", process.env.CASHFREE_ENV );
+    // Changed from findByIdAndUpdate to findOneAndUpdate
+    await SafariBooking.findOneAndUpdate(
+      { bookingId: customerId }, // Use your custom bookingId field
+      { razorpayOrderId: order.id },
+      { new: true }
+    );
 
-
-    if (response.data && response.data.payment_session_id) {
-      const validSessionId = response.data.payment_session_id.replace(/paymentpayment$/, '');
-
-      // Generate a payment link
-      const paymentLink = response.data.payments.url;
-    
-      console.log("✅ Valid Session ID:", validSessionId); // Debugging log    
-
-      res.json({
-        success: true,
-        paymentSessionId: response.data.payment_session_id,
-        orderId: response.data.order_id,
-        paymentLink, 
-      });
-    } else {
-      throw new Error("Order creation failed or response format unexpected");
-    }
+    res.json({
+      success: true,
+      orderId: order.id,
+      paymentLink: `https://checkout.razorpay.com/v1/checkout/embedded/${order.id}`,
+    });
   } catch (error) {
-    console.error("Cashfree Order Error:", error.response?.data || error.message);
-    res.status(500).json({ success: false, error: "Payment Order Creation Failed" });
+    console.error("Razorpay Order Error:", error);
+    res.status(500).json({ success: false, message: "Payment Order Creation Failed" });
   }
 };
-
-// payment.controller.js
-
 const verifyPayment = async (req, res) => {
   try {
-    const { orderId } = req.body;
-    const headers = {
-      "Content-Type": "application/json",
-      "x-client-id": process.env.CASHFREE_APP_ID?.trim(),
-      "x-client-secret": process.env.CASHFREE_SECRET_KEY?.trim(),
-      "x-api-version": "2022-09-01",
-    };
+    const { orderId, paymentId, signature } = req.body;
 
-    console.log("Verifying payment for order:", orderId);
-    const response = await axios.get(`${BASE_URL}/orders/${orderId}/payments`, { headers });
+    // Razorpay Signature Verify करें
+    const generatedSignature = crypto
+      .createHmac("sha256", process.env.RAZORPAY_SECRET)
+      .update(`${orderId}|${paymentId}`)
+      .digest("hex");
 
-    if (response.data && response.data.payment_status === "SUCCESS") {
-      res.json({ success: true, message: "Payment verified successfully!" });
-    } else {
-      res.status(400).json({
-        success: false,
-        message: "Payment verification failed!",
-        status: response.data?.payment_status || "UNKNOWN",
-      });
+    if (generatedSignature !== signature) {
+      return res.status(400).json({ success: false, message: "Invalid Payment Signature!" });
     }
+
+    // ✅ Booking को Database में Update करें
+    const booking = await SafariBooking.findOneAndUpdate(
+      { razorpayOrderId: orderId }, // Razorpay Order ID से Booking ढूंढें
+      {
+        paymentStatus: "Success",
+        paymentId: paymentId,
+        paymentSignature: signature,
+        paymentDate: new Date(),
+      },
+      { new: true } // Updated Document Return करेगा
+    );
+
+    if (!booking) {
+      return res.status(404).json({ success: false, message: "Booking not found!" });
+    }
+
+    res.json({ 
+      success: true, 
+      message: "Payment Verified & Booking Confirmed!",
+      bookingId: booking.bookingId,
+      booking 
+    });
+
   } catch (error) {
-    console.error("Cashfree Payment Verification Error:", error.response?.data || error.message);
+    console.error("Payment Verification Error:", error);
     res.status(500).json({ success: false, message: "Payment verification failed!" });
   }
 };
-// 3️⃣ **Webhook handler for payment notifications**
+// Webhook handler for Razorpay to handle payment notifications
 const handleWebhook = async (req, res) => {
   try {
-
     const webhookData = req.body;
 
-    // Verify webhook signature (if using HMAC verification)
-    const signature = req.headers["x-webhook-signature"];
+    // Verify webhook signature
+    const signature = req.headers["x-razorpay-signature"];
     if (!signature) {
       return res.status(403).json({ success: false, message: "Invalid signature" });
     }
-    if (webhookData.event_type === "ORDER_PAID") {
-      console.log(`Order ${webhookData.order_id} has been paid`);
+
+    // Assuming webhookData.event contains the event type
+    if (webhookData.event === "payment.captured") {
+      console.log(`Payment for Order ${webhookData.payload.payment.entity.order_id} was successful`);
+      // Handle successful payment
     }
 
     res.status(200).json({ success: true });
   } catch (error) {
-    console.error("Webhook Error:", error);
+    console.error("Razorpay Webhook Error:", error);
     res.status(500).json({ success: false });
   }
 };

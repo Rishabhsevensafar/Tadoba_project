@@ -5,6 +5,7 @@ const {
   getSafariBookingById,
   deleteSafariBooking,
   addTravelerDetails,
+  updateSafariBooking,
 } = require("../controllers/safaribookingController");
 
 const router = express.Router();
@@ -14,4 +15,5 @@ router.post("/:id/travelers", addTravelerDetails); // Route to add traveler deta
 router.get("/", getSafariBookings);
 router.get("/:id", getSafariBookingById);
 router.delete("/:id", deleteSafariBooking);
+router.put('/update/:id', updateSafariBooking); // <-- नई route
 module.exports = router;

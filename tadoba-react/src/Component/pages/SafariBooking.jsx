@@ -6,49 +6,166 @@ import ImportantLinks from "../ImportantLinks";
 import Footer from "../Footer";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
+import "../../styles/SafariBooking.css"; // Create this CSS file for custom styles
 
 function SafariBooking() {
+  // State for selected date with validation to prevent past dates
   const [date, setDate] = useState(new Date());
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(null);
+
+  // Form data state
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     safariZone: "",
-    vehicleType: "Jeep",
-    safariTime: "",
+    vehicleType: ["Jeep","Canter"],
+    safariTime: ["Morning","Evening"],
     children: 0,
     adults: 1,
+    amountPaid: 6100,
   });
 
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
+
+  // Scroll to top on component mount
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
+  // Handle form input changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleEnquiry = async () => {
-    try {
-      let enquiryData = { ...formData, date: date.toISOString() };
-  
-      // ✅ Remove empty keys dynamically
-      enquiryData = Object.fromEntries(
-        Object.entries(enquiryData).filter(([key, value]) => key.trim() !== "" && value !== "")
+  const generateCalendarGrid = () => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+
+    // First day of the month
+    const firstDay = new Date(year, month, 1);
+    const lastDay = new Date(year, month + 1, 0);
+
+    // Create grid
+    const calendarGrid = [];
+
+    // Weekday names
+    const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+    calendarGrid.push(weekdays);
+
+    // Pad initial empty days
+    const startingDay = firstDay.getDay();
+    const initialPadding = Array(startingDay).fill(null);
+
+    // Generate date numbers
+    const monthDays = Array.from(
+      { length: lastDay.getDate() },
+      (_, i) => i + 1
+    );
+
+    // Combine padded days and month days
+    const fullGrid = [...initialPadding, ...monthDays];
+
+    // Break into weeks
+    for (let i = 0; i < fullGrid.length; i += 7) {
+      calendarGrid.push(fullGrid.slice(i, i + 7));
+    }
+
+    return calendarGrid;
+  };
+
+  // Handle date selection
+  const handleDateSelect = (day) => {
+    if (day) {
+      const selectedFullDate = new Date(
+        currentDate.getFullYear(),
+        currentDate.getMonth(),
+        day
       );
-  
-      console.log("Cleaned Enquiry Data:", enquiryData); // Debug after cleaning
-  
-      const response = await fetch("http://localhost:5000/api/safarienquiry/create", {
+
+      // Prevent selecting past dates
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      if (selectedFullDate >= today) {
+        setSelectedDate(selectedFullDate);
+      }
+    }
+  };
+
+  // Navigate between months
+  const changeMonth = (direction) => {
+    const newDate = new Date(currentDate);
+    newDate.setMonth(currentDate.getMonth() + direction);
+    setCurrentDate(newDate);
+  };
+
+  const calendarGrid = generateCalendarGrid();
+
+  // Handle booking submission
+  const handleBooking = async () => {
+    try {
+      if (!selectedDate) {
+        alert("Please select a date for your safari");
+        return;
+      }
+
+      const payload = { ...formData, date: selectedDate.toISOString() };
+      console.log("Sending booking request with data:", payload);
+
+      const response = await fetch("http://localhost:5000/api/booking/book", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(enquiryData),
+        body: JSON.stringify(payload),
       });
-  
+
+      const data = await response.json();
+      console.log("Server Response:", data);
+
+      if (response.ok && data.booking) {
+        localStorage.setItem("booking", JSON.stringify(data.booking));
+        navigate(`/travellerdetail`, { state: { booking: data.booking } });
+      } else {
+        alert(data.error || "Booking failed.");
+      }
+    } catch (error) {
+      console.error("Booking error:", error);
+    }
+  };
+
+  // Handle enquiry submission
+  const handleEnquiry = async () => {
+    try {
+      if (!selectedDate) {
+        alert("Please select a date for your safari");
+        return;
+      }
+
+      let enquiryData = {
+        ...formData,
+        date: selectedDate.toISOString(), // Use selectedDate instead of date
+      };
+
+      // Remove empty keys
+      enquiryData = Object.fromEntries(
+        Object.entries(enquiryData).filter(
+          ([key, value]) => key.trim() !== "" && value !== ""
+        )
+      );
+
+      const response = await fetch(
+        "http://localhost:5000/api/safarienquiry/create",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(enquiryData),
+        }
+      );
+
       const data = await response.json();
       console.log("Enquiry Response:", data);
-  
+
       if (response.ok) {
         alert("Enquiry submitted successfully! Admin will contact you soon.");
       } else {
@@ -58,235 +175,603 @@ function SafariBooking() {
       console.error("Enquiry submission error:", error);
     }
   };
-  
-  
+  // Custom calendar tile class to disable past dates
+  const tileClassName = ({ date: tileDate, view }) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (view === "month" && tileDate < today) {
+      return "disabled-date";
+    }
+  };
+
+  // Disable past dates in calendar
+  const tileDisabled = ({ date: tileDate, view }) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    return view === "month" && tileDate < today;
+  };
 
   return (
     <>
-      <Header></Header>
-      <section className="safaritable">
-        <div className="container">
-          <div className="row">
-            <div className="col-sm-12 col-md-7 col-lg-7">
-              {/* <h2>Tadoba Jeep Safari Details</h2> */}
-              <table className="table table-bordered">
-                <thead>
-                  <tr>
-                    <th scope="col" style={{ width: "40px" }}>
-                      Tickets Booking in 4-59 Days{" "}
-                    </th>
-                    <th scope="col" style={{ width: "30px" }}>
-                      Monday to Friday{" "}
-                    </th>
-                    <th scope="col" style={{ width: "30px" }}>
-                      Saturday & Sundays
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td>Amount</td>
-                    <td>INR 6100 </td>
-                    <td>INR 7100 </td>
-                  </tr>
-                  <tr>
-                    <td>Tickets Booking in 60-120 Days </td>
-                    <td>Monday to Friday </td>
-                    <td>Saturday & Sundays</td>
-                  </tr>
-                  <tr>
-                    <td>Amount</td>
-                    <td>INR 9000 </td>
-                    <td>INR 10000</td>
-                  </tr>
-                  <tr>
-                    <td>Tickets Booking in 01-03 Days (Tatkal) </td>
-                    <td> Monday to Sunday </td>
-                    <td>N/A</td>
-                  </tr>
-                  <tr>
-                    <td>Amount</td>
-                    <td>INR 10000</td>
-                    <td>N/A</td>
-                  </tr>
-                  <tr>
-                    <td colSpan={3}>
-                      Safari Booking will be CLOSED after 5:00 PM for Next Day
-                      booking.
-                    </td>
-                  </tr>
-                  <tr>
-                    <td colSpan={3}>
-                      All Core Gates are CLOSED on every Tuesday.
-                    </td>
-                  </tr>
-                  <tr>
-                    <td colSpan={3}>
-                      All Buffer Gates are CLOSED on every Wednesday.
-                    </td>
-                  </tr>
-                  <tr>
-                    <td colSpan={3}>
-                      M,E,N in above table stands for Morning, Evening, Night
-                      respectively.
-                    </td>
-                  </tr>
-                  <tr>
-                    <td colSpan={3}>
-                      Tatkal Booking is available for Core gates only 3 days
-                      Prior to Safari.
-                    </td>
-                  </tr>
-                  <tr>
-                    <td colSpan={3}>Terms and Conditions:</td>
-                  </tr>
-                  <tr>
-                    <td colSpan={3}>
-                      The visitors for safari are not allowed to extend the
-                      passengers as they will not get the entry in the park.
-                    </td>
-                  </tr>
-                  <tr>
-                    <td colSpan={3}>Jeep Safari amounts is non refundable.</td>
-                  </tr>
-                  <tr>
-                    <td colSpan={3}>
-                      Welcome to the Tadoba National Park online safari booking
-                      platform. Here, visitors can conveniently reserve Jeep
-                      seats in advance through our online service. The entire
-                      booking process for Tadoba Safari Jeeps is overseen and
-                      managed by the park's forest officials. Safari tours are
-                      available in both the core and buffer zones of the park in
-                      the stipulated time slots mentioned above.
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-            <div className="col-sm-12 col-md-5 col-lg-5">
-              <div>
-                <div className="booking-des">
-                  <h3>Tadoba National Park Booking</h3>
-                  {/* <h4 className="text-xl font-bold mb-4">Select Date</h4> */}
-                  <div className="">
-                    <Calendar
-                      onChange={setDate}
-                      value={date}
-                      className="border rounded-lg p-2 shadow-md calender react-calendar"
-                    />
-                  </div>
-                </div>
-                <div className="calenderForm row"
-                style={{
-                  marginLeft:'0px'
-                }}
-                >
-                  <div className="col-sm-12 col-md-6 col-lg-6">
-                    <div className=" ">
-                      <select
-                        naGbme=""
-                        className="optionValue"
-                        id=""
-                        onChange={handleChange}
-                      >
-                        <option value="">Select vehical</option>
-                        <option value="">Jeep</option>
-                      </select>
-                      <select
-                        name="safariTime"
-                        className="optionValue"
-                        onChange={handleChange}
-                        required
-                      >
-                        <option value="">Select Safari Time</option>
-                        <option value="6-10 AM">6-10 AM</option>
-                        <option value="2-6 PM">2-6 PM</option>
-                      </select>
+      <Header />
 
-                      <select
-                        name="children"
-                        className="optionValue"
-                        onChange={handleChange}
-                      >
-                        <option value="0">No Child</option>
-                        {[...Array(12)].map((_, i) => (
-                          <option key={i + 1} value={i + 1}>
-                            {i + 1}
-                          </option>
+      {/* Main Booking Section */}
+      <section className="booking-section">
+        <div className="container">
+          <div className="booking-grid">
+            {/* Booking Form (Right Side) */}
+            <div className="d-block d-md-none booking-form-container">
+              <div className="booking-card">
+                <h3 className="booking-title">
+                  <i className="fas fa-calendar-alt"></i> Tadoba National Park
+                  Booking
+                </h3>
+
+                <div className="custom-safari-calendar">
+                  <div className="calendar-header">
+                    <button
+                      onClick={() => changeMonth(-1)}
+                      className="nav-button"
+                    >
+                      ◀️
+                    </button>
+                    <h3>
+                      {currentDate.toLocaleString("default", {
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </h3>
+                    <button
+                      onClick={() => changeMonth(1)}
+                      className="nav-button"
+                    >
+                      ▶️
+                    </button>
+                  </div>
+                  <table className="calendar-table">
+                    <thead>
+                      <tr>
+                        {calendarGrid[0].map((day) => (
+                          <th key={day} className="weekday-header">
+                            {day}
+                          </th>
                         ))}
-                      </select>
-                      <input
-                        type="number"
-                        name="phone"
-                        id=""
-                        className="optionValue"
-                        placeholder="Enter Your Mobile"
-                        onChange={handleChange}
-                      />
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {calendarGrid.slice(1).map((week, weekIndex) => (
+                        <tr key={weekIndex}>
+                          {week.map((day, dayIndex) => {
+                            const isToday =
+                              day &&
+                              new Date().toDateString() ===
+                                new Date(
+                                  currentDate.getFullYear(),
+                                  currentDate.getMonth(),
+                                  day
+                                ).toDateString();
+
+                            const isPastDate =
+                              day &&
+                              new Date(
+                                currentDate.getFullYear(),
+                                currentDate.getMonth(),
+                                day
+                              ) < new Date().setHours(0, 0, 0, 0);
+
+                            const isSelected =
+                              selectedDate &&
+                              selectedDate.getFullYear() ===
+                                currentDate.getFullYear() &&
+                              selectedDate.getMonth() ===
+                                currentDate.getMonth() &&
+                              selectedDate.getDate() === day;
+
+                            return (
+                              <td
+                                key={dayIndex}
+                                className={`calendar-day 
+                      ${isToday ? "today" : ""} 
+                      ${isPastDate ? "past-date" : ""} 
+                      ${isSelected ? "selected-date" : ""}
+                      ${day ? "active-date" : "empty-date"}`}
+                                onClick={() => handleDateSelect(day)}
+                              >
+                                {day || ""}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {selectedDate && (
+                    <div className="selected-date-info">
+                      Selected Date: {selectedDate.toLocaleDateString()}
+                    </div>
+                  )}
+                </div>
+
+                {/* Safari Booking Form */}
+                <div className="safari-form">
+                  <div className="form-grid">
+                    {/* Left Column */}
+                    <div className="form-column">
+                      <div className="form-group">
+                        {/* <label htmlFor="safariZone">Safari Zone</label> */}
+                        <select
+                          name="safariZone"
+                          id="safariZone"
+                          onChange={handleChange}
+                          required
+                        >
+                          <option value="">Select Zone</option>
+                          <option value="Moharli/Mamla/Agarzari/Adegaon/Junona/Devada">
+                            Moharli/Mamla/Agarzari/Adegaon/Junona/Devada
+                          </option>
+                          <option value="Kolara/Alizanza/Madnapur/Palasgaon/Shirkheda Belara">
+                            Kolara/Alizanza/Madnapur/Palasgaon/Shirkheda Belara
+                          </option>
+                          <option value="Navegaon/Ramdegi/Nimdela">
+                            Navegaon/Ramdegi/Nimdela
+                          </option>
+                          <option value="Kesalaghat/Pangadi/Pangadi Aswal Chuha/Zari Peth">
+                            Kesalaghat/Pangadi/Pangadi Aswal Chuha/Zari Peth
+                          </option>
+                        </select>
+                      </div>
+
+                      <div className="form-group">
+                        {/* <label htmlFor="vehicleType">Vehicle Type</label> */}
+                        <select
+                          name="vehicleType"
+                          id="vehicleType"
+                          onChange={handleChange}
+                        >
+                          <option value="Jeep">Jeep</option>
+                          <option value="Canter">Canter</option>
+                        </select>
+                      </div>
+
+                      <div className="form-group">
+                        {/* <label htmlFor="safariTime">Safari Time</label> */}
+                        <select
+                          name="safariTime"
+                          id="safariTime"
+                          onChange={handleChange}
+                          required
+                        >
+                          <option value="">Select Time</option>
+                          <option value="Morning">Morning</option>
+                          <option value="Evening">Evening</option>
+                        </select>
+                      </div>
+                      <div className="form-group">
+                        {/* <label htmlFor="name">Full Name</label> */}
+                        <input
+                          type="text"
+                          name="name"
+                          id="name"
+                          placeholder="Enter your full name"
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    {/* Right Column */}
+                    <div className="form-column">
+                      <div className="form-group">
+                        {/* <label htmlFor="adults">Adults</label> */}
+                        <select
+                          name="adults"
+                          id="adults"
+                          onChange={handleChange}
+                        >
+                          {[...Array(8)].map((_, i) => (
+                            <option key={i + 1} value={i + 1}>
+                              {i + 1}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="form-group">
+                        {/* <label htmlFor="children">Children</label> */}
+                        <select
+                          name="children"
+                          id="children"
+                          onChange={handleChange}
+                        >
+                          <option value="0">No Child</option>
+                          {[...Array(12)].map((_, i) => (
+                            <option key={i + 1} value={i + 1}>
+                              {i + 1}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="form-group">
+                        {/* <label htmlFor="email">Email Address</label> */}
+                        <input
+                          type="email"
+                          name="email"
+                          id="email"
+                          placeholder="Enter your email"
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+                      <div className="form-group">
+                        {/* <label htmlFor="phone">Phone Number</label> */}
+                        <input
+                          type="tel"
+                          name="phone"
+                          id="phone"
+                          placeholder="Enter your mobile number"
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
                     </div>
                   </div>
-                  <div className="col-sm-12 col-md-6 col-lg-6">
-                    <select
-                      name="safariZone"
-                      className="optionValue"
-                      onChange={handleChange}
-                      required
-                    >
-                      <option value="">Select Zone</option>
-                      <option value="Moharli/Mamla/Agarzari/Adegaon/Junona/Devada">
-                        Moharli/Mamla/Agarzari/Adegaon/Junona/Devada
-                      </option>
-                      <option value="Kolara/Alizanza/Madnapur/Palasgaon/Shirkheda Belara">
-                        Kolara/Alizanza/Madnapur/Palasgaon/Shirkheda Belara{" "}
-                      </option>
-                      <option value="Navegaon/Ramdegi/Nimdela">
-                        Navegaon/Ramdegi/Nimdela
-                      </option>
-                      <option value="Kesalaghat/Pangadi/Pangadi Aswal Chuha/Zari Peth">
-                        Kesalaghat/Pangadi/Pangadi Aswal Chuha/Zari Peth
-                      </option>
-                    </select>
-                    <select
-                      name="adults"
-                      className="optionValue"
-                      onChange={handleChange}
-                    >
-                      {[...Array(8)].map((_, i) => (
-                        <option key={i + 1} value={i + 1}>
-                          {i + 1}
-                        </option>
-                      ))}
-                    </select>
-                    <input
-                      type="text"
-                      name="name"
-                      id=""
-                      className="optionValue"
-                      placeholder="Enter Your Name"
-                      onChange={handleChange}
-                    />
-                    <input
-                      type="email"
-                      name="email"
-                      id=""
-                      className="optionValue"
-                      placeholder="Enter Your Email"
-                      onChange={handleChange}
-                    />
+                  {/* Action Buttons */}
+                  <div className="action-buttons">
+                    {/* <button className="btn-book-now" onClick={handleBooking}>
+                      <i className="fas fa-check-circle"></i> Book Now
+                    </button> */}
+                    <button className="btn-enquiry" onClick={handleEnquiry}>
+                      <i className="fas fa-question-circle"></i> Enquiry
+                    </button>
                   </div>
-{/* 
-                  <button className="btnbooking" onClick={handleBooking}>
-                    <span>Book Now</span>
-                  </button> */}
-                  <button className="btnbooking" onClick={handleEnquiry}>
-                    <span>Enquiry Now</span>
-                  </button>
+                </div>
+              </div>
+            </div>
+            {/* Safari Information Table (Left Side - Desktop) */}
+            <div className="safari-info-container">
+              <h2 className="section-title">Tadoba Jeep Safari Details</h2>
+              <div className="pricing-table">
+                {/* <h2>Tadoba Jeep Safari Details</h2> */}
+                <table className="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th scope="col" style={{ width: "73px", color: "white" }}>
+                        Tickets Booking in 4-59 Days{" "}
+                      </th>
+                      <th scope="col" style={{ width: "30px", color: "white" }}>
+                        Monday to Friday{" "}
+                      </th>
+                      <th scope="col" style={{ width: "30px", color: "white" }}>
+                        Saturday & Sundays
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Amount</td>
+                      <td>INR 6100 </td>
+                      <td>INR 7100 </td>
+                    </tr>
+                    <tr>
+                      <td>Tickets Booking in 60-120 Days </td>
+                      <td>Monday to Friday </td>
+                      <td>Saturday & Sundays</td>
+                    </tr>
+                    <tr>
+                      <td>Amount</td>
+                      <td>INR 9000 </td>
+                      <td>INR 10000</td>
+                    </tr>
+                    <tr>
+                      <td>Tickets Booking in 01-03 Days (Tatkal) </td>
+                      <td> Monday to Sunday </td>
+                      <td>N/A</td>
+                    </tr>
+                    <tr>
+                      <td>Amount</td>
+                      <td>INR 10000</td>
+                      <td>N/A</td>
+                    </tr>
+                    <tr>
+                      <td colSpan={3}>
+                        Safari Booking will be CLOSED after 5:00 PM for Next Day
+                        booking.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colSpan={3}>
+                        All Core Gates are CLOSED on every Tuesday.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colSpan={3}>
+                        All Buffer Gates are CLOSED on every Wednesday.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colSpan={3}>
+                        M,E,N in above table stands for Morning, Evening, Night
+                        respectively.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colSpan={3}>
+                        Tatkal Booking is available for Core gates only 3 days
+                        Prior to Safari.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colSpan={3}>Terms and Conditions:</td>
+                    </tr>
+                    <tr>
+                      <td colSpan={3}>
+                        The visitors for safari are not allowed to extend the
+                        passengers as they will not get the entry in the park.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colSpan={3}>
+                        Jeep Safari amounts is non refundable.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colSpan={3}>
+                        Welcome to the Tadoba National Park online safari
+                        booking platform. Here, visitors can conveniently
+                        reserve Jeep seats in advance through our online
+                        service. The entire booking process for Tadoba Safari
+                        Jeeps is overseen and managed by the park's forest
+                        officials. Safari tours are available in both the core
+                        and buffer zones of the park in the stipulated time
+                        slots mentioned above.
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Booking Form (Right Side) */}
+            <div className="d-none d-md-block booking-form-container">
+              <div className="booking-card">
+                <h3 className="booking-title">
+                  <i className="fas fa-calendar-alt"></i> Tadoba National Park
+                  Booking
+                </h3>
+
+                <div className="custom-safari-calendar">
+                  <div className="calendar-header">
+                    <button
+                      onClick={() => changeMonth(-1)}
+                      className="nav-button"
+                    >
+                      ◀️
+                    </button>
+                    <h3>
+                      {currentDate.toLocaleString("default", {
+                        month: "long",
+                        year: "numeric",
+                      })}
+                    </h3>
+                    <button
+                      onClick={() => changeMonth(1)}
+                      className="nav-button"
+                    >
+                      ▶️
+                    </button>
+                  </div>
+                  <table className="calendar-table">
+                    <thead>
+                      <tr>
+                        {calendarGrid[0].map((day) => (
+                          <th key={day} className="weekday-header">
+                            {day}
+                          </th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {calendarGrid.slice(1).map((week, weekIndex) => (
+                        <tr key={weekIndex}>
+                          {week.map((day, dayIndex) => {
+                            const isToday =
+                              day &&
+                              new Date().toDateString() ===
+                                new Date(
+                                  currentDate.getFullYear(),
+                                  currentDate.getMonth(),
+                                  day
+                                ).toDateString();
+
+                            const isPastDate =
+                              day &&
+                              new Date(
+                                currentDate.getFullYear(),
+                                currentDate.getMonth(),
+                                day
+                              ) < new Date().setHours(0, 0, 0, 0);
+
+                            const isSelected =
+                              selectedDate &&
+                              selectedDate.getFullYear() ===
+                                currentDate.getFullYear() &&
+                              selectedDate.getMonth() ===
+                                currentDate.getMonth() &&
+                              selectedDate.getDate() === day;
+
+                            return (
+                              <td
+                                key={dayIndex}
+                                className={`calendar-day 
+                      ${isToday ? "today" : ""} 
+                      ${isPastDate ? "past-date" : ""} 
+                      ${isSelected ? "selected-date" : ""}
+                      ${day ? "active-date" : "empty-date"}`}
+                                onClick={() => handleDateSelect(day)}
+                              >
+                                {day || ""}
+                              </td>
+                            );
+                          })}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                  {selectedDate && (
+                    <div className="selected-date-info">
+                      Selected Date: {selectedDate.toLocaleDateString()}
+                    </div>
+                  )}
+                </div>
+
+                {/* Safari Booking Form */}
+                <div className="safari-form">
+                  <div className="form-grid">
+                    {/* Left Column */}
+                    <div className="form-column">
+                      <div className="form-group">
+                        {/* <label htmlFor="safariZone">Safari Zone</label> */}
+                        <select
+                          name="safariZone"
+                          id="safariZone"
+                          onChange={handleChange}
+                          required
+                        >
+                          <option value="">Select Zone</option>
+                          <option value="Moharli/Mamla/Agarzari/Adegaon/Junona/Devada">
+                            Moharli/Mamla/Agarzari/Adegaon/Junona/Devada
+                          </option>
+                          <option value="Kolara/Alizanza/Madnapur/Palasgaon/Shirkheda Belara">
+                            Kolara/Alizanza/Madnapur/Palasgaon/Shirkheda Belara
+                          </option>
+                          <option value="Navegaon/Ramdegi/Nimdela">
+                            Navegaon/Ramdegi/Nimdela
+                          </option>
+                          <option value="Kesalaghat/Pangadi/Pangadi Aswal Chuha/Zari Peth">
+                            Kesalaghat/Pangadi/Pangadi Aswal Chuha/Zari Peth
+                          </option>
+                        </select>
+                      </div>
+
+                      <div className="form-group">
+                        {/* <label htmlFor="vehicleType">Vehicle Type</label> */}
+                        <select
+                          name="vehicleType"
+                          id="vehicleType"
+                          onChange={handleChange}
+                        >
+                          <option value="Jeep">Jeep</option>
+                          <option value="Canter">Canter</option>
+                        </select>
+                      </div>
+
+                      <div className="form-group">
+                        {/* <label htmlFor="safariTime">Safari Time</label> */}
+                        <select
+                          name="safariTime"
+                          id="safariTime"
+                          onChange={handleChange}
+                          required
+                        >
+                          <option value="">Select Time</option>
+                          <option value="Morning">Morning</option>
+                          <option value="Evening">Evening</option>
+                        </select>
+                      </div>
+                      <div className="form-group">
+                        {/* <label htmlFor="name">Full Name</label> */}
+                        <input
+                          type="text"
+                          name="name"
+                          id="name"
+                          placeholder="Enter your full name"
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    {/* Right Column */}
+                    <div className="form-column">
+                      <div className="form-group">
+                        {/* <label htmlFor="adults">Adults</label> */}
+                        <select
+                          name="adults"
+                          id="adults"
+                          onChange={handleChange}
+                        >
+                          {[...Array(8)].map((_, i) => (
+                            <option key={i + 1} value={i + 1}>
+                              {i + 1}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div className="form-group">
+                        {/* <label htmlFor="children">Children</label> */}
+                        <select
+                          name="children"
+                          id="children"
+                          onChange={handleChange}
+                        >
+                          <option value="0">No Child</option>
+                          {[...Array(12)].map((_, i) => (
+                            <option key={i + 1} value={i + 1}>
+                              {i + 1}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="form-group">
+                        {/* <label htmlFor="email">Email Address</label> */}
+                        <input
+                          type="email"
+                          name="email"
+                          id="email"
+                          placeholder="Enter your email"
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+                      <div className="form-group">
+                        {/* <label htmlFor="phone">Phone Number</label> */}
+                        <input
+                          type="tel"
+                          name="phone"
+                          id="phone"
+                          placeholder="Enter your mobile number"
+                          onChange={handleChange}
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                  {/* Action Buttons */}
+                  {!selectedDate && (
+                      <p className="error-message">
+                        Please select a date for your safari
+                      </p>
+                    )}
+                  <div className="action-buttons d-flex ">
+                    {/* <button className="btn-book-now" onClick={handleBooking}>
+                      <i className="fas fa-check-circle"></i> Book Now
+                    </button> */}
+
+                    <button className="btn-enquiry" onClick={handleEnquiry}>
+                      <i className="fas fa-question-circle"></i> Enquiry
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </section>
+
+      {/* Additional Information Section */}
       <section className="pt-2 pb-4 leaf">
         <div className="container">
           <h3>Tadoba Online Jeep Safari Booking</h3>
@@ -423,8 +908,9 @@ function SafariBooking() {
           </div>
         </div>
       </section>
-      <ImportantLinks></ImportantLinks>
-      <Footer></Footer>
+
+      <ImportantLinks />
+      <Footer />
     </>
   );
 }

@@ -1,6 +1,7 @@
 @import 'bootstrap/scss/bootstrap';
 .row {
     --bs-gutter-x: 0;
+    padding: 0px;
 }
 p{
     font-size: 14px;
@@ -56,9 +57,9 @@ margin-bottom: 0px;
 padding-top: 10px;
 padding-bottom: 5px;
 }
-.section {
-padding: 30px 0px;
-}
+// .section {
+// // padding: 30px 0px;
+// }
 li {
     font-size: 14px;
     color: #565656;
@@ -110,8 +111,11 @@ padding-bottom: 5px;
 }
 td {
 font-size: 14px;
-color: #565656;
+color: #000000;
 }
+    // td:hover{
+    //     color:#565656;
+    // }
 th {
 font-size: 14px;
 color: #565656;
@@ -129,7 +133,7 @@ color: #565656;
 font-size: 14px;
 border: 1px solid #565656;
 padding: 2px 5px;
-outline: none;
+outline: none;  
 }
 input::placeholder
 {

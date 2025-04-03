@@ -45,14 +45,15 @@ function PaymentPage() {
         order_id: order.id, // ✅ Razorpay still needs an order_id
         handler: async function (response) {
           console.log("🛠 Payment Response:", response);
-
+          console.log("🛠 Order Data:", orderData);
+          
           try {
             const verifyRes = await verifyPayment({
-              booking_id: bookingId, // ✅ Using `bookingId` instead of `order_id`
+              order_id: response.razorpay_order_id,
+              booking_id: bookingId,
               payment_id: response.razorpay_payment_id,
               signature: response.razorpay_signature,
-            });
-
+          });             
             console.log("✅ Verify Response:", verifyRes);
 
             if (verifyRes.success) {

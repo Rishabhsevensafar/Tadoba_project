@@ -1,0 +1,488 @@
+/* Main Container Styles */
+.booking-section {
+    padding: 1rem 0;
+    background-image: url("../assets/images/safaribookingpg.jpg");
+    /* padding: 30px 10px; */
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+  
+  .container {
+    max-width: 1440px;
+    margin: 0 auto;
+    padding: 0 15px;
+  }
+  
+  /* Grid Layout */
+  .booking-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  @media (min-width: 992px) {
+    .booking-grid {
+      grid-template-columns: 2fr 1.5fr;
+    }
+  }
+  
+  /* Safari Info Container */
+  .safari-info-container {
+    background: rgb(255 255 255 / 20%);
+    border-radius: 10px;
+    padding: 1.5rem;
+  }
+  @media (max-width: 926px) {
+    .safari-info-container{
+      padding: 0.5rem;
+    }
+  }
+  
+  .section-title {
+    color: #ffffff;
+    background-color: #e79e1d;
+    font-size: 1.5rem;
+    margin-bottom: .5rem;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 0.2rem;
+    text-align: center;
+    border-radius: 10px;
+    padding-top: 0px;
+  }
+  /* Pricing Table */
+  .pricing-table {
+    overflow-x: auto;
+  }
+  
+  .pricing-table table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1.5rem;
+  }
+  
+  .pricing-table th, 
+  .pricing-table td {
+    padding: 12px;
+    text-align: left;
+    border: 1px solid #ddd;
+  }
+  
+  .pricing-table th {
+    background-color: #878c8f;
+    color: white;
+  }
+  
+  .pricing-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  .pricing-table td{
+    background: #30383c;
+    color: white;
+  }
+  /* .pricing-table tr:hover {
+    background-color: #e6f7ff;
+  } */
+  
+  .important-note {
+    background-color: #fff8e1;
+  }
+  
+  .important-note i {
+    margin-right: 8px;
+    color: #f39c12;
+  }
+  
+  /* Booking Form Container */
+  .booking-form-container {
+    position: relative;
+  }
+  
+  .booking-card {
+    background: rgb(255 255 255 / 20%);
+    border-radius: 10px;
+    padding: 1.5rem;
+    position: sticky;
+    top: 20px;
+  }
+  @media (max-width: 926px) {
+    .booking-card{padding: 0.5rem;}
+  }
+  .booking-title {
+    color: white;
+    font-size: 1.5rem;
+    margin-bottom: 0px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+  }
+  
+  .booking-title i {
+    margin-right: 10px;
+    color: #3498db;
+  }
+  
+  /* Calendar Styles */
+  .calendar-section {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 10px;
+    background: white;
+    /* box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); */
+  }
+  
+  .safari-calendar {
+    width: 100%;
+    /* border: none; */
+    /* border-radius: 8px; */
+    padding: 10px;
+  }
+  
+  .react-calendar__navigation button {
+    color: #3498db;
+    font-weight: bold;
+  }
+  
+  .react-calendar__tile--active {
+    background: #30383c;
+    color: white;
+  }
+  
+  .react-calendar__tile--now {
+    background: #30383c;
+  }
+  
+  .disabled-date {
+    color: #ccc;
+    background-color: #30383c;
+  }
+  
+  /* Safari Form Styles */
+  .safari-form {
+    /* margin-top: 1.5rem; */
+   background-color:#a89377 ; 
+   padding: 10px;
+  }
+  
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  @media (min-width: 768px) {
+    .form-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  @media (max-width :768px){
+    .form-grid{
+      padding: 0.2rem;
+    }
+  }
+  .form-group {
+    margin-bottom: 0.6rem;
+  }
+  
+  .form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #555;
+    font-weight: 500;
+  }
+  
+  .form-group input,
+  .form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s;
+  }
+  
+  .form-group input:focus,
+  .form-group select:focus {
+    border-color: #3498db;
+    outline: none;
+  }
+  
+  /* Personal Info Section */
+  .personal-info-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #eee;
+  }
+  
+  .section-subtitle {
+    color: #2c3e50;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  .section-subtitle i {
+    margin-right: 10px;
+    color: #3498db;
+  }
+  
+  /* Action Buttons */
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    /* margin-top: 1.5rem; */
+  }
+  
+  .btn-book-now,
+  .btn-enquiry {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .btn-book-now i,
+  .btn-enquiry i {
+    margin-right: 8px;
+  }
+  
+  .btn-book-now {
+    background: #3498db;
+    color: white;
+  }
+  
+  .btn-book-now:hover {
+    background: #2980b9;
+  }
+  
+  .btn-enquiry {
+    background: #f39c12;
+    color: white;
+  }
+  
+  .btn-enquiry:hover {
+    background: #e67e22;
+  }
+  
+  /* Info Section Styles */
+  .info-section {
+    padding: 3rem 0;
+    background: linear-gradient(to bottom, #e9ecef, #f8f9fa);
+  }
+  
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  
+  @media (min-width: 768px) {
+    .info-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  
+  .info-card {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+  }
+  
+  .info-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .info-list li {
+    padding: 8px 0;
+    border-bottom: 1px dashed #eee;
+    display: flex;
+    align-items: center;
+  }
+  
+  .info-list li:before {
+    content: "•";
+    color: #3498db;
+    font-weight: bold;
+    margin-right: 10px;
+  }
+  
+  /* Route Info Styles */
+  .route-info {
+    margin-top: 2rem;
+  }
+  
+  .route-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    margin-top: 1.5rem;
+  }
+  
+  @media (min-width: 576px) {
+    .route-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  
+  @media (min-width: 992px) {
+    .route-grid {
+      grid-template-columns: 1fr 1fr 1fr;
+    }
+  }
+  
+  .route-card {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    transition: transform 0.3s;
+  }
+  
+  .route-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .route-card h4 {
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+  }
+  
+  .route-card p {
+    color: #7f8c8d;
+    font-size: 0.9rem;
+  }
+  
+  /* Important Info Styles */
+  .important-info {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 2rem;
+    margin-top: 2rem;
+  }
+  
+  @media (min-width: 768px) {
+    .important-info {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+  
+  .info-column {
+    background: white;
+    border-radius: 10px;
+    padding: 1.5rem;
+  }
+  
+  .info-title {
+    color: #2c3e50;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+  }
+  
+  .info-title i {
+    margin-right: 10px;
+  }
+
+  .custom-safari-calendar {
+    background-color: #f0f4f8;
+    /* border-radius: 12px; */
+    /* box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); */
+    /* padding: 15px; */
+    /* max-width: 400px; */
+    margin: 0 auto;
+  }
+  
+  .calendar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+    color: #000000;
+  }
+  
+  .nav-button {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+  
+  .nav-button:hover {
+    color: #34db6c;
+  }
+  
+  .calendar-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 2px;
+  }
+  
+  .weekday-header {
+    text-align: center;
+    color: white;
+    font-weight: bold;
+    padding: 10px;
+    background-color: #30383c;
+  }
+  
+  .calendar-day {
+    text-align: center;
+    padding: 10px;
+    /* border-radius: 8px; */
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+  }
+  
+  .empty-date {
+    background-color: #4b4b4b;
+    cursor: default;
+  }
+  
+  .active-date {
+    background-color: #008001;
+    color: white;
+  }
+  
+  .active-date:hover {
+    background-color: rgb(216, 43, 43);
+  }
+  
+  .today {
+    background-color: #55db34;
+    color: white;
+    border: 2px solid;
+    border-color: #e79e1d;
+    font-weight: bold;
+  }
+  .toady td{
+    border-color: #e79e1d;
+  }
+  
+  .past-date {
+    color: #a0a0a0;
+    background-color: #4b4b4b;
+    cursor: not-allowed;
+  }
+  
+  .selected-date {
+    background-color:rgb(216, 43, 43)    ;
+    color: white;
+  }
+  
+  .selected-date-info {
+    margin-top: 15px;
+    text-align: center;
+    color: #2c3e50;
+    font-weight: bold;
+  }

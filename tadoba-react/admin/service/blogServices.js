@@ -2,8 +2,8 @@ import axios from "axios";
 
 const API_URL = "http://localhost:5000/api/blogs";
 
-const getBlogs = async () => {
-  const response = await axios.get(API_URL);
+const getBlogsAdmin = async () => {
+  const response = await axios.get(`${API_URL}/admin/`);
   return response.data.blogs;
 };
 
@@ -27,4 +27,4 @@ const deleteBlog = async (id, token) => {
   });
 };
 
-export { getBlogs, createBlog, updateBlog, deleteBlog };
+export { getBlogsAdmin, createBlog, updateBlog, deleteBlog };

@@ -6,8 +6,8 @@ const SafariBookingEnquirySchema = new mongoose.Schema(
         phone: { type: String, required: true },
         date: { type: Date, required: true },
         safariZone: { type: String, required: true },
-        vehicleType: { type: String, required: true, enum: ["Jeep"] },
-        safariTime: { type: String, required: true, enum: ["6-10 AM", "2-6 PM"] },
+        vehicleType: { type: String, required: true, enum: ["Jeep", "Canter"] },
+        safariTime: { type: String, required: true, enum: ["Morning", "Evening"] },
         children: { type: Number, default: 0 },
         adults: { type: Number, required: true },
         status: { type: String, enum: ["Pending", "Success", "Not Interested", "No Response"], default: "Pending" }, // Admin can change status

@@ -1,10 +1,39 @@
 import React, { useState, useEffect } from "react";
 import { Table, Button, Modal, Form, Input, Upload, Select, message, Typography, Space, Row, Col } from "antd";
 import { UploadOutlined, EditOutlined, DeleteOutlined, PlusOutlined, EyeOutlined } from "@ant-design/icons";
-import { getBlogs, createBlog, updateBlog, deleteBlog } from "../service/blogServices";
+import { getBlogsAdmin, createBlog, updateBlog, deleteBlog } from "../service/blogServices";
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 const { Option } = Select;
 const { Text, Paragraph } = Typography;
+
+// Custom React Quill modules and formats
+const modules = {
+  toolbar: [
+    [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+    ['bold', 'italic', 'underline', 'strike'],
+    [{ 'color': [] }, { 'background': [] }],
+    [{ 'font': [] }],
+    [{ 'align': [] }],
+    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+    [{ 'indent': '-1'}, { 'indent': '+1' }],
+    ['link', 'image', 'video'],
+    ['clean']
+  ],
+  clipboard: {
+    matchVisual: false,
+  }
+};
+
+const formats = [
+  'header',
+  'bold', 'italic', 'underline', 'strike',
+  'color', 'background', 'font',
+  'align',
+  'list', 'bullet', 'indent',
+  'link', 'image', 'video'
+];
 
 const AdminBlogs = () => {
   const [blogs, setBlogs] = useState([]);
@@ -14,6 +43,9 @@ const AdminBlogs = () => {
   const [form] = Form.useForm();
   const [editingBlog, setEditingBlog] = useState(null);
   const [file, setFile] = useState(null);
+  const [content, setContent] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [imagePreview, setImagePreview] = useState(null);
   const token = localStorage.getItem("adminToken");
 
   useEffect(() => {
@@ -21,11 +53,15 @@ const AdminBlogs = () => {
   }, []);
 
   const fetchBlogs = async () => {
+    setLoading(true);
     try {
-      const data = await getBlogs();
+      const data = await getBlogsAdmin();
       setBlogs(data);
     } catch (error) {
       console.error("Error fetching blogs:", error);
+      message.error("Failed to fetch blogs");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -33,6 +69,7 @@ const AdminBlogs = () => {
     setEditingBlog(blog);
     setModalVisible(true);
     setFile(null);
+    setImagePreview(blog?.image || null);
     if (blog) {
       form.setFieldsValue({
         title: blog.title,
@@ -40,32 +77,39 @@ const AdminBlogs = () => {
         tags: blog.tags.join(", "),
         status: blog.status,
       });
+      setContent(blog.content);
     } else {
       form.resetFields();
+      setContent('');
     }
   };
 
-  const openViewModal = (blog) => {
-    setCurrentBlog(blog);
-    setViewModalVisible(true);
-  };
-
   const handleFileChange = ({ file }) => {
-    setFile(file);
+    if (file) {
+      setFile(file);
+      // Create preview URL
+      const reader = new FileReader();
+      reader.onload = (e) => setImagePreview(e.target.result);
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = async (values) => {
     const formData = new FormData();
     formData.append("title", values.title);
-    formData.append("content", values.content);
+    formData.append("content", content);
     formData.append("tags", values.tags);
     formData.append("status", values.status);
-
+    
     if (file) {
       formData.append("image", file);
+    } else if (editingBlog?.image && !imagePreview) {
+      // If no new file is uploaded and preview is cleared
+      formData.append("removeImage", "true");
     }
 
     try {
+      setLoading(true);
       if (editingBlog) {
         await updateBlog(editingBlog._id, formData, token);
         message.success("Blog updated successfully!");
@@ -77,27 +121,30 @@ const AdminBlogs = () => {
       fetchBlogs();
     } catch (error) {
       console.error("Error saving blog:", error);
-      message.error("Failed to save blog.");
+      message.error(error.response?.data?.message || "Failed to save blog");
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDelete = async (id) => {
-    try {
-      await deleteBlog(id, token);
-      message.success("Blog deleted successfully!");
-      fetchBlogs();
-    } catch (error) {
-      console.error("Error deleting blog:", error);
-      message.error("Failed to delete blog.");
-    }
-  };
-
-  // Function to truncate text
-  const truncateText = (text, maxLength = 50) => {
-    if (text && text.length > maxLength) {
-      return text.substring(0, maxLength) + "...";
-    }
-    return text;
+    Modal.confirm({
+      title: "Are you sure you want to delete this blog?",
+      content: "This action cannot be undone",
+      okText: "Delete",
+      okType: "danger",
+      cancelText: "Cancel",
+      onOk: async () => {
+        try {
+          await deleteBlog(id, token);
+          message.success("Blog deleted successfully!");
+          fetchBlogs();
+        } catch (error) {
+          console.error("Error deleting blog:", error);
+          message.error("Failed to delete blog");
+        }
+      }
+    });
   };
 
   const columns = [
@@ -118,19 +165,14 @@ const AdminBlogs = () => {
       title: "Title", 
       dataIndex: "title", 
       key: "title",
-      render: (title) => truncateText(title, 30)
-    },
-    { 
-      title: "Content", 
-      dataIndex: "content", 
-      key: "content",
-      render: (content) => truncateText(content, 50)
+      ellipsis: true
     },
     { 
       title: "Tags", 
       dataIndex: "tags", 
       key: "tags", 
-      render: (tags) => truncateText(tags.join(", "), 30) 
+      render: (tags) => tags.join(", "),
+      ellipsis: true
     },
     { 
       title: "Status", 
@@ -152,28 +194,25 @@ const AdminBlogs = () => {
     {
       title: "Actions",
       key: "actions",
-      width: 220,
+      width: 150,
       render: (_, blog) => (
         <Space>
           <Button 
             icon={<EyeOutlined />} 
-            onClick={() => openViewModal(blog)}
-            size="small"
-          >
-          </Button>
+            onClick={() => {
+              setCurrentBlog(blog);
+              setViewModalVisible(true);
+            }}
+          />
           <Button 
             icon={<EditOutlined />} 
             onClick={() => openModal(blog)}
-            size="small"
-          >
-          </Button>
+          />
           <Button 
             icon={<DeleteOutlined />} 
             danger 
             onClick={() => handleDelete(blog._id)}
-            size="small"
-          >
-          </Button>
+          />
         </Space>
       ),
     },
@@ -181,16 +220,27 @@ const AdminBlogs = () => {
 
   return (
     <div className="p-6">
-      <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl font-bold">Manage Blogs</h2>
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => openModal()}>New Blog</Button>
+      <div className="flex justify-between items-center mb-6">
+        <Typography.Title level={3} style={{ margin: 0 }}>Blog Management</Typography.Title>
+        <Button 
+          type="primary" 
+          icon={<PlusOutlined />} 
+          onClick={() => openModal()}
+          size="large"
+          style={{
+            marginBottom:'10px'
+          }}
+        >
+          New Blog
+        </Button>
       </div>
 
       <Table 
         dataSource={blogs} 
         columns={columns} 
         rowKey="_id" 
-        pagination={{ pageSize: 5 }}
+        loading={loading}
+        pagination={{ pageSize: 8 }}
         bordered
         size="middle"
         scroll={{ x: 'max-content' }}
@@ -202,91 +252,177 @@ const AdminBlogs = () => {
         open={modalVisible} 
         onCancel={() => setModalVisible(false)} 
         footer={null}
-        width={700}
+        width={800}
+        destroyOnClose
       >
         <Form form={form} layout="vertical" onFinish={handleSubmit}>
-          <Form.Item name="title" label="Title" rules={[{ required: true, message: "Title is required" }]}>
-            <Input placeholder="Enter blog title" />
-          </Form.Item>
-          <Form.Item name="content" label="Content" rules={[{ required: true, message: "Content is required" }]}>
-            <Input.TextArea rows={6} placeholder="Enter blog content" />
-          </Form.Item>
-          <Form.Item name="tags" label="Tags">
-            <Input placeholder="Enter tags (comma separated)" />
-          </Form.Item>
-          <Form.Item name="status" label="Status">
-            <Select>
-              <Option value="Draft">Draft</Option>
-              <Option value="Published">Published</Option>
-            </Select>
-          </Form.Item>
-          <Form.Item name="image" label="Image">
-            <Upload 
-              beforeUpload={() => false} 
-              onChange={handleFileChange} 
-              maxCount={1}
-              accept="image/*"
-              listType="picture"
-            >
-              <Button icon={<UploadOutlined />}>Select Image</Button>
-            </Upload>
-          </Form.Item>
-          <Form.Item>
-            <Button type="primary" htmlType="submit">{editingBlog ? "Update" : "Create"}</Button>
-          </Form.Item>
+          <Row gutter={16}>
+            <Col span={24}>
+              <Form.Item 
+                name="title" 
+                label="Title" 
+                rules={[{ required: true, message: "Please enter blog title" }]}
+              >
+                <Input placeholder="Blog title" size="large" />
+              </Form.Item>
+            </Col>
+            
+            <Col span={24}>
+              <Form.Item 
+                name="content" 
+                label="Content" 
+                rules={[{ required: true, message: "Blog content is required" }]}
+              >
+                <ReactQuill 
+                  theme="snow" 
+                  value={content} 
+                  onChange={setContent}
+                  modules={modules}
+                  formats={formats}
+                  style={{ height: '300px', marginBottom: '40px' }}
+                />
+              </Form.Item>
+            </Col>
+            
+            <Col span={12}>
+              <Form.Item 
+                name="tags" 
+                label="Tags"
+                tooltip="Separate tags with commas"
+              >
+                <Input placeholder="e.g., travel, adventure, wildlife" />
+              </Form.Item>
+            </Col>
+            
+            <Col span={12}>
+              <Form.Item 
+                name="status" 
+                label="Status"
+                initialValue="Draft"
+              >
+                <Select>
+                  <Option value="Draft">Draft</Option>
+                  <Option value="Published">Published</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            
+            <Col span={24}>
+              <Form.Item label="Featured Image">
+                <Upload 
+                  beforeUpload={() => false}
+                  onChange={handleFileChange}
+                  maxCount={1}
+                  accept="image/*"
+                  listType="picture-card"
+                  showUploadList={false}
+                >
+                  {imagePreview ? (
+                    <div style={{ position: 'relative' }}>
+                      <img 
+                        src={imagePreview.startsWith('data:') ? imagePreview : `http://localhost:5000${imagePreview}`} 
+                        alt="Preview" 
+                        style={{ width: '100%', height: '200px', objectFit: 'cover' }}
+                      />
+                      <Button 
+                        type="link" 
+                        danger 
+                        style={{ position: 'absolute', top: 0, right: 0 }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setImagePreview(null);
+                          setFile(null);
+                        }}
+                      >
+                        Remove
+                      </Button>
+                    </div>
+                  ) : (
+                    <div>
+                      <UploadOutlined style={{ fontSize: '24px' }} />
+                      <div style={{ marginTop: 8 }}>Upload Image</div>
+                    </div>
+                  )}
+                </Upload>
+              </Form.Item>
+            </Col>
+            
+            <Col span={24}>
+              <Form.Item>
+                <Button 
+                  type="primary" 
+                  htmlType="submit" 
+                  loading={loading}
+                  size="large"
+                >
+                  {editingBlog ? "Update Blog" : "Create Blog"}
+                </Button>
+              </Form.Item>
+            </Col>
+          </Row>
         </Form>
       </Modal>
 
       {/* View Blog Modal */}
       <Modal
-        title="View Blog"
+        title={currentBlog?.title}
         open={viewModalVisible}
         onCancel={() => setViewModalVisible(false)}
         footer={[
           <Button key="close" onClick={() => setViewModalVisible(false)}>
             Close
           </Button>,
-          <Button key="edit" type="primary" onClick={() => {
-            setViewModalVisible(false);
-            openModal(currentBlog);
-          }}>
+          <Button 
+            key="edit" 
+            type="primary" 
+            onClick={() => {
+              setViewModalVisible(false);
+              openModal(currentBlog);
+            }}
+          >
             Edit
           </Button>
         ]}
         width={800}
       >
         {currentBlog && (
-          <div>
-            <Row gutter={[16, 16]}>
-              <Col span={24}>
-                <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-                  <img 
-                    src={`http://localhost:5000${currentBlog.image}`} 
-                    alt={currentBlog.title} 
-                    style={{ maxWidth: '100%', maxHeight: '300px', objectFit: 'contain' }} 
-                  />
-                </div>
-              </Col>
-              <Col span={24}>
-                <Typography.Title level={3}>{currentBlog.title}</Typography.Title>
-                <div style={{ margin: '10px 0', display: 'flex', justifyContent: 'space-between' }}>
-                  <Text type="secondary">
-                    Tags: {currentBlog.tags.join(", ")}
-                  </Text>
-                  <Text 
-                    style={{ 
-                      padding: '2px 8px', 
-                      borderRadius: '4px',
-                      backgroundColor: currentBlog.status === 'Published' ? '#e6f7ff' : '#fff7e6',
-                      color: currentBlog.status === 'Published' ? '#1890ff' : '#fa8c16'
-                    }}
-                  >
-                    {currentBlog.status}
-                  </Text>
-                </div>
-                <Paragraph style={{ marginTop: '20px' }}>{currentBlog.content}</Paragraph>
-              </Col>
-            </Row>
+          <div className="blog-content">
+            {currentBlog.image && (
+              <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+                <img 
+                  src={`http://localhost:5000${currentBlog.image}`} 
+                  alt={currentBlog.title} 
+                  style={{ maxWidth: '100%', maxHeight: '400px', objectFit: 'contain' }} 
+                />
+              </div>
+            )}
+            
+            <div style={{ marginBottom: '16px', display: 'flex', justifyContent: 'space-between' }}>
+              <Text type="secondary">
+                Tags: {currentBlog.tags.join(", ")}
+              </Text>
+              <Text 
+                style={{ 
+                  padding: '2px 8px', 
+                  borderRadius: '4px',
+                  backgroundColor: currentBlog.status === 'Published' ? '#e6f7ff' : '#fff7e6',
+                  color: currentBlog.status === 'Published' ? '#1890ff' : '#fa8c16'
+                }}
+              >
+                {currentBlog.status}
+              </Text>
+            </div>
+            
+            <div 
+              className="ql-editor" 
+              dangerouslySetInnerHTML={{ __html: currentBlog.content }} 
+              style={{ 
+                padding: 0,
+                fontFamily: 'inherit',
+                fontSize: 'inherit',
+                lineHeight: 1.6
+              }}
+            />
           </div>
         )}
       </Modal>

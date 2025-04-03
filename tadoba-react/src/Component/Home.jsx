@@ -36,17 +36,10 @@ function Home() {
         <Tourism/>
         <GeographicalDetails/>  
         <NewsBlogs></NewsBlogs>
-        <ImportantLinks></ImportantLinks>
-
-        
+        <ImportantLinks></ImportantLinks>  
         <Footer/>
         </>
     )
-
-
-
-
-    
 }
 
 export default Home

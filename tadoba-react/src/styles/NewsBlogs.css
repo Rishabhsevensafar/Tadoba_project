@@ -1,0 +1,135 @@
+/* General Styles */
+.news-blog-section {
+    padding: 10px 20px;
+    background-color: #f9f9f9;
+}
+  .news-blog-section .section-header h2 {
+    text-align: left;
+    font-size: 2rem;
+    margin-bottom: 5px;
+    color: #333;
+    margin-left: 0.7rem;
+  }
+  
+  /* Blog Container */
+  .news-blog-section .blog-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    max-width: 1200px;
+    /* margin: 0 auto; */
+    margin: 10px;
+  }
+  
+  /* Blog List */
+  .blog-list {
+    flex: 3;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+  }
+  
+  .news-blog-section .blog-card {
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
+    transition: transform 0.3s ease;
+  }
+  
+  .news-blog-section .blog-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  .blog-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+  }
+  .blog-meta {
+    font-size: 0.9rem;
+    color: #777;
+    margin-bottom: 0px !important;
+  }
+  
+  .news-blog-section .blog-title {
+    font-size: 1.2rem;
+    margin-bottom: 10px;
+    color: #333;
+  }
+  
+  .blog-description {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 20px;
+  }
+  
+  .read-more-btn {
+    background: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .read-more-btn:hover {
+    background: #0056b3;
+  }
+  
+  /* Popular Stories */
+  .popular-stories {
+    flex: 1;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    /* box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); */
+  }
+  
+  .popular-stories h4 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .story-card {
+    margin-bottom: 20px;
+  }
+  
+  .story-title {
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+    color: #333;
+  }
+  
+  .story-meta {
+    font-size: 0.9rem;
+    color: #777;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 768px) {
+    .blog-container {
+      flex-direction: column;
+    }
+  
+    .blog-list {
+      grid-template-columns: 1fr;
+    }
+  
+    .popular-stories {
+      margin-top: 20px;
+    }
+    .section-header h2 {
+      text-align: left;
+      font-size: 1.8rem;
+      margin-bottom: 5px;
+      margin-left: .1rem;
+    }
+    .blog-title {
+      font-size: 1rem;
+      margin-bottom: 10px;
+      color: #333;
+    }
+  }

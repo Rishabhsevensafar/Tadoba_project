@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Table, Select, DatePicker, message, Button, Modal } from "antd";
+import { Table, Select, DatePicker, message, Button, Modal, Descriptions, Tag, Space, Card, Divider } from "antd";
+import { EyeOutlined, EditOutlined, ReloadOutlined, FilterOutlined } from "@ant-design/icons";
 import axios from "axios";
 import moment from "moment";
 
@@ -46,16 +47,25 @@ const AdminQuickPaymentReports = () => {
     }
   };
 
-  const handleStatusChange = async (id, newStatus) => {
+  const handleStatusChange = async (newStatus) => {
+    if (!selectedPayment) return;
+    
     setUpdating(true);
     try {
-      const response = await axios.put(`http://localhost:5000/api/quick-payment/update-status/${id}`, {
+      const response = await axios.put(`http://localhost:5000/api/quick-payment/update-status/${selectedPayment._id}`, {
         status: newStatus,
       });
 
       if (response.data.success) {
         message.success("Payment status updated successfully!");
-        fetchPayments(); // Refresh data after update
+        
+        // Update the selected payment status locally
+        setSelectedPayment({...selectedPayment, status: newStatus});
+        
+        // Update in the table data
+        setPayments(payments.map(payment => 
+          payment._id === selectedPayment._id ? {...payment, status: newStatus} : payment
+        ));
       } else {
         message.error("Failed to update payment status.");
       }
@@ -67,39 +77,30 @@ const AdminQuickPaymentReports = () => {
     }
   };
 
+  // Only show the most important columns in the table
   const columns = [
     {
       title: "Date",
       dataIndex: "createdAt",
       key: "createdAt",
-      render: (text) => moment(text).format("DD-MM-YYYY HH:mm"),
+      render: (text) => moment(text).format("DD-MM-YYYY"),
     },
     {
       title: "Booking ID",
-      dataIndex: "bookingId", // Changed from orderId to bookingId
+      dataIndex: "bookingId",
       key: "bookingId",
-      render: (text) => <span className="font-bold">#{text ? text.slice(-6) : "N/A"}</span>,
+      render: (text) => <span className="font-bold">{text}</span>,
     },
     {
       title: "Payment ID",
       dataIndex: "paymentId",
       key: "paymentId",
-      render: (text) => text ? <span className="text-green-600">{text}</span> : <span className="text-red-500">N/A</span>,
+      render: (text) => <span className="font-bold">{text}</span>,
     },
     {
       title: "Name",
       dataIndex: "name",
       key: "name",
-    },
-    {
-      title: "Email",
-      dataIndex: "email",
-      key: "email",
-    },
-    {
-      title: "Mobile",
-      dataIndex: "mobile",
-      key: "mobile",
     },
     {
       title: "Amount",
@@ -108,91 +109,160 @@ const AdminQuickPaymentReports = () => {
       render: (amount) => `₹${amount}`,
     },
     {
-      title: "Payment Status",
-      dataIndex: "status", // Ensure we're using the correct field
+      title: "Status",
+      dataIndex: "status",
       key: "status",
       render: (status) => (
-        <span
-          className={`px-2 py-1 text-white font-semibold rounded-md ${
-            status === "Success" ? "bg-green-500" : status === "Pending" ? "bg-yellow-500" : "bg-red-500"
-          }`}
+        <Tag
+          color={
+            status === "Success" ? "green" : 
+            status === "Pending" ? "gold" : "red"
+          }
         >
           {status}
-        </span>
-      ),
-    },
-    {
-      title: "Update Status",
-      dataIndex: "_id", // Use _id as the data source for this column
-      key: "updateStatus",
-      render: (id, record) => (
-        <Select
-          value={record.status} // Use current status as value
-          style={{ width: 120 }}
-          onChange={(newStatus) => handleStatusChange(id, newStatus)}
-          disabled={updating}
-        >
-          <Option value="Success">Success</Option>
-          <Option value="Pending">Pending</Option>
-          <Option value="Failed">Failed</Option>
-        </Select>
+        </Tag>
       ),
     },
     {
       title: "Actions",
-      dataIndex: "actions",
       key: "actions",
       render: (_, record) => (
-        <Button type="link" onClick={() => setSelectedPayment(record)}>View</Button>
+        <Space>
+          <Button 
+            type="primary" 
+            size="small" 
+            icon={<EyeOutlined />} 
+            onClick={() => setSelectedPayment(record)}
+          >
+            View
+          </Button>
+          <Button 
+            type="default" 
+            size="small" 
+            icon={<EditOutlined />} 
+            onClick={() => {
+              setSelectedPayment(record);
+            }}
+          >
+            Edit
+          </Button>
+        </Space>
       ),
     },
   ];
+
+  const getStatusColor = (status) => {
+    return status === "Success" ? "green" : 
+           status === "Pending" ? "gold" : "red";
+  };
 
   return (
     <div className="p-6">
       <h2 className="text-xl font-bold mb-4">Quick Payment Reports</h2>
 
-      <div className="flex gap-4 mb-4">
-        <RangePicker onChange={handleDateChange} />
-        <Select 
-          placeholder="Filter by Status" 
-          onChange={(value) => setFilters({ ...filters, status: value })} 
-          allowClear 
-          className="w-48"
-        >
-          <Option value="Success">Success</Option>
-          <Option value="Pending">Pending</Option>
-          <Option value="Failed">Failed</Option>
-        </Select>
-        <Button type="primary" onClick={fetchPayments}>Refresh</Button>
-      </div>
+      <Card className="mb-4">
+        <Space size="large">
+          <RangePicker 
+            onChange={handleDateChange} 
+            placeholder={["Start Date", "End Date"]}
+          />
+          <Select 
+            placeholder="Filter by Status" 
+            onChange={(value) => setFilters({ ...filters, status: value })} 
+            allowClear 
+            style={{ width: 150 }}
+            suffixIcon={<FilterOutlined />}
+          >
+            <Option value="Success">Success</Option>
+            <Option value="Pending">Pending</Option>
+            <Option value="Failed">Failed</Option>
+          </Select>
+          <Button type="primary" icon={<ReloadOutlined />} onClick={fetchPayments}>
+            Refresh Data
+          </Button>
+        </Space>
+      </Card>
 
       <Table 
         dataSource={payments} 
         columns={columns} 
         rowKey="_id" 
         loading={loading} 
-        pagination={{ pageSize: 10 }} 
+        pagination={{ pageSize: 10 }}
+        className="shadow-sm"
+        bordered={true}
+        scroll={{ x: true }}
       />
 
-      {/* View Payment Details Modal */}
+      {/* Payment Details Modal */}
       <Modal
-        title="Payment Details"
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span>Payment Details</span>
+            {selectedPayment && (
+              <Tag color={getStatusColor(selectedPayment.status)} style={{ marginRight: 0 }}>
+                {selectedPayment.status}
+              </Tag>
+            )}
+          </div>
+        }
         open={!!selectedPayment}
         onCancel={() => setSelectedPayment(null)}
-        footer={null}
+        width={700}
+        footer={[
+          <Button key="close" onClick={() => setSelectedPayment(null)}>
+            Close
+          </Button>
+        ]}
       >
         {selectedPayment && (
-          <div>
-            <p><strong>Booking ID:</strong> {selectedPayment.bookingId || "N/A"}</p>
-            <p><strong>Payment ID:</strong> {selectedPayment.paymentId || "N/A"}</p>
-            <p><strong>Name:</strong> {selectedPayment.name}</p>
-            <p><strong>Email:</strong> {selectedPayment.email}</p>
-            <p><strong>Mobile:</strong> {selectedPayment.mobile}</p>
-            <p><strong>Amount:</strong> ₹{selectedPayment.amount}</p>
-            <p><strong>Status:</strong> {selectedPayment.status}</p>
-            <p><strong>Date:</strong> {moment(selectedPayment.createdAt).format("DD-MM-YYYY HH:mm")}</p>
-          </div>
+          <>
+            <Descriptions bordered column={2}>
+              <Descriptions.Item label="Booking Date" span={2}>
+                {moment(selectedPayment.createdAt).format("DD-MM-YYYY HH:mm:ss")}
+              </Descriptions.Item>
+              
+              <Descriptions.Item label="Booking ID" span={2}>
+                <strong>{selectedPayment.bookingId || "N/A"}</strong>
+              </Descriptions.Item>
+              
+              <Descriptions.Item label="Payment ID" span={2}>
+                {selectedPayment.paymentId || <span style={{ color: 'red' }}>Not Paid</span>}
+              </Descriptions.Item>
+              
+              <Descriptions.Item label="Amount">₹{selectedPayment.amount}</Descriptions.Item>
+              <Descriptions.Item label="Currency">{selectedPayment.currency || "INR"}</Descriptions.Item>
+              
+              <Descriptions.Item label="Name">{selectedPayment.name}</Descriptions.Item>
+              <Descriptions.Item label="Email">{selectedPayment.email}</Descriptions.Item>
+              
+              <Descriptions.Item label="Mobile">{selectedPayment.mobile}</Descriptions.Item>
+              <Descriptions.Item label="City">{selectedPayment.city || "N/A"}</Descriptions.Item>
+              
+              <Descriptions.Item label="ZIP Code">{selectedPayment.zip || "N/A"}</Descriptions.Item>
+              <Descriptions.Item label="Remark">{selectedPayment.remark || "N/A"}</Descriptions.Item>
+            </Descriptions>
+            
+            <Divider />
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <span style={{ marginRight: 10 }}>Update Payment Status:</span>
+                <Select
+                  value={selectedPayment.status}
+                  style={{ width: 120 }}
+                  onChange={handleStatusChange}
+                  disabled={updating}
+                >
+                  <Option value="Success">Success</Option>
+                  <Option value="Pending">Pending</Option>
+                  <Option value="Failed">Failed</Option>
+                </Select>
+              </div>
+              
+              {updating && <span>Updating...</span>}
+            </div>
+          </>
         )}
       </Modal>
     </div>

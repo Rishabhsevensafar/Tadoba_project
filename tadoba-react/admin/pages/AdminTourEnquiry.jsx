@@ -2,36 +2,51 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { 
   Table, Button, Modal, Form, Input, Select, Tag, Space, Typography, Card, Badge, 
-  message, Divider, Popconfirm, Row, Col, Descriptions
+  message, Divider, Popconfirm, Row, Col, Descriptions, DatePicker, Tooltip
 } from "antd";
 import { 
   EyeOutlined, CheckCircleOutlined, CloseCircleOutlined, HourglassOutlined, 
-  QuestionCircleOutlined, TagOutlined, DeleteOutlined, ReloadOutlined
+  QuestionCircleOutlined, TagOutlined, DeleteOutlined, ReloadOutlined,
+  DownloadOutlined, FilterOutlined, ClearOutlined
 } from "@ant-design/icons";
 import moment from "moment";
 
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 const { Option } = Select;
+const { RangePicker } = DatePicker;
 
 const AdminTourEnquiries = () => {
   const [enquiries, setEnquiries] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [selectedEnquiry, setSelectedEnquiry] = useState(null);
   const [remark, setRemark] = useState("");
   const [status, setStatus] = useState("");
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [isFilterVisible, setIsFilterVisible] = useState(false);
+  
+  // Filter states
+  const [filterName, setFilterName] = useState("");
+  const [filterEmail, setFilterEmail] = useState("");
+  const [filterPhone, setFilterPhone] = useState("");
+  const [filterStatus, setFilterStatus] = useState("");
+  const [filterDateRange, setFilterDateRange] = useState(null);
 
   useEffect(() => {
     fetchEnquiries();
   }, []);
+  
+  useEffect(() => {
+    applyFilters();
+  }, [enquiries, filterName, filterEmail, filterPhone, filterStatus, filterDateRange]);
 
   const fetchEnquiries = async () => {
     setLoading(true);
     try {
       const response = await axios.get("http://localhost:5000/api/tour/tour-enquiries");
       setEnquiries(response.data.enquiries);
-      // message.success("Enquiries loaded successfully");
+      setFilteredData(response.data.enquiries);
     } catch (error) {
       console.error("Error fetching enquiries:", error);
       message.error("Failed to load enquiries");
@@ -75,6 +90,107 @@ const AdminTourEnquiries = () => {
     }
   };
 
+  // Apply filters to the data
+  const applyFilters = () => {
+    let results = [...enquiries];
+    
+    if (filterName) {
+      results = results.filter(item => 
+        item.name.toLowerCase().includes(filterName.toLowerCase())
+      );
+    }
+    
+    if (filterEmail) {
+      results = results.filter(item => 
+        item.email.toLowerCase().includes(filterEmail.toLowerCase())
+      );
+    }
+    
+    if (filterPhone) {
+      results = results.filter(item => 
+        item.phone.includes(filterPhone)
+      );
+    }
+    
+    if (filterStatus) {
+      results = results.filter(item => item.status === filterStatus);
+    }
+    
+    if (filterDateRange && filterDateRange[0] && filterDateRange[1]) {
+      const startDate = filterDateRange[0].startOf('day');
+      const endDate = filterDateRange[1].endOf('day');
+      
+      results = results.filter(item => {
+        const itemDate = moment(item.createdAt);
+        return itemDate.isSameOrAfter(startDate) && itemDate.isSameOrBefore(endDate);
+      });
+    }
+    
+    setFilteredData(results);
+  };
+
+  // Reset all filters
+  const clearFilters = () => {
+    setFilterName("");
+    setFilterEmail("");
+    setFilterPhone("");
+    setFilterStatus("");
+    setFilterDateRange(null);
+  };
+
+  // Download CSV function
+  const downloadCSV = () => {
+    // Define which columns to include in the CSV
+    const csvColumns = [
+      "Date & Time", "Name", "Email", 
+      "Hotel", "Package", "Message", "Remark", "Status", "Country"
+    ];
+    
+    // Format data for CSV
+    const csvData = filteredData.map(item => ({
+      "Date & Time": moment(item.createdAt).format("DD-MM-YYYY hh:mm A"),
+      "Name": item.name,
+      "Phone Number": item.phone,
+      "Email": item.email,
+      "Hotel": item.hotel?.title || "N/A",
+      "Package": item.package?.title || "N/A",
+      "Message": item.message,
+      "Remark": item.remark || "N/A",
+      "Status": item.status,
+      "Country": item.country || "N/A"
+    }));
+    
+    // Convert to CSV format
+    const header = csvColumns.join(',');
+    const rows = csvData.map(row => 
+      csvColumns.map(col => {
+        let value = row[col] || '';
+        // Escape commas and quotes
+        if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+          value = `"${value.replace(/"/g, '""')}"`;
+        }
+        return value;
+      }).join(',')
+    );
+    
+    const csv = [header, ...rows].join('\n');
+    
+    // Create and download the file
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    
+    link.setAttribute('href', url);
+    link.setAttribute('download', `tour_enquiries_${moment().format('YYYY-MM-DD')}.csv`);
+    link.style.visibility = 'hidden';
+    
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    message.success("CSV file has been downloaded");
+  };
+
   // Function to get status icon and color
   const getStatusInfo = (status) => {
     switch (status) {
@@ -114,20 +230,20 @@ const AdminTourEnquiries = () => {
   // Simplified table columns (minimal information)
   const columns = [
     {
-      title: "Date & Time",
-      dataIndex: "createdAt",
-      key: "createdAt",
-      render: (createdAt) => (
-        <Text>{moment(createdAt).format("DD-MM-YYYY hh:mm A")}</Text> // ✅ Format date
-      ),
-      sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt), // ✅ Enable sorting
-    },
-    {
       title: "Name",
       dataIndex: "name",
       key: "name",
       sorter: (a, b) => a.name.localeCompare(b.name),
       render: (text) => <Text strong>{text}</Text>,
+    },
+    {
+      title: "Date & Time",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (createdAt) => (
+        <Text>{moment(createdAt).format("DD-MM-YYYY hh:mm A")}</Text>
+      ),
+      sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
     },
     {
       title: "Email",
@@ -171,13 +287,6 @@ const AdminTourEnquiries = () => {
         const { color, icon, text } = getStatusInfo(status);
         return <Tag color={color} icon={icon}>{text}</Tag>;
       },
-      filters: [
-        { text: "Pending", value: "Pending" },
-        { text: "Success", value: "Success" },
-        { text: "Not Interested", value: "Not Interested" },
-        { text: "No Response", value: "No Response" },
-      ],
-      onFilter: (value, record) => record.status === value,
     },
     {
       title: "Action",
@@ -201,20 +310,126 @@ const AdminTourEnquiries = () => {
         </Title>
       }
       extra={
-        <Button 
-          type="primary" 
-          icon={<ReloadOutlined />} 
-          onClick={fetchEnquiries}
-          loading={loading}
-        >
-          Refresh
-        </Button>
+        <Space>
+          <Tooltip title="Toggle Filter Panel">
+            <Button 
+              type={isFilterVisible ? "primary" : "default"}
+              icon={<FilterOutlined />} 
+              onClick={() => setIsFilterVisible(!isFilterVisible)}
+            >
+              Filter
+            </Button>
+          </Tooltip>
+          <Tooltip title="Download as CSV">
+            <Button 
+              icon={<DownloadOutlined />} 
+              onClick={downloadCSV}
+              disabled={filteredData.length === 0}
+            >
+              Export CSV
+            </Button>
+          </Tooltip>
+          <Button 
+            type="primary" 
+            icon={<ReloadOutlined />} 
+            onClick={fetchEnquiries}
+            loading={loading}
+          >
+            Refresh
+          </Button>
+        </Space>
       }
       style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.05)" }}
     >
+      {/* Filter Panel */}
+      {isFilterVisible && (
+        <Card 
+          size="small" 
+          style={{ marginBottom: 16, background: "#f9f9f9" }}
+          title="Filter Options"
+          extra={
+            <Button 
+              icon={<ClearOutlined />} 
+              onClick={clearFilters}
+              size="small"
+            >
+              Clear Filters
+            </Button>
+          }
+        >
+          <Row gutter={[16, 16]}>
+            <Col xs={24} sm={12} md={6} lg={6}>
+              <Form.Item label="Name" style={{ marginBottom: 0 }}>
+                <Input 
+                  placeholder="Filter by name" 
+                  value={filterName} 
+                  onChange={e => setFilterName(e.target.value)}
+                  allowClear
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6} lg={6}>
+              <Form.Item label="Email" style={{ marginBottom: 0 }}>
+                <Input 
+                  placeholder="Filter by email" 
+                  value={filterEmail} 
+                  onChange={e => setFilterEmail(e.target.value)}
+                  allowClear
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6} lg={6}>
+              <Form.Item label="Phone" style={{ marginBottom: 0 }}>
+                <Input 
+                  placeholder="Filter by phone" 
+                  value={filterPhone} 
+                  onChange={e => setFilterPhone(e.target.value)}
+                  allowClear
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={6} lg={6}>
+              <Form.Item label="Status" style={{ marginBottom: 0 }}>
+                <Select 
+                  placeholder="Filter by status" 
+                  value={filterStatus} 
+                  onChange={value => setFilterStatus(value)}
+                  allowClear
+                  style={{ width: '100%' }}
+                >
+                  <Option value="Pending">Pending</Option>
+                  <Option value="Success">Success</Option>
+                  <Option value="Not Interested">Not Interested</Option>
+                  <Option value="No Response">No Response</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={12} lg={12}>
+              <Form.Item label="Date Range" style={{ marginBottom: 0 }}>
+                <RangePicker 
+                  value={filterDateRange}
+                  onChange={dates => setFilterDateRange(dates)}
+                  style={{ width: '100%' }}
+                />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Card>
+      )}
+
+      {/* Results Info */}
+      <div style={{ marginBottom: 16 }}>
+        <Text type="secondary">
+          {filteredData.length === enquiries.length 
+            ? `Showing all ${filteredData.length} enquiries` 
+            : `Found ${filteredData.length} matching enquiries out of ${enquiries.length} total`
+          }
+        </Text>
+      </div>
+
       <Table
         columns={columns}
-        dataSource={enquiries}
+        dataSource={filteredData}
         rowKey="_id"
         loading={loading}
         pagination={{ 
@@ -354,4 +569,4 @@ const AdminTourEnquiries = () => {
   );
 };
 
-export default AdminTourEnquiries;  
+export default AdminTourEnquiries;

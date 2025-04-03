@@ -17,6 +17,7 @@ import {
   CreditCardOutlined,
   HomeOutlined,
   FileTextOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
 
 const { Title, Paragraph, Text } = Typography;
@@ -24,14 +25,16 @@ const { Title, Paragraph, Text } = Typography;
 function PaymentSuccess() {
   const [loading, setLoading] = useState(true);
   const [paymentStatus, setPaymentStatus] = useState(null);
+  const [paymentDetails, setPaymentDetails] = useState(null);
   const location = useLocation();
   const navigate = useNavigate();
 
   useEffect(() => {
-    const verifyPayment = async () => {
+    const checkPaymentStatus = async () => {
       try {
         const params = new URLSearchParams(location.search);
-        const bookingId = params.get('booking_id'); // ✅ Use `booking_id`
+        const bookingId = params.get('booking_id');
+        const paymentId = params.get('payment_id');
     
         if (!bookingId) {
           setPaymentStatus({ success: false, message: "No booking ID found in URL" });
@@ -39,24 +42,25 @@ function PaymentSuccess() {
           return;
         }
     
-        const response = await fetch(`http://localhost:5000/api/quick-payment/verify-payment`, {
+        // Use the new endpoint that only requires booking_id
+        const response = await fetch(`http://localhost:5000/api/quick-payment/payment-status`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ booking_id: bookingId }) // ✅ Changed from `order_id`
+          body: JSON.stringify({ booking_id: bookingId })
         });
     
         const data = await response.json();
         setPaymentStatus(data);
+        setPaymentDetails(data.payment);
       } catch (error) {
-        console.error("Payment verification error:", error);
-        setPaymentStatus({ success: false, message: "Failed to verify payment" });
+        console.error("Payment status check error:", error);
+        setPaymentStatus({ success: false, message: "Failed to verify payment status" });
       } finally {
         setLoading(false);
       }
     };
     
-
-    verifyPayment();
+    checkPaymentStatus();
   }, [location.search]);
 
   if (loading) {
@@ -81,15 +85,15 @@ function PaymentSuccess() {
     );
   }
 
-  // Get current date and time for receipt
-  const currentDate = new Date().toLocaleString();
+  // Get payment date from response or use current date as fallback
+  const paymentDate = paymentDetails?.date 
+    ? new Date(paymentDetails.date).toLocaleString()
+    : new Date().toLocaleString();
 
-  // Generate a random transaction ID for display purposes
-  const transactionId = paymentStatus?.success
-    ? `TXN${Math.floor(Math.random() * 1000000)
-        .toString()
-        .padStart(6, "0")}`
-    : "N/A";
+  // Get payment ID from URL or generate a display transaction ID
+  const params = new URLSearchParams(location.search);
+  const displayPaymentId = params.get('payment_id') || 
+    (paymentStatus?.success ? `TXN${Math.floor(Math.random() * 1000000).toString().padStart(6, "0")}` : "N/A");
 
   return (
     <div style={{ maxWidth: "800px", margin: "40px auto", padding: "0 20px" }}>
@@ -123,7 +127,11 @@ function PaymentSuccess() {
                   : "Payment Failed"}
               </Title>
             }
-            subTitle={paymentStatus?.message}
+            subTitle={
+              paymentStatus?.success && paymentDetails?.name 
+                ? `Thank you, ${paymentDetails.name}!` 
+                : paymentStatus?.message
+            }
             status={paymentStatus?.success ? "success" : "error"}
           />
         </div>
@@ -149,14 +157,30 @@ function PaymentSuccess() {
                     style={{ display: "flex", justifyContent: "space-between" }}
                   >
                     <Text>Transaction ID:</Text>
-                    <Text code>{transactionId}</Text>
+                    <Text code>{displayPaymentId}</Text>
                   </div>
+                  {paymentDetails?.name && (
+                    <div
+                      style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}
+                    >
+                      <Text><UserOutlined style={{ marginRight: 8 }} />Customer Name:</Text>
+                      <Text strong>{paymentDetails.name}</Text>
+                    </div>
+                  )}
                   <div
                     style={{ display: "flex", justifyContent: "space-between" }}
                   >
                     <Text>Date & Time:</Text>
-                    <Text>{currentDate}</Text>
+                    <Text>{paymentDate}</Text>
                   </div>
+                  {paymentDetails?.amount && (
+                    <div
+                      style={{ display: "flex", justifyContent: "space-between" }}
+                    >
+                      <Text>Amount:</Text>
+                      <Text>₹{paymentDetails.amount}</Text>
+                    </div>
+                  )}
                   <div
                     style={{ display: "flex", justifyContent: "space-between" }}
                   >
@@ -169,7 +193,7 @@ function PaymentSuccess() {
               </div>
 
               <Alert
-                message="Payment Confirmation"
+                message={`Payment Confirmation for ${paymentDetails?.name || 'Customer'}`}
                 description="Your quick payment has been successfully processed! You will receive an email with the details shortly. Keep the confirmation email for your records."
                 type="success"
                 showIcon

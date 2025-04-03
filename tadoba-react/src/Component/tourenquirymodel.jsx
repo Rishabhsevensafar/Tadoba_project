@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import axios from "axios";
-import "./TourEnquiry.css"; // Add this CSS file to your project
+import "../styles/TourEnquiry.css"; // Add this CSS file to your project
 
 const TourEnquiryModal = ({ show, handleClose, hotel, packageId }) => {
   const [formData, setFormData] = useState({

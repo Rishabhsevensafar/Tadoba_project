@@ -1,4 +1,5 @@
 import React from "react";
+import Slider from "react-slick";
 import ImportantLinks from "../ImportantLinks";
 import axios from "axios"; // ✅ Import axios
 import Header from "../Header";
@@ -12,15 +13,26 @@ import pkg from "../../assets/pkg1.jpg";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { Link } from "react-router-dom";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 function TourPackage() {
   const [date, setDate] = useState(new Date());
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
   const [packages, setPackages] = useState([]);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
   useEffect(() => {
     window.scrollTo(0, 0);
-    fetchPackages(); // ✅ Call the function to fetch data
-  }, []);
+    fetchPackages();
+
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []); 
+  
   const fetchPackages = async () => {
     try {
       const response = await axios.get("http://localhost:5000/api/tourpackage");
@@ -29,97 +41,48 @@ function TourPackage() {
       console.error("Error fetching tour packages:", error);
     }
   };
-
+  // Slider settings
+  const sliderSettings = {
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+  };
   return (
     <>
       <Header></Header>
       <div>
-        <div className="row">
-          <div className="col-sm-12 col-md-4 col-lg-4 p-0">
-            <img
-              src={tourPckages}
-              className="tourPackageImg pe-lg-1"
-              alt="Tour Packages "
-            />
-          </div>
-          <div className="col-sm-12 col-md-4 col-lg-4 p-0">
-            <img
-              src={tourPckages2}
-              className="tourPackageImg pe-lg-1"
-              alt="Tour Packages "
-            />
-          </div>
-          <div className="col-sm-12 col-md-4 col-lg-4 p-0">
-            <img
-              src={tourPckages3}
-              className="tourPackageImg"
-              alt="Tour Packages "
-            />
-          </div>
-        </div>
-      </div>
-      {/* <div className="row hotelback ">
-        <div className="col-sm-12 col-md-3 col-lg-3 px-2">
-          <div className="boxx">
-            <select>
-              <option value="">Select</option>
-              <option value="">Tiger valley resort Tdaoba</option>
-              <option value="">Tiger valley resort Tdaoba</option>
-              <option value="">Tiger valley resort Tdaoba</option>
-            </select>
-            <p>All Hotels in tadoba</p>
-          </div>
-        </div>
-        <div className="col-sm-12 col-md-3 col-lg-3 px-2">
-          <div className="boxx">
-            <div className="dateFormat">
-              <DatePicker
-                className="date1"
-                placeholderText="Check In"
-                selectsStart
-                selected={startDate}
-                onChange={(date) => setStartDate(date)}
-                startDate={startDate}
-              />
-              <DatePicker
-                className="date1"
-                placeholderText="Check Out"
-                selectsEnd
-                selected={endDate}
-                onChange={(date) => setEndDate(date)}
-                endDate={endDate}
-                startDate={startDate}
-                minDate={startDate}
-              />
+      <div>
+        {isMobile ? (
+          <Slider {...sliderSettings}>
+            <div>
+              <img src={tourPckages} className="tourPackageImg" alt="Tour Package 1" />
             </div>
-            <p>Choose Date</p>
+            <div>
+              <img src={tourPckages2} className="tourPackageImg" alt="Tour Package 2" />
+            </div>
+            <div>
+              <img src={tourPckages3} className="tourPackageImg" alt="Tour Package 3" />
+            </div>
+          </Slider>
+        ) : (
+          <div className="row">
+            <div className="col-sm-12 col-md-4 col-lg-4 p-0">
+              <img src={tourPckages} className="tourPackageImg pe-lg-1" alt="Tour Package 1" />
+            </div>
+            <div className="col-sm-12 col-md-4 col-lg-4 p-0">
+              <img src={tourPckages2} className="tourPackageImg pe-lg-1" alt="Tour Package 2" />
+            </div>
+            <div className="col-sm-12 col-md-4 col-lg-4 p-0">
+              <img src={tourPckages3} className="tourPackageImg" alt="Tour Package 3" />
+            </div>
           </div>
-        </div>
-        <div className="col-sm-12 col-md-2 col-lg-2 px-2">
-          <div className="boxx">
-            <select>
-              <option value="">Select</option>
-              <option value="">Tiger valley resort Tadoba</option>
-              <option value="">Tiger valley resort Tadoba</option>
-              <option value="">Tiger valley resort Tadoba</option>
-            </select>
-            <p>All Hotels in tadoba</p>
-          </div>
-        </div>
-        <div className="col-sm-12 col-md-2 col-lg-2 px-2">
-          <div className="boxx ">
-            <select>
-              <option value="">Select</option>
-              <option value="">Indian</option>
-              <option value="">Foreigner</option>
-            </select>
-            <p>All Hotels in tadoba</p>
-          </div>
-        </div>{" "}
-        <div className="col-sm-12 col-md-2 col-lg-2  px-2">
-          <button className="boxxSearch">Search</button>
-        </div>{" "}
-      </div> */}
+        )}
+      </div>
+      </div>
+      
       <section className="packagelisting leaf">
         <div className="container">
           <div className="row">
