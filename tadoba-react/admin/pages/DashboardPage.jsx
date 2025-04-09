@@ -11,6 +11,7 @@ import {
   theme,
   Modal,
   ConfigProvider,
+  Calendar,
 } from "antd";
 import {
   Binoculars,
@@ -33,7 +34,8 @@ import {
   Settings,
   LogOut,
   User,
-  IndianRupee
+  IndianRupee,
+  Calendar1Icon
 } from "lucide-react";
 import { UserOutlined, LogoutOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
 
@@ -62,13 +64,14 @@ const DashboardPage = () => {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
   const { token } = theme.useToken();
+  const role = localStorage.getItem("admin-role");
 
   const handleLogout = () => {
     Modal.confirm({
       title: "Are you sure you want to logout?",
       icon: <LogOut size={20} style={{ color: token.colorError }} />,
       okText: "Logout",
-      cancelText: "Cancel",
+      cancelText: "Cancel", 
       okButtonProps: { danger: true },
       onOk: () => {
         localStorage.removeItem("adminToken");
@@ -77,7 +80,6 @@ const DashboardPage = () => {
     });
   };
 
-  // Reorganized menu with dropdowns
   const menuItems = [
     {
       key: "dashboard",
@@ -89,7 +91,14 @@ const DashboardPage = () => {
       key: "enquiries",
       icon: <MessageCircle size={20} />,
       label: "Enquiries",
+      hidden: role === "seo", // ❌ hide for SEO
       children: [
+        {
+          key: "/admin/dashboard/safari-enquiry",
+          icon: <Compass size={18} />,
+          label: "Safari Enquiry",
+          onClick: () => navigate("/admin/dashboard/safari-enquiry"),
+        },
         {
           key: "/admin/dashboard/tour-enquiry",
           icon: <HelpCircle size={18} />,
@@ -102,18 +111,13 @@ const DashboardPage = () => {
           label: "Hotel Enquiry",
           onClick: () => navigate("/admin/dashboard/hotel-enquiry"),
         },
-        {
-          key: "/admin/dashboard/safari-enquiry",
-          icon: <Compass size={18} />,
-          label: "Safari Enquiry",
-          onClick: () => navigate("/admin/dashboard/safari-enquiry"),
-        }
       ],
     },
     {
       key: "bookings",
       icon: <Map size={20} />,
       label: "Bookings",
+      hidden: role === "seo", // ❌ hide for SEO
       children: [
         {
           key: "/admin/dashboard/safari-booking-report",
@@ -129,11 +133,11 @@ const DashboardPage = () => {
         },
       ],
     },
-
     {
       key: "management",
       icon: <Package size={20} />,
       label: "Management",
+      hidden: role !== "admin", // ❌ hide for non-admin
       children: [
         {
           key: "/admin/dashboard/Packages",
@@ -146,7 +150,13 @@ const DashboardPage = () => {
           icon: <Hotel size={18} />,
           label: "Hotel Manager",
           onClick: () => navigate("/admin/dashboard/hotel-manager"),
-        }
+        },
+        {
+          key: "/admin/dashboard/date-config",
+          icon: <Calendar1Icon size={18} />,
+          label: "Date Config",
+          onClick: () => navigate("/admin/dashboard/date-config"),
+        },
       ],
     },
     {
@@ -154,18 +164,28 @@ const DashboardPage = () => {
       icon: <IndianRupee size={20} />,
       label: "Payments",
       onClick: () => navigate("/admin/dashboard/quick-payment"),
+      hidden: role !== "admin", // ❌ hide for non-admin
     },
     {
       key: "/admin/dashboard/contact-enquiry",
       icon: <PhoneCall size={18} />,
       label: "Contact Enquiry",
       onClick: () => navigate("/admin/dashboard/contact-enquiry"),
+      hidden: role !== "admin", // ❌ hide for non-admin
     },
     {
       key: "/admin/dashboard/blogs",
       icon: <Newspaper size={18} />,
       label: "Blogs",
       onClick: () => navigate("/admin/dashboard/blogs"),
+      hidden: role === "sales", // ❌ hide for sales
+    },
+    {
+      key: "/admin/dashboard/setting",
+      icon: <Settings size={18} />,
+      label: "Global Settings",
+      onClick: () => navigate("/admin/dashboard/setting"),
+      hidden: role !== "admin", // ❌ hide for non-admin
     },
   ];
 
@@ -174,7 +194,7 @@ const DashboardPage = () => {
       key: "profile",
       icon: <User size={16} />,
       label: "Profile",
-      onClick: () => navigate("/admin/dashboard/profile"),
+      onClick: () => navigate("/admin/dashboard/Admin-profile"),
     },
     {
       key: "settings",
@@ -339,31 +359,7 @@ const DashboardPage = () => {
                   justifyContent: "center",
                 }}
               />
-              <Title
-                level={5}
-                style={{
-                  margin: 0,
-                  marginLeft: 16,
-                  color: token.colorTextBase,
-                }}
-              >
-                {/* Dynamically show current section title based on path */}
-                {location.pathname.includes("safari-booking") 
-                  ? "Safari Bookings" 
-                  : location.pathname.includes("/tour-booking") 
-                  ? "Tour Bookings"
-                  : location.pathname.includes("/Packages")
-                  ? "Tour Packages"
-                  : location.pathname.includes("/enquiry")
-                  ? "Enquiries"
-                  : location.pathname.includes("/hotel-manager")
-                  ? "Hotel Manager"
-                  : location.pathname.includes("/quick-payment")
-                  ? "Quick Payments"
-                  : location.pathname.includes("/blogs")
-                  ? "Blog Management"
-                  : "Dashboard"}
-              </Title>
+
             </div>
 
             <Space>

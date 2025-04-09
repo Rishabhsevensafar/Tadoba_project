@@ -17,6 +17,10 @@ import AdminSafariEnquiries from "./pages/AdminSafariEnquiry";
 import AdminContactEnquiries from "./pages/AdminContactEnquiry";
 import AdminBlogs from "./pages/AdminBlogs";
 import AdminQuickPaymentReports from "./pages/AdminQuickPayment";
+import AdminBookingConfig from "./pages/AdminSafariConfig";
+import GlobalSettings from "./pages/AdminGlobalSetting";
+import AdminProfile from "./pages/AdminProfile";
+import AdminUserManager from "./pages/AdminUserManager";
 
 const AppAdmin = () => {
   return (
@@ -39,6 +43,10 @@ const AppAdmin = () => {
           <Route path="contact-enquiry" element={<AdminContactEnquiries/>}/>
           <Route path="blogs" element={<AdminBlogs/>}/>
           <Route path="quick-payment" element={<AdminQuickPaymentReports/>}/>
+          <Route path="date-config" element={<AdminBookingConfig/>}/>
+          <Route path="setting" element={<GlobalSettings/>}/>
+          <Route path="Admin-profile" element={<AdminProfile/>}/>
+          <Route path="user-manager" element={<AdminUserManager />} />
         </Route>
         <Route path="*" element={<div>404 Not Found</div>} />
       </Routes>

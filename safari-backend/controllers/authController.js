@@ -19,9 +19,10 @@ router.post("/login", async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({ success: false, message: "Invalid credentials" });
     }
+    console.log("Admin role in DB:", admin.role);
 
     // ✅ Generate JWT Token
-    const token = jwt.sign({ id: admin._id, role: "admin" }, JWT_SECRET, { expiresIn: "7h" });
+    const token = jwt.sign({ id: admin._id, role: admin.role}, JWT_SECRET, { expiresIn: "7h" });
 
     res.status(200).json({ success: true, token, message: "Login successful" });
   } catch (error) {

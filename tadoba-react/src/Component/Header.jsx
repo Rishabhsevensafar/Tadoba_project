@@ -1,19 +1,33 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/images/logo.png";
-
+import axios from "axios";
+const BASE_URL = "http://localhost:5000";
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const [logoUrl, setLogoUrl] = useState(null);
+
 
   const toggleNavbar = () => {
     setIsOpen(!isOpen);
   };
 
+  useEffect(() => {
+    axios.get(`${BASE_URL}/api/global-setting`).then((res) => {
+      if (res.data.logoUrl) {
+        setLogoUrl(`${BASE_URL}${res.data.logoUrl}`);
+      }
+    });
+  }, []);
   return (
     <header className="navbar-container">
       <div className="navbar">
         {/* Logo */}
-        <img src={logo} alt="Logo" className="logo" />
+        <img
+          src={logoUrl || logo}
+          alt="Logo"
+          className="logo"
+        />
 
         {/* Desktop Navbar Links */}
         <nav className="nav-links">
@@ -54,7 +68,11 @@ function Header() {
       <nav className={`mobile-nav ${isOpen ? "slide-in" : "slide-out"}`}>
         {/* Header with Logo & Close Button */}
         <div className="mobile-header">
-          <img src={logo} alt="Logo" className="mobile-logo" />
+            <img
+            src={logoUrl || "/default-logo.png"}
+            alt="Logo"
+            className="mobile-logo"
+          />
           <button className="close-btn" onClick={toggleNavbar}>
             ✖
           </button>

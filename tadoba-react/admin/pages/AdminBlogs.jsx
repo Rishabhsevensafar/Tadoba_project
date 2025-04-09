@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Modal, Form, Input, Upload, Select, message, Typography, Space, Row, Col } from "antd";
+import { Table, Button, Modal, Form, Input, Upload, Select, message, Typography, Space, Row, Col, Tooltip } from "antd";
 import { UploadOutlined, EditOutlined, DeleteOutlined, PlusOutlined, EyeOutlined } from "@ant-design/icons";
 import { getBlogsAdmin, createBlog, updateBlog, deleteBlog } from "../service/blogServices";
 import ReactQuill from 'react-quill';
@@ -146,7 +146,41 @@ const AdminBlogs = () => {
       }
     });
   };
-
+  const formatDate = (dateString) => {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    return date.toLocaleString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+  
+  // Time ago utility
+  const timeAgo = (dateString) => {
+    if (!dateString) return '-';
+    const date = new Date(dateString);
+    const seconds = Math.floor((new Date() - date) / 1000);
+    
+    let interval = Math.floor(seconds / 31536000);
+    if (interval >= 1) return `${interval} year${interval === 1 ? '' : 's'} ago`;
+    
+    interval = Math.floor(seconds / 2592000);
+    if (interval >= 1) return `${interval} month${interval === 1 ? '' : 's'} ago`;
+    
+    interval = Math.floor(seconds / 86400);
+    if (interval >= 1) return `${interval} day${interval === 1 ? '' : 's'} ago`;
+    
+    interval = Math.floor(seconds / 3600);
+    if (interval >= 1) return `${interval} hour${interval === 1 ? '' : 's'} ago`;
+    
+    interval = Math.floor(seconds / 60);
+    if (interval >= 1) return `${interval} minute${interval === 1 ? '' : 's'} ago`;
+    
+    return `${Math.floor(seconds)} second${seconds === 1 ? '' : 's'} ago`;
+  };
   const columns = [
     {
       title: "Image",
@@ -190,6 +224,36 @@ const AdminBlogs = () => {
           {status}
         </Text>
       )
+    },
+    {
+      title: "Created",
+      dataIndex: "createdAt",
+      key: "createdAt",
+      render: (date) => (
+        <Tooltip title={formatDate(date)}>
+          <Text type="secondary"
+          style={{
+            color:'black'
+          }}
+          >{timeAgo(date)}</Text>
+        </Tooltip>
+      ),
+      sorter: (a, b) => new Date(a.createdAt) - new Date(b.createdAt),
+      width: 150
+    },
+    {
+      title: "Updated",
+      dataIndex: "updatedAt",
+      key: "updatedAt",
+      render: (date) => (
+        <Tooltip title={formatDate(date)}>
+          <Text type="secondary" style={{
+            color:"black"
+          }}>{timeAgo(date)}</Text>
+        </Tooltip>
+      ),
+      sorter: (a, b) => new Date(a.updatedAt) - new Date(b.updatedAt),
+      width: 150
     },
     {
       title: "Actions",
@@ -243,7 +307,8 @@ const AdminBlogs = () => {
         pagination={{ pageSize: 8 }}
         bordered
         size="middle"
-        scroll={{ x: 'max-content' }}
+        // scroll={{ x: 'max-content' }}
+        className="black-bordered-table"
       />
 
       {/* Create/Edit Modal */}
@@ -426,6 +491,44 @@ const AdminBlogs = () => {
           </div>
         )}
       </Modal>
+      <style jsx>
+        {
+          ` .black-bordered-table table {
+          border: 1px solid #000 !important;
+        }
+        .black-bordered-table th,
+        .black-bordered-table td {
+          border: 1px solid #000 !important;
+        }
+        .black-bordered-descriptions table {
+          border: 1px solid #000 !important;
+          
+        }
+        .black-bordered-descriptions th,
+        .black-bordered-descriptions td {
+          border: 1px solid #000 !important;
+        }
+        .black-bordered-descriptions th{
+          background-color: #2c5f2d !important;
+          color: #fff !important;
+        }
+        .black-bordered-table th {
+          background-color: #2c5f2d !important;
+          color: #fff !important;
+        }
+          
+        .black-bordered-table
+          .ant-table-column-sort
+          .ant-table-column-sorter-up.active,
+        .black-bordered-table
+          .ant-table-column-sort
+          .ant-table-column-sorter-down.active {
+          color: #ff4d4f; 
+        }
+
+          `
+        }
+      </style>
     </div>
   );
 };

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { jwtDecode } from "jwt-decode";
+
 
 // Import your preferred toast library
 // import { toast, Toaster } from "react-hot-toast";
@@ -29,9 +31,15 @@ const LoginPage = () => {
         "http://localhost:5000/api/admin/auth/login",
         formData
       );
-      localStorage.setItem("adminToken", response.data.token);
+      const token = response.data.token; // ✅ now it's defined
+      const decoded = jwtDecode(token);  // ✅ safe to decode now
+  
+      localStorage.setItem("adminToken", token);
+      localStorage.setItem("admin-role", decoded.role);
+  
       // Toast message (replace with your preferred method)
       alert("Login successful!");
+      
       setTimeout(() => navigate("/admin/dashboard"), 1000);
     } catch (error) {
       // Toast error message (replace with your preferred method)
@@ -198,7 +206,6 @@ const styles = `
     justify-content: center;
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     padding: 20px;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   }
 
   .login-card {
