@@ -134,7 +134,6 @@ const AdminQuickPaymentReports = () => {
             icon={<EyeOutlined />} 
             onClick={() => setSelectedPayment(record)}
           >
-            View
           </Button>
           <Button 
             type="default" 
@@ -144,7 +143,6 @@ const AdminQuickPaymentReports = () => {
               setSelectedPayment(record);
             }}
           >
-            Edit
           </Button>
         </Space>
       ),
@@ -189,9 +187,10 @@ const AdminQuickPaymentReports = () => {
         rowKey="_id" 
         loading={loading} 
         pagination={{ pageSize: 10 }}
-        className="shadow-sm"
+        className=" black-bordered-table"
         bordered={true}
-        scroll={{ x: true }}
+        // scroll={{ x: true }}
+      
       />
 
       {/* Payment Details Modal */}
@@ -265,6 +264,48 @@ const AdminQuickPaymentReports = () => {
           </>
         )}
       </Modal>
+      <style jsx>{`
+        .table-row-light {
+          background-color: #ffffff;
+        }
+        .table-row-dark {
+          background-color: #fafafa;
+        }
+        .black-bordered-table table {
+          border: 1px solid #000 !important;
+        }
+        .black-bordered-table th,
+        .black-bordered-table td {
+          border: 1px solid #000 !important;
+        }
+        .black-bordered-descriptions table {
+          border: 1px solid #000 !important;
+        }
+        .black-bordered-descriptions th,
+        .black-bordered-descriptions td {
+          border: 1px solid #000 !important;
+        }
+        .black-bordered-descriptions th {
+          background-color: #2c5f2d !important;
+          color: #fff !important;
+        }
+        .black-bordered-table th {
+          background-color: #2c5f2d !important;
+          color: #fff !important;
+        }
+        .black-bordered-table .ant-table-column-sorter {
+          color: #fff; 
+        }
+
+        .black-bordered-table
+          .ant-table-column-sort
+          .ant-table-column-sorter-up.active,
+        .black-bordered-table
+          .ant-table-column-sort
+          .ant-table-column-sorter-down.active {
+          color: #ff4d4f; 
+        }
+      `}</style>
     </div>
   );
 };

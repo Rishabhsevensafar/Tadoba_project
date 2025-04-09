@@ -4,7 +4,14 @@ const bcrypt = require("bcrypt");
 const adminSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  role: { type: String, default: "admin" }, // Add role field
+  name: { type: String },
+  contactNumber: { type: String },
+  avatar: { type: String },
+  role: {
+    type: String,
+    enum: ["admin", "sales", "seo"],
+    default: "admin",
+  },
 });
 
 adminSchema.pre("save", async function (next) {

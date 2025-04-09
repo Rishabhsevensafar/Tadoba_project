@@ -165,7 +165,7 @@ const PackageManager = () => {
         <Space>
           <Space direction="vertical" size={0}>
             <Text strong>{record.title}</Text>
-            <Text type="secondary" style={{ fontSize: '12px' }}>
+            <Text  style={{ fontSize: '12px', }}>
               ID: {record._id?.substring(0, 12)}...
             </Text>
           </Space>
@@ -193,6 +193,7 @@ const PackageManager = () => {
         <Badge count={totalSeats || 0} showZero style={{ backgroundColor: totalSeats ? '#1890ff' : '#d9d9d9' }} />
       ),
       sorter: (a, b) => (a.totalSeats || 0) - (b.totalSeats || 0),
+      width:'80px'
     },
     {
       title: <><ClockCircleOutlined /> Duration</>,
@@ -233,7 +234,7 @@ const PackageManager = () => {
       dataIndex: "isActive",
       key: "status",
       render: (isActive) => (
-        <Tag color={isActive ? "success" : "error"} style={{ padding: '4px 12px' }}>
+        <Tag color={isActive ? "green" : "error"} style={{ padding: '4px 12px',  }}>
           {isActive ? <><CheckCircleOutlined /> Active</> : <><StopOutlined /> Inactive</>}
         </Tag>
       ),
@@ -342,6 +343,7 @@ const PackageManager = () => {
             bordered
             style={{ background: "#fff", borderRadius: "8px", overflow: "hidden" }}
             rowClassName={(record, index) => (index % 2 === 0 ? "table-row-light" : "table-row-dark")}
+            className="black-bordered-table"
           />
 
           <div
@@ -397,6 +399,40 @@ const PackageManager = () => {
         }
         .shadow-md {
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+          .black-bordered-table table {
+          border: 1px solid #000 !important;
+        }
+        .black-bordered-table th,
+        .black-bordered-table td {
+          border: 1px solid #000 !important;
+        }
+        .black-bordered-descriptions table {
+          border: 1px solid #000 !important;
+          
+        }
+        .black-bordered-descriptions th,
+        .black-bordered-descriptions td {
+          border: 1px solid #000 !important;
+        }
+        .black-bordered-descriptions th{
+          background-color: #2c5f2d !important;
+          color: #fff !important;
+        }
+        .black-bordered-table th {
+          background-color: #2c5f2d !important;
+          color: #fff !important;
+        }
+          .black-bordered-table .ant-table-column-sorter {
+          color: #fff; 
+        }
+        .black-bordered-table
+          .ant-table-column-sort
+          .ant-table-column-sorter-up.active,
+        .black-bordered-table
+          .ant-table-column-sort
+          .ant-table-column-sorter-down.active {
+          color: #ff4d4f; 
         }
       `}</style>
     </div>

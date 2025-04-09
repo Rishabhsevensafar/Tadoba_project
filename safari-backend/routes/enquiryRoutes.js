@@ -5,7 +5,10 @@ const {
   getAllEnquiries,
   updateEnquiryStatus,
   addRemarkToEnquiry,
+  createManualEnquiry,
+  getStatusHistory,
 } = require("../controllers/hotelenquiryController");
+const { adminAuth } = require("../middleware/authMiddleware");
 
 // Route to create enquiry (Public)
 router.post("/", createEnquiry);
@@ -19,4 +22,7 @@ router.put("/:id/status", updateEnquiryStatus);
 // Route to add remark to an enquiry (Admin)
 router.put("/:id/remark", addRemarkToEnquiry);
 
+router.post('/manual', adminAuth,  createManualEnquiry);
+// Add this new route for status history
+router.get('/status-history/:id', getStatusHistory);
 module.exports = router;

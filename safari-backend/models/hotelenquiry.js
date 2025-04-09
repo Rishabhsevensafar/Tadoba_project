@@ -1,5 +1,11 @@
 const mongoose = require("mongoose");
 
+const statusHistorySchema = new mongoose.Schema({
+  status: { type: String, required: true },
+  changedAt: { type: Date, default: Date.now },
+  remark: { type: String }
+});
+
 const enquirySchema = new mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -13,6 +19,8 @@ const enquirySchema = new mongoose.Schema(
       default: "pending",
     },
     remark: { type: String, default: "" },
+    statusHistory: [statusHistorySchema], // Add status history array
+    isManual: { type: Boolean, default: false }
   },
   { timestamps: true }
 );

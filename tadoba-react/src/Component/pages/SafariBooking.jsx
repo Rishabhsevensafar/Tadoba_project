@@ -6,22 +6,26 @@ import ImportantLinks from "../ImportantLinks";
 import Footer from "../Footer";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
-import "../../styles/SafariBooking.css"; // Create this CSS file for custom styles
+import "../../styles/SafariBooking.css";
 
 function SafariBooking() {
-  // State for selected date with validation to prevent past dates
   const [date, setDate] = useState(new Date());
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
+  const [bookingConfig, setBookingConfig] = useState({
+    cutOffTime: "17:00", // Default cut-off time (5:00 PM in 24-hour format)
+    blockedDates: [], // Array of dates when booking is blocked
+  });
+  const [isAfterCutOff, setIsAfterCutOff] = useState(false);
+  const [isDateBlocked, setIsDateBlocked] = useState(false);
 
-  // Form data state
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     safariZone: "",
-    vehicleType: ["Jeep","Canter"],
-    safariTime: ["Morning","Evening"],
+    vehicleType: ["Jeep", "Canter"],
+    safariTime: ["Morning", "Evening"],
     children: 0,
     adults: 1,
     amountPaid: 6100,
@@ -29,12 +33,26 @@ function SafariBooking() {
 
   const navigate = useNavigate();
 
-  // Scroll to top on component mount
   useEffect(() => {
     window.scrollTo(0, 0);
+    fetchBookingConfig();
   }, []);
 
-  // Handle form input changes
+  // Fetch booking configuration from backend
+  const fetchBookingConfig = async () => {
+    try {
+      const response = await fetch(
+        "http://localhost:5000/api/safaridate/config"
+      );
+      const data = await response.json();
+      if (response.ok) {
+        setBookingConfig(data);
+      }
+    } catch (error) {
+      console.error("Error fetching booking config:", error);
+    }
+  };
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -42,40 +60,24 @@ function SafariBooking() {
   const generateCalendarGrid = () => {
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
-
-    // First day of the month
     const firstDay = new Date(year, month, 1);
     const lastDay = new Date(year, month + 1, 0);
-
-    // Create grid
     const calendarGrid = [];
-
-    // Weekday names
     const weekdays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
     calendarGrid.push(weekdays);
-
-    // Pad initial empty days
     const startingDay = firstDay.getDay();
     const initialPadding = Array(startingDay).fill(null);
-
-    // Generate date numbers
     const monthDays = Array.from(
       { length: lastDay.getDate() },
       (_, i) => i + 1
     );
-
-    // Combine padded days and month days
     const fullGrid = [...initialPadding, ...monthDays];
-
-    // Break into weeks
     for (let i = 0; i < fullGrid.length; i += 7) {
       calendarGrid.push(fullGrid.slice(i, i + 7));
     }
-
     return calendarGrid;
   };
 
-  // Handle date selection
   const handleDateSelect = (day) => {
     if (day) {
       const selectedFullDate = new Date(
@@ -83,18 +85,45 @@ function SafariBooking() {
         currentDate.getMonth(),
         day
       );
-
-      // Prevent selecting past dates
       const today = new Date();
       today.setHours(0, 0, 0, 0);
 
       if (selectedFullDate >= today) {
         setSelectedDate(selectedFullDate);
+
+        // Check if selected date is blocked
+        const isBlocked = bookingConfig.blockedDates.some((blockedDate) => {
+          const blockedDateObj = new Date(blockedDate);
+          return (
+            blockedDateObj.getFullYear() === selectedFullDate.getFullYear() &&
+            blockedDateObj.getMonth() === selectedFullDate.getMonth() &&
+            blockedDateObj.getDate() === selectedFullDate.getDate()
+          );
+        });
+        setIsDateBlocked(isBlocked);
+
+        // Check if current time is after cut-off for today's date
+        if (selectedFullDate.toDateString() === today.toDateString()) {
+          checkCutOffTime();
+        } else {
+          setIsAfterCutOff(false);
+        }
       }
     }
   };
 
-  // Navigate between months
+  // Check if current time is after cut-off time
+  const checkCutOffTime = () => {
+    const now = new Date();
+    const [cutOffHour, cutOffMinute] = bookingConfig.cutOffTime
+      .split(":")
+      .map(Number);
+    const cutOffTime = new Date();
+    cutOffTime.setHours(cutOffHour, cutOffMinute, 0, 0);
+
+    setIsAfterCutOff(now > cutOffTime);
+  };
+
   const changeMonth = (direction) => {
     const newDate = new Date(currentDate);
     newDate.setMonth(currentDate.getMonth() + direction);
@@ -103,11 +132,22 @@ function SafariBooking() {
 
   const calendarGrid = generateCalendarGrid();
 
-  // Handle booking submission
   const handleBooking = async () => {
     try {
       if (!selectedDate) {
         alert("Please select a date for your safari");
+        return;
+      }
+
+      if (isAfterCutOff) {
+        alert(
+          `Booking is closed for today. The last time for booking was ${bookingConfig.cutOffTime}.`
+        );
+        return;
+      }
+
+      if (isDateBlocked) {
+        alert("Booking is not available for the selected date.");
         return;
       }
 
@@ -134,7 +174,6 @@ function SafariBooking() {
     }
   };
 
-  // Handle enquiry submission
   const handleEnquiry = async () => {
     try {
       if (!selectedDate) {
@@ -142,12 +181,23 @@ function SafariBooking() {
         return;
       }
 
+      if (isAfterCutOff) {
+        alert(
+          `Enquiry is closed for today. The last time for enquiry was ${bookingConfig.cutOffTime}.`
+        );
+        return;
+      }
+
+      if (isDateBlocked) {
+        alert("Enquiry is not available for the selected date.");
+        return;
+      }
+
       let enquiryData = {
         ...formData,
-        date: selectedDate.toISOString(), // Use selectedDate instead of date
+        date: selectedDate.toISOString(),
       };
 
-      // Remove empty keys
       enquiryData = Object.fromEntries(
         Object.entries(enquiryData).filter(
           ([key, value]) => key.trim() !== "" && value !== ""
@@ -180,11 +230,30 @@ function SafariBooking() {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    if (view === "month" && tileDate < today) {
-      return "disabled-date";
-    }
-  };
+    let classes = [];
 
+    if (view === "month") {
+      if (tileDate < today) {
+        classes.push("disabled-date");
+      }
+
+      // Check if date is blocked
+      const isBlocked = bookingConfig.blockedDates.some((blockedDate) => {
+        const blockedDateObj = new Date(blockedDate);
+        return (
+          blockedDateObj.getFullYear() === tileDate.getFullYear() &&
+          blockedDateObj.getMonth() === tileDate.getMonth() &&
+          blockedDateObj.getDate() === tileDate.getDate()
+        );
+      });
+
+      if (isBlocked) {
+        classes.push("blocked-date");
+      }
+    }
+
+    return classes.join(" ");
+  };
   // Disable past dates in calendar
   const tileDisabled = ({ date: tileDate, view }) => {
     const today = new Date();
@@ -208,6 +277,22 @@ function SafariBooking() {
                   <i className="fas fa-calendar-alt"></i> Tadoba National Park
                   Booking
                 </h3>
+                {/* Cut-off time notification */}
+                {isAfterCutOff && (
+                  <div className="alert alert-warning">
+                    <i className="fas fa-exclamation-triangle"></i>{" "}
+                    Booking/Enquiry is closed for today. The last time for
+                    booking/enquiry was {bookingConfig.cutOffTime}.
+                  </div>
+                )}
+
+                {/* Blocked date notification */}
+                {isDateBlocked && (
+                  <div className="alert alert-danger">
+                    <i className="fas fa-ban"></i> Safari is not available on
+                    the selected date.
+                  </div>
+                )}
 
                 <div className="custom-safari-calendar">
                   <div className="calendar-header">
@@ -290,6 +375,20 @@ function SafariBooking() {
                   {selectedDate && (
                     <div className="selected-date-info">
                       Selected Date: {selectedDate.toLocaleDateString()}
+                      {isDateBlocked && (
+                        <div className="blocked-date-warning">
+                          <i className="fas fa-exclamation-triangle"></i>
+                          Safari is not available on this date. Please select
+                          another date.
+                        </div>
+                      )}
+                      {isAfterCutOff && (
+                        <div className="cutoff-warning">
+                          <i className="fas fa-clock"></i>
+                          Bookings/Enquiries are closed for today. The cut-off
+                          time was {bookingConfig.cutOffTime}.
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -422,7 +521,11 @@ function SafariBooking() {
                     {/* <button className="btn-book-now" onClick={handleBooking}>
                       <i className="fas fa-check-circle"></i> Book Now
                     </button> */}
-                    <button className="btn-enquiry" onClick={handleEnquiry}>
+                    <button
+                      className="btn-enquiry"
+                      onClick={handleEnquiry}
+                      disabled={isAfterCutOff || isDateBlocked}
+                    >
                       <i className="fas fa-question-circle"></i> Enquiry
                     </button>
                   </div>
@@ -514,6 +617,18 @@ function SafariBooking() {
                     <tr>
                       <td colSpan={3}>
                         Jeep Safari amounts is non refundable.
+                      </td>
+                    </tr>
+                    <tr>
+                      <td colSpan={3}>
+                        Welcome to the Tadoba National Park online safari
+                        booking platform. Here, visitors can conveniently
+                        reserve Jeep seats in advance through our online
+                        service. The entire booking process for Tadoba Safari
+                        Jeeps is overseen and managed by the park's forest
+                        officials. Safari tours are available in both the core
+                        and buffer zones of the park in the stipulated time
+                        slots mentioned above.
                       </td>
                     </tr>
                     <tr>
@@ -621,7 +736,25 @@ function SafariBooking() {
                   </table>
                   {selectedDate && (
                     <div className="selected-date-info">
-                      Selected Date: {selectedDate.toLocaleDateString()}
+                      {selectedDate && (
+                        <div className="selected-date-info">
+                          Selected Date: {selectedDate.toLocaleDateString()}
+                          {isDateBlocked && (
+                            <div className="blocked-date-warning">
+                              <i className="fas fa-exclamation-triangle"></i>
+                              Safari is not available on this date. Please
+                              select another date.
+                            </div>
+                          )}
+                          {isAfterCutOff && (
+                            <div className="cutoff-warning">
+                              <i className="fas fa-clock"></i>
+                              Bookings/Enquiries are closed for today. The
+                              cut-off time was {bookingConfig.cutOffTime}.
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -662,6 +795,7 @@ function SafariBooking() {
                           id="vehicleType"
                           onChange={handleChange}
                         >
+                          <option value="">Select Velhical</option>
                           <option value="Jeep">Jeep</option>
                           <option value="Canter">Canter</option>
                         </select>
@@ -751,16 +885,20 @@ function SafariBooking() {
                   </div>
                   {/* Action Buttons */}
                   {!selectedDate && (
-                      <p className="error-message">
-                        Please select a date for your safari
-                      </p>
-                    )}
+                    <p className="error-message">
+                      Please select a date for your safari
+                    </p>
+                  )}
                   <div className="action-buttons d-flex ">
                     {/* <button className="btn-book-now" onClick={handleBooking}>
                       <i className="fas fa-check-circle"></i> Book Now
                     </button> */}
 
-                    <button className="btn-enquiry" onClick={handleEnquiry}>
+                    <button
+                      className="btn-enquiry"
+                      onClick={handleEnquiry}
+                      disabled={isAfterCutOff || isDateBlocked}
+                    >
                       <i className="fas fa-question-circle"></i> Enquiry
                     </button>
                   </div>

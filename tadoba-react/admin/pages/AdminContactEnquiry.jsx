@@ -248,11 +248,13 @@ const AdminContactEnquiries = () => {
       title: "Email",
       dataIndex: "email",
       key: "email",
+      width:'180px',
     },
     {
       title: "Phone",
       dataIndex: "phone",
       key: "phone",
+      width:'100px'
     },
     {
       title: "Message",
@@ -420,6 +422,7 @@ const AdminContactEnquiries = () => {
         bordered
         size="middle"
         rowClassName={(record, index) => index % 2 === 0 ? "table-row-light" : "table-row-dark"}
+        className="black-bordered-table"
       />
 
       {/* Contact Details Modal */}
@@ -522,6 +525,38 @@ const AdminContactEnquiries = () => {
         }
         .contact-info-section p {
           margin-bottom: 8px;
+        }
+           .black-bordered-table table {
+          border: 1px solid #000 !important;
+        }
+        .black-bordered-table th,
+        .black-bordered-table td {
+          border: 1px solid #000 !important;
+        }
+        .black-bordered-descriptions table {
+          border: 1px solid #000 !important;
+          
+        }
+        .black-bordered-descriptions th,
+        .black-bordered-descriptions td {
+          border: 1px solid #000 !important;
+        }
+        .black-bordered-descriptions th{
+          background-color: #2c5f2d !important;
+          color: #fff !important;
+        }
+        .black-bordered-table th {
+          background-color: #2c5f2d !important;
+          color: #fff !important;
+        }
+          
+        .black-bordered-table
+          .ant-table-column-sort
+          .ant-table-column-sorter-up.active,
+        .black-bordered-table
+          .ant-table-column-sort
+          .ant-table-column-sorter-down.active {
+          color: #ff4d4f; 
         }
       `}</style>
     </Card>

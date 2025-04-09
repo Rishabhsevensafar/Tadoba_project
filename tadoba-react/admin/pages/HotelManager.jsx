@@ -305,6 +305,7 @@ const HotelManager = () => {
     ];
 
     return (
+        <>
         <Card className="shadow-md">
             <div className="p-6">
                 <div className="flex justify-between items-center mb-6">
@@ -337,7 +338,7 @@ const HotelManager = () => {
                         showSizeChanger: true,
                         showTotal: (total, range) => `${range[0]}-${range[1]} of ${total} hotels`
                     }}
-
+                    className='black-bordered-table'
                     bordered
                 />
 
@@ -614,6 +615,51 @@ const HotelManager = () => {
                 </Modal>
             </div>
         </Card>
+        <style jsx>{`
+        .table-row-light {
+          background-color: #ffffff;
+        }
+        .table-row-dark {
+          background-color: #f9f9f9;
+        }
+        .shadow-md {
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .black-bordered-table table {
+          border: 1px solid #000 !important;
+        }
+        .black-bordered-table th,
+        .black-bordered-table td {
+          border: 1px solid #000 !important;
+        }
+        .black-bordered-descriptions table {
+          border: 1px solid #000 !important;
+        }
+        .black-bordered-descriptions th,
+        .black-bordered-descriptions td {
+          border: 1px solid #000 !important;
+        }
+        .black-bordered-descriptions th {
+          background-color: #2c5f2d !important;
+          color: #fff !important;
+        }
+        .black-bordered-table th {
+          background-color: #2c5f2d !important;
+          color: #fff !important;
+        }
+        .black-bordered-table .ant-table-column-sorter {
+          color: #fff;
+        }
+        .black-bordered-table
+          .ant-table-column-sort
+          .ant-table-column-sorter-up.active,
+        .black-bordered-table
+          .ant-table-column-sort
+          .ant-table-column-sorter-down.active {
+          color: #ff4d4f;
+        }
+      `}</style>
+      </>
     );
 };
 

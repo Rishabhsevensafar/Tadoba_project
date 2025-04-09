@@ -34,12 +34,6 @@ function About() {
                   area of approx 1727 square kms. In the year 1986 Andhari
                   Wildlife sanctuary came into existence and later it was
                   diluted with the area of Tadoba National Park.
-                  river that flows through the area Andhari. Tadoba National
-                  Park is one of the biggest and oldest national parks of
-                  Maharashtra which was created in the year 1955 sprawl over an
-                  area of approx 1727 square kms. In the year 1986 Andhari
-                  Wildlife sanctuary came into existence and later it was
-                  diluted with the area of Tadoba National Park.
                 </p>
                 <h3>Our Excellence</h3>
                 <p>

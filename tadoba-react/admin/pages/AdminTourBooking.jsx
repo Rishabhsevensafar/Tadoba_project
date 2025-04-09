@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Table, Button, Tag, message, Popconfirm, Modal, Space, Card, Input, DatePicker, Select, Tooltip } from 'antd';
-import { DownloadOutlined, EyeOutlined, CheckOutlined, CloseOutlined, SearchOutlined } from '@ant-design/icons';
+import { Table, Button, Tag, message, Modal, Space, Card, Input, DatePicker, Select, Tooltip } from 'antd';
+import { DownloadOutlined, EyeOutlined, SearchOutlined, EditOutlined } from '@ant-design/icons';
 import moment from 'moment';
 import { CSVLink } from 'react-csv';
 
@@ -13,10 +13,13 @@ const TourBookingReport = () => {
     const [filteredBookings, setFilteredBookings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+    const [isEditStatusModalOpen, setIsEditStatusModalOpen] = useState(false);
     const [selectedBooking, setSelectedBooking] = useState(null);
+    const [newStatus, setNewStatus] = useState('');
     const [searchText, setSearchText] = useState('');
     const [statusFilter, setStatusFilter] = useState('all');
     const [dateRange, setDateRange] = useState([]);
+    const [statusUpdateLoading, setStatusUpdateLoading] = useState(false);
 
     useEffect(() => {
         fetchBookings();
@@ -73,27 +76,55 @@ const TourBookingReport = () => {
         setIsViewModalOpen(true);
     };
 
-    const updateBookingStatus = async (id, newStatus) => {
+    const handleEditStatus = (booking) => {
+        setSelectedBooking(booking);
+        setNewStatus(booking.paymentStatus);
+        setIsEditStatusModalOpen(true);
+    };
+
+    const updateBookingStatus = async () => {
+        if (!selectedBooking || !newStatus) return;
+
         try {
-            await axios.put(`http://localhost:5000/api/tourbooking/${id}/status`, { paymentStatus: newStatus });
-            message.success("Booking status updated successfully");
-            fetchBookings();
+            setStatusUpdateLoading(true);
+            // Replace with your actual API endpoint
+            const response = await axios.put(`http://localhost:5000/api/tourbooking/${selectedBooking._id}/status`, {
+                paymentStatus: newStatus
+            });
+
+            if (response.data.success) {
+                message.success("Payment status updated successfully");
+                
+                // Update the status in both arrays
+                const updatedBookings = bookings.map(booking => 
+                    booking._id === selectedBooking._id 
+                        ? { ...booking, paymentStatus: newStatus } 
+                        : booking
+                );
+                setBookings(updatedBookings);
+                
+                setIsEditStatusModalOpen(false);
+            } else {
+                message.error("Failed to update payment status");
+            }
         } catch (error) {
-            message.error("Failed to update booking");
-            console.error("Error updating booking:", error);
+            console.error("Error updating status:", error);
+            message.error("Failed to update payment status");
+        } finally {
+            setStatusUpdateLoading(false);
         }
     };
 
     const getStatusTag = (status) => {
         const statusConfig = {
-            "paid": { color: "green", icon: <CheckOutlined /> },
-            "pending": { color: "red", icon: <CloseOutlined /> },
-            "confirmed": { color: "blue", icon: <CheckOutlined /> }
+            "paid": { color: "green", text: "PAYMENT SUCCESSFUL" },
+            "pending": { color: "orange", text: "PAYMENT PENDING" },
+            "failed": { color: "red", text: "PAYMENT FAILED" }
         };
         
         return (
-            <Tag color={statusConfig[status]?.color || 'orange'} icon={statusConfig[status]?.icon}>
-                {status ? status.toUpperCase() : "PENDING"}
+            <Tag color={statusConfig[status]?.color || 'orange'}>
+                {statusConfig[status]?.text || "PENDING"}
             </Tag>
         );
     };
@@ -154,7 +185,7 @@ const TourBookingReport = () => {
             title: "Booking ID",
             dataIndex: "_id",
             key: "_id",
-            width: 120,
+            width: 100,
             render: (text) => text ? text.substring(0, 8) + '...' : 'N/A'
         },
         {
@@ -196,7 +227,8 @@ const TourBookingReport = () => {
                     <div><strong>Persons:</strong> {record.numPersons || 0}</div>
                     <div><strong>Rooms:</strong> {record.numRooms || 0}</div>
                 </div>
-            )
+            ),
+            width: 80
         },
         {
             title: "Amount",
@@ -208,13 +240,13 @@ const TourBookingReport = () => {
             title: "Status",
             dataIndex: "paymentStatus",
             key: "paymentStatus",
-            width: 120,
+            width: 140,
             render: (status) => getStatusTag(status)
         },
         {
             title: "Actions",
             key: "actions",
-            width: 150,
+            width: 120,
             render: (_, record) => (
                 <Space>
                     <Tooltip title="View details">
@@ -223,22 +255,12 @@ const TourBookingReport = () => {
                             onClick={() => handleView(record)}
                         />
                     </Tooltip>
-                    
-                    {record.paymentStatus !== "paid" && (
-                        <Popconfirm
-                            title={`Mark this booking as paid?`}
-                            onConfirm={() => updateBookingStatus(record._id, "paid")}
-                            okText="Yes"
-                            cancelText="No"
-                        >
-                            <Tooltip title="Mark as paid">
-                                <Button 
-                                    type="primary" 
-                                    icon={<CheckOutlined />}
-                                />
-                            </Tooltip>
-                        </Popconfirm>
-                    )}
+                    <Tooltip title="Edit status">
+                        <Button 
+                            icon={<EditOutlined />}
+                            onClick={() => handleEditStatus(record)}
+                        />
+                    </Tooltip>
                 </Space>
             )
         }
@@ -258,9 +280,31 @@ const TourBookingReport = () => {
             'Number of Persons': booking.numPersons || 0,
             'Number of Rooms': booking.numRooms || 0,
             'Total Price': booking.totalPrice || 0,
-            'Payment Status': booking.paymentStatus ? booking.paymentStatus.toUpperCase() : 'PENDING',
+            'Payment Status': booking.paymentStatus === 'paid' ? 'PAYMENT SUCCESSFUL' : 
+                             booking.paymentStatus === 'failed' ? 'PAYMENT FAILED' : 'PAYMENT PENDING',
             'Created At': booking.createdAt ? moment(booking.createdAt).format("DD-MM-YYYY HH:mm") : 'N/A'
         }));
+    };
+
+    // Custom table styles
+    const tableStyles = {
+        table: {
+            border: '1px solid black',
+            borderCollapse: 'collapse'
+        },
+        thead: {
+            backgroundColor: '#f0f0f0', // Light gray background for headers
+            fontWeight: 'bold'
+        },
+        th: {
+            border: '1px solid black',
+            padding: '12px',
+            backgroundColor: '#e6f7ff' // Light blue background for header cells
+        },
+        td: {
+            border: '1px solid black',
+            padding: '8px'
+        }
     };
 
     return (
@@ -298,12 +342,12 @@ const TourBookingReport = () => {
                             placeholder="Filter by status"
                             value={statusFilter}
                             onChange={value => setStatusFilter(value)}
-                            style={{ width: 150 }}
+                            style={{ width: 180 }}
                         >
                             <Option value="all">All Status</Option>
-                            <Option value="pending">Pending</Option>
-                            <Option value="paid">Paid</Option>
-                            <Option value="confirmed">Confirmed</Option>
+                            <Option value="pending">Payment Pending</Option>
+                            <Option value="paid">Payment Successful</Option>
+                            <Option value="failed">Payment Failed</Option>
                         </Select>
                         
                         <RangePicker 
@@ -324,10 +368,43 @@ const TourBookingReport = () => {
                         showSizeChanger: true,
                         showTotal: (total) => `Total ${total} bookings`
                     }}
-                    scroll={{ x: 'max-content' }}
+                    // scroll={{ x: 'max-content' }}
+                    className="custom-table black-bordered-table"
+                    // Apply custom styles
+                    components={{
+                        header: {
+                            cell: props => (
+                                <th style={tableStyles.th} {...props} />
+                            )
+                        },
+                        body: {
+                            cell: props => (
+                                <td style={tableStyles.td} {...props} />
+                            )
+                        }
+                    }}
                 />
+                
+                {/* Add custom CSS for table styling */}
+                <style jsx>{`
+                    .custom-table th {
+                        background-color: #e6f7ff;
+                        border: 1px solid black !important;
+                    }
+                    .custom-table td {
+                        border: 1px solid black !important;
+                    }
+                    .ant-table-thead > tr > th {
+                        background-color: #e6f7ff;
+                        border: 1px solid black;
+                    }
+                    .ant-table-tbody > tr > td {
+                        border: 1px solid black;
+                    }
+                `}</style>
             </Card>
 
+            {/* View Booking Details Modal */}
             <Modal 
                 title={<><EyeOutlined style={{ marginRight: 8 }} />Booking Details</>}
                 open={isViewModalOpen} 
@@ -337,6 +414,79 @@ const TourBookingReport = () => {
             >
                 {renderBookingDetails(selectedBooking)}
             </Modal>
+
+            {/* Edit Status Modal */}
+            <Modal
+                title={<><EditOutlined style={{ marginRight: 8 }} />Update Payment Status</>}
+                open={isEditStatusModalOpen}
+                onCancel={() => setIsEditStatusModalOpen(false)}
+                footer={[
+                    <Button key="cancel" onClick={() => setIsEditStatusModalOpen(false)}>
+                        Cancel
+                    </Button>,
+                    <Button 
+                        key="submit" 
+                        type="primary" 
+                        loading={statusUpdateLoading}
+                        onClick={updateBookingStatus}
+                    >
+                        Update Status
+                    </Button>
+                ]}
+            >
+                <div style={{ marginBottom: 16 }}>
+                    <p><strong>Booking ID:</strong> {selectedBooking?._id}</p>
+                    <p><strong>Customer:</strong> {selectedBooking?.name}</p>
+                    <p><strong>Current Status:</strong> {selectedBooking && getStatusTag(selectedBooking.paymentStatus)}</p>
+                </div>
+                
+                <div>
+                    <p><strong>New Status:</strong></p>
+                    <Select
+                        style={{ width: '100%' }}
+                        value={newStatus}
+                        onChange={value => setNewStatus(value)}
+                    >
+                        <Option value="pending">Payment Pending</Option>
+                        <Option value="paid">Payment Successful</Option>
+                        <Option value="failed">Payment Failed</Option>
+                    </Select>
+                </div>
+            </Modal>
+            <style jsx>{`
+             .black-bordered-table table {
+          border: 1px solid #000 !important;
+        }
+        .black-bordered-table th,
+        .black-bordered-table td {
+          border: 1px solid #000 !important;
+        }
+        .black-bordered-descriptions table {
+          border: 1px solid #000 !important;
+          
+        }
+        .black-bordered-descriptions th,
+        .black-bordered-descriptions td {
+          border: 1px solid #000 !important;
+        }
+        .black-bordered-descriptions th{
+          background-color: #2c5f2d !important;
+          color: #fff !important;
+        }
+        .black-bordered-table th {
+          background-color: #2c5f2d !important;
+          color: #fff !important;
+        }
+          
+        .black-bordered-table
+          .ant-table-column-sort
+          .ant-table-column-sorter-up.active,
+        .black-bordered-table
+          .ant-table-column-sort
+          .ant-table-column-sorter-down.active {
+          color: #ff4d4f; 
+        }
+            `}</style>
         </div>
     );
 };
