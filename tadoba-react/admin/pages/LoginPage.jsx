@@ -3,11 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
 
-
-// Import your preferred toast library
-// import { toast, Toaster } from "react-hot-toast";
-
-const LoginPage = () => {
+const AdminLogin = () => {
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(false);
@@ -31,18 +27,16 @@ const LoginPage = () => {
         "http://localhost:5000/api/admin/auth/login",
         formData
       );
-      const token = response.data.token; // ✅ now it's defined
-      const decoded = jwtDecode(token);  // ✅ safe to decode now
+      const token = response.data.token;
+      const decoded = jwtDecode(token);
   
       localStorage.setItem("adminToken", token);
       localStorage.setItem("admin-role", decoded.role);
   
-      // Toast message (replace with your preferred method)
       alert("Login successful!");
       
       setTimeout(() => navigate("/admin/dashboard"), 1000);
     } catch (error) {
-      // Toast error message (replace with your preferred method)
       alert(error.response?.data?.message || "Invalid email or password");
     } finally {
       setLoading(false);
@@ -50,26 +44,25 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="login-container">
-      {/* Add your toast component here if using a toast library */}
-      <div className="login-card">
+    <div className="adm_login_container">
+      <div className="adm_login_card">
         {/* Header */}
-        <div className="login-header">
-          <h1 className="header-title">Admin Portal</h1>
+        <div className="adm_login_header">
+          <h1 className="adm_header_title">Admin Portal</h1>
         </div>
 
         {/* Form Content */}
-        <div className="login-body">
-          <p className="login-subtitle">Please login to continue</p>
+        <div className="adm_login_body">
+          <p className="adm_login_subtitle">Please login to continue</p>
 
-          <form onSubmit={handleLogin} className="login-form">
+          <form onSubmit={handleLogin} className="adm_login_form">
             {/* Email Field */}
-            <div className="form-group">
-              <label htmlFor="email" className="form-label">
+            <div className="adm_form_group">
+              <label htmlFor="email" className="adm_form_label">
                 Email Address
               </label>
-              <div className="input-container">
-                <div className="input-icon">
+              <div className="adm_input_wrapper">
+                <div className="adm_input_icon">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                     <circle cx="12" cy="7" r="4"></circle>
@@ -82,19 +75,19 @@ const LoginPage = () => {
                   required
                   value={formData.email}
                   onChange={handleChange}
-                  className="form-input"
+                  className="adm_form_input"
                   placeholder="admin@example.com"
                 />
               </div>
             </div>
 
             {/* Password Field */}
-            <div className="form-group">
-              <label htmlFor="password" className="form-label">
+            <div className="adm_form_group">
+              <label htmlFor="password" className="adm_form_label">
                 Password
               </label>
-              <div className="input-container">
-                <div className="input-icon">
+              <div className="adm_input_wrapper">
+                <div className="adm_input_icon">
                   <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
                     <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
@@ -107,11 +100,11 @@ const LoginPage = () => {
                   required
                   value={formData.password}
                   onChange={handleChange}
-                  className="form-input"
+                  className="adm_form_input"
                   placeholder="Enter your password"
                   minLength={6}
                 />
-                <div className="password-toggle" onClick={() => setShowPassword(!showPassword)}>
+                <div className="adm_password_toggle" onClick={() => setShowPassword(!showPassword)}>
                   {showPassword ? (
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
@@ -128,21 +121,21 @@ const LoginPage = () => {
             </div>
 
             {/* Remember Me & Forgot Password */}
-            <div className="form-extras">
-              <div className="remember-me">
+            <div className="adm_form_extras">
+              <div className="adm_remember_wrapper">
                 <input
                   id="remember-me"
                   name="remember-me"
                   type="checkbox"
                   checked={rememberMe}
                   onChange={() => setRememberMe(!rememberMe)}
-                  className="checkbox"
+                  className="adm_checkbox"
                 />
-                <label htmlFor="remember-me" className="checkbox-label">
+                <label htmlFor="remember-me" className="adm_checkbox_label">
                   Remember me
                 </label>
               </div>
-              <a href="/admin/forgot-password" className="forgot-password">
+              <a href="/admin/forgot-password" className="adm_forgot_password">
                 Forgot password?
               </a>
             </div>
@@ -151,13 +144,13 @@ const LoginPage = () => {
             <button
               type="submit"
               disabled={loading}
-              className={`submit-button ${loading ? "loading" : ""}`}
+              className={`adm_submit_button ${loading ? "adm_loading" : ""}`}
             >
               {loading ? (
                 <>
-                  <svg className="spinner" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
-                    <circle className="spinner-circle" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
-                    <path className="spinner-path" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  <svg className="adm_spinner" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+                    <circle className="adm_spinner_circle" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
+                    <path className="adm_spinner_path" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                   Signing in...
                 </>
@@ -168,19 +161,19 @@ const LoginPage = () => {
           </form>
 
           {/* Divider */}
-          <div className="divider">
-            <span className="divider-text">Secure Login</span>
+          <div className="adm_divider">
+            <span className="adm_divider_text">Secure Login</span>
           </div>
 
           {/* Footer */}
-          <div className="login-footer">
-            <div className="secure-message">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="shield-icon">
+          <div className="adm_login_footer">
+            <div className="adm_secure_message">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="adm_shield_icon">
                 <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
               </svg>
               <span>This login is encrypted and secure</span>
             </div>
-            <p className="copyright">
+            <p className="adm_copyright">
               © {new Date().getFullYear()} Admin System
             </p>
           </div>
@@ -190,25 +183,20 @@ const LoginPage = () => {
   );
 };
 
-// Add this CSS style tag to your component or in your CSS file
+// New CSS with unique class names
 const styles = `
-  /* Reset and base styles */
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-
-  .login-container {
+  /* Admin Login specific styles with unique class names */
+  .adm_login_container {
     min-height: 100vh;
     display: flex;
     align-items: center;
     justify-content: center;
     background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
     padding: 20px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
   }
 
-  .login-card {
+  .adm_login_card {
     width: 100%;
     max-width: 400px;
     background-color: white;
@@ -217,56 +205,57 @@ const styles = `
     box-shadow: 0 10px 25px rgba(0,0,0,0.1);
   }
 
-  .login-header {
-    background: linear-gradient(90deg, #3860AC 0%, #2E4A97 100%);
+  .adm_login_header {
+    background: #3860AC;
     padding: 20px 0;
     text-align: center;
   }
 
-  .header-title {
+  .adm_header_title {
     color: white;
     font-size: 24px;
     font-weight: 600;
     margin: 0;
   }
 
-  .login-body {
-    padding: 10px 24px 10px 24px;
+  .adm_login_body {
+    padding: 20px 24px;
   }
 
-  .login-subtitle {
+  .adm_login_subtitle {
     color: #666;
     text-align: center;
     margin-bottom: 24px;
     font-size: 14px;
   }
 
-  .login-form {
+  .adm_login_form {
     display: flex;
     flex-direction: column;
     gap: 20px;
   }
 
-  .form-group {
+  .adm_form_group {
     display: flex;
     flex-direction: column;
     gap: 8px;
   }
 
-  .form-label {
+  .adm_form_label {
     font-size: 14px;
     font-weight: 500;
     color: #333;
-        padding: 0px;
+    padding: 0;
+    margin: 0;
   }
 
-  .input-container {
+  .adm_input_wrapper {
     position: relative;
     display: flex;
     align-items: center;
   }
 
-  .input-icon {
+  .adm_input_icon {
     position: absolute;
     left: 12px;
     color: #9ca3af;
@@ -274,7 +263,7 @@ const styles = `
     align-items: center;
   }
 
-  .form-input {
+  .adm_form_input {
     width: 100%;
     padding: 12px 12px 12px 40px;
     border: 1px solid #d1d5db;
@@ -284,52 +273,54 @@ const styles = `
     outline: none;
   }
 
-  .form-input:focus {
+  .adm_form_input:focus {
     border-color: #3860AC;
     box-shadow: 0 0 0 3px rgba(56, 96, 172, 0.1);
   }
 
-  .password-toggle {
+  .adm_password_toggle {
     position: absolute;
     right: 12px;
     color: #9ca3af;
     cursor: pointer;
   }
 
-  .form-extras {
+  .adm_form_extras {
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
 
-  .remember-me {
+  .adm_remember_wrapper {
     display: flex;
     align-items: center;
     gap: 8px;
   }
 
-  .checkbox {
+  .adm_checkbox {
     width: 16px;
     height: 16px;
     accent-color: #3860AC;
   }
 
-  .checkbox-label {
+  .adm_checkbox_label {
     font-size: 14px;
     color: #4b5563;
+    margin: 0;
+    padding: 0;
   }
 
-  .forgot-password {
+  .adm_forgot_password {
     font-size: 14px;
     color: #3860AC;
     text-decoration: none;
   }
 
-  .forgot-password:hover {
+  .adm_forgot_password:hover {
     text-decoration: underline;
   }
 
-  .submit-button {
+  .adm_submit_button {
     display: flex;
     justify-content: center;
     align-items: center;
@@ -346,20 +337,20 @@ const styles = `
     transition: background-color 0.15s ease-in-out;
   }
 
-  .submit-button:hover:not(:disabled) {
+  .adm_submit_button:hover:not(:disabled) {
     background-color: #2E4A97;
   }
 
-  .submit-button:disabled {
+  .adm_submit_button:disabled {
     background-color: #93a8d6;
     cursor: not-allowed;
   }
 
-  .spinner {
-    animation: spin 1s linear infinite;
+  .adm_spinner {
+    animation: adm_spin 1s linear infinite;
   }
 
-  @keyframes spin {
+  @keyframes adm_spin {
     from {
       transform: rotate(0deg);
     }
@@ -368,13 +359,13 @@ const styles = `
     }
   }
 
-  .divider {
+  .adm_divider {
     position: relative;
     margin: 24px 0;
     text-align: center;
   }
 
-  .divider::before {
+  .adm_divider::before {
     content: "";
     position: absolute;
     top: 50%;
@@ -384,7 +375,7 @@ const styles = `
     background-color: #e5e7eb;
   }
 
-  .divider-text {
+  .adm_divider_text {
     position: relative;
     display: inline-block;
     padding: 0 10px;
@@ -393,11 +384,12 @@ const styles = `
     font-size: 14px;
   }
 
-  .login-footer {
+  .adm_login_footer {
     text-align: center;
+    margin-top: 20px;
   }
 
-  .secure-message {
+  .adm_secure_message {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -407,13 +399,14 @@ const styles = `
     font-size: 14px;
   }
 
-  .shield-icon {
+  .adm_shield_icon {
     color: #10b981;
   }
 
-  .copyright {
+  .adm_copyright {
     color: #9ca3af;
     font-size: 12px;
+    margin: 0;
   }
 `;
 
@@ -421,7 +414,7 @@ export default () => {
   return (
     <>
       <style>{styles}</style>
-      <LoginPage />
+      <AdminLogin />
     </>
   );
 };

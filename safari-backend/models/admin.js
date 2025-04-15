@@ -9,9 +9,11 @@ const adminSchema = new mongoose.Schema({
   avatar: { type: String },
   role: {
     type: String,
-    enum: ["admin", "sales", "seo"],
-    default: "admin",
   },
+  dob: { type: Date },
+  address: { type: String },
+  permissions: [{ type: String }], // e.g., ['dashboard', 'blogs', 'bookings']
+  isActive: { type: Boolean, default: true },
 });
 
 adminSchema.pre("save", async function (next) {

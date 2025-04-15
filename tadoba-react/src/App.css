@@ -1797,3 +1797,11 @@ input {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
 }
+/* Sidebar font override */
+.ant-menu,
+.ant-menu-item,
+.ant-menu-submenu-title,
+.ant-menu-item-icon,
+.ant-menu-sub {
+  font-family: 'Poppins', sans-serif !important;
+}

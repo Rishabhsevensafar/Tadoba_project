@@ -25,8 +25,8 @@ router.get("/profile", adminAuth, async (req, res) => {
 });
 
 router.put("/profile", adminAuth, upload.single("avatar"), async (req, res) => {
-  const { email, name, contactNumber } = req.body;
-  const updates = { email, name, contactNumber };
+  const { email, name, contactNumber, dob, address } = req.body;
+  const updates = { email, name, contactNumber, dob, address };
 
   if (req.file) {
     updates.avatar = `/uploads/admin/avatar/${req.file.filename}`;
@@ -51,4 +51,63 @@ router.put("/change-password", adminAuth, async (req, res) => {
 
   res.json({ success: true, message: "Password updated successfully" });
 });
+
+router.post("/create-user", adminAuth, async (req, res) => {
+  const { email, password, role = "sales", permissions=[] } = req.body;
+
+  // ✅ Only admin can create another admin
+  if (role === "admin" && req.user?.role !== "admin") {
+    return res.status(403).json({ message: "Only admins can create other admins." });
+  }
+
+  if (!email || !password || !role) {
+    return res.status(400).json({ message: "All fields are required" });
+  }
+  if (role === "admin" && req.user?.role !== "admin") {
+    return res.status(403).json({ message: "Only admins can create other admins." });
+  }
+  // ✅ Allow custom roles  
+
+  const existing = await Admin.findOne({ email });
+  if (existing) {
+    return res.status(409).json({ message: "User already exists" });
+  }
+
+  const newUser = new Admin({ email, password, role, permissions });
+  await newUser.save();
+
+  res.json({ success: true, message: `${role.toUpperCase()} user created`, user: newUser });
+});
+router.get("/users", adminAuth, async (req, res) => {
+  try {
+    const users = await Admin.find({}, "email role isActive createdAt dob address permissions");// ✅ include isActive
+    res.json(users);
+  } catch (err) {
+    res.status(500).json({ message: "Failed to fetch users" });
+  }
+});
+// ✅ Update user (email or role)
+router.put("/user/:id", adminAuth, async (req, res) => {
+  const { email, role, permissions=[] } = req.body;
+  const user = await Admin.findByIdAndUpdate(req.params.id, { email, role, permissions }, { new: true });
+  res.json({ success: true, user });
+});
+
+// ✅ Toggle active status
+router.put("/user/:id/toggle", adminAuth, async (req, res) => {
+  const user = await Admin.findById(req.params.id);
+  if (!user) return res.status(404).json({ message: "User not found" });
+
+  user.isActive = !user.isActive;
+  await user.save();
+
+  res.json({ success: true, message: "Status updated", user });
+});
+
+// ✅ Delete user
+router.delete("/user/:id", adminAuth, async (req, res) => {
+  await Admin.findByIdAndDelete(req.params.id);
+  res.json({ success: true, message: "User deleted" });
+});
+
 module.exports = router;

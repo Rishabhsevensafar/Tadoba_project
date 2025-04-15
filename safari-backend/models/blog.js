@@ -6,8 +6,10 @@ const blogSchema = new mongoose.Schema({
   image: { type: String },
   author: { type: mongoose.Schema.Types.ObjectId, ref: "Admin", required: true },
   tags: [{ type: String }],
-  status: { type: String, enum: ["Draft", "Published"], default: "Draft" }
-}, { 
+  status: { type: String, enum: ["Draft", "Published"], default: "Draft" },
+  metaTitle: { type: String },
+  metaDescription: { type: String },
+}, {
   timestamps: true // This automatically adds and manages createdAt and updatedAt
 });
 

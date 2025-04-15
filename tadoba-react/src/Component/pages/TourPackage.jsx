@@ -31,8 +31,8 @@ function TourPackage() {
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []); 
-  
+  }, []);
+
   const fetchPackages = async () => {
     try {
       const response = await axios.get("http://localhost:5000/api/tourpackage");
@@ -54,35 +54,59 @@ function TourPackage() {
     <>
       <Header></Header>
       <div>
-      <div>
-        {isMobile ? (
-          <Slider {...sliderSettings}>
-            <div>
-              <img src={tourPckages} className="tourPackageImg" alt="Tour Package 1" />
+        <div>
+          {isMobile ? (
+            <Slider {...sliderSettings}>
+              <div>
+                <img
+                  src={tourPckages}
+                  className="tourPackageImg"
+                  alt="Tour Package 1"
+                />
+              </div>
+              <div>
+                <img
+                  src={tourPckages2}
+                  className="tourPackageImg"
+                  alt="Tour Package 2"
+                />
+              </div>
+              <div>
+                <img
+                  src={tourPckages3}
+                  className="tourPackageImg"
+                  alt="Tour Package 3"
+                />
+              </div>
+            </Slider>
+          ) : (
+            <div className="row">
+              <div className="col-sm-12 col-md-4 col-lg-4 p-0">
+                <img
+                  src={tourPckages}
+                  className="tourPackageImg pe-lg-1"
+                  alt="Tour Package 1"
+                />
+              </div>
+              <div className="col-sm-12 col-md-4 col-lg-4 p-0">
+                <img
+                  src={tourPckages2}
+                  className="tourPackageImg pe-lg-1"
+                  alt="Tour Package 2"
+                />
+              </div>
+              <div className="col-sm-12 col-md-4 col-lg-4 p-0">
+                <img
+                  src={tourPckages3}
+                  className="tourPackageImg"
+                  alt="Tour Package 3"
+                />
+              </div>
             </div>
-            <div>
-              <img src={tourPckages2} className="tourPackageImg" alt="Tour Package 2" />
-            </div>
-            <div>
-              <img src={tourPckages3} className="tourPackageImg" alt="Tour Package 3" />
-            </div>
-          </Slider>
-        ) : (
-          <div className="row">
-            <div className="col-sm-12 col-md-4 col-lg-4 p-0">
-              <img src={tourPckages} className="tourPackageImg pe-lg-1" alt="Tour Package 1" />
-            </div>
-            <div className="col-sm-12 col-md-4 col-lg-4 p-0">
-              <img src={tourPckages2} className="tourPackageImg pe-lg-1" alt="Tour Package 2" />
-            </div>
-            <div className="col-sm-12 col-md-4 col-lg-4 p-0">
-              <img src={tourPckages3} className="tourPackageImg" alt="Tour Package 3" />
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
-      </div>
-      
+
       <section className="packagelisting leaf">
         <div className="container">
           <div className="row">

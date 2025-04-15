@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import {
   Layout,
@@ -11,14 +11,11 @@ import {
   theme,
   Modal,
   ConfigProvider,
-  Calendar,
 } from "antd";
 import {
   Binoculars,
-  Building,
   Building2,
   Compass,
-  CreditCard,
   Gauge,
   Map,
   MapPin,
@@ -29,33 +26,36 @@ import {
   Package,
   HelpCircle,
   Hotel,
-  DollarSign,
-  Home,
   Settings,
   LogOut,
   User,
   IndianRupee,
-  Calendar1Icon
+  Calendar1Icon,
 } from "lucide-react";
-import { UserOutlined, LogoutOutlined, MenuFoldOutlined, MenuUnfoldOutlined } from "@ant-design/icons";
+import {
+  UserOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+} from "@ant-design/icons";
+import axios from "axios";
+const BASE_URL = "http://localhost:5000";
 
 const { Header, Sider, Content } = Layout;
 const { Title } = Typography;
 const { SubMenu } = Menu;
 
-// Corbett National Park inspired theme colors
 const corbettTheme = {
   token: {
-    colorPrimary: "#2C5F2D", // Forest green
+    colorPrimary: "#2C5F2D",
     colorBgContainer: "#ffffff",
-    colorBgLayout: "#f5f7f2", // Light natural tone
+    colorBgLayout: "#f5f7f2",
     colorTextBase: "#333333",
     colorTextSecondary: "#666666",
-    colorBgElevated: "#edf3e7", // Light green bg for dropdowns
-    colorBorder: "#c9d8b6", // Light border color
-    colorSuccess: "#5a8a5a", // Dark green for success states
-    colorError: "#d25f5f", // Reddish for error/danger states
-    colorWarning: "#e6a23c", // Amber for warning states
+    colorBgElevated: "#edf3e7",
+    colorBorder: "#c9d8b6",
+    colorSuccess: "#5a8a5a",
+    colorError: "#d25f5f",
+    colorWarning: "#e6a23c",
   },
 };
 
@@ -65,50 +65,89 @@ const DashboardPage = () => {
   const [collapsed, setCollapsed] = useState(false);
   const { token } = theme.useToken();
   const role = localStorage.getItem("admin-role");
+  const [logoUrl, setLogoUrl] = useState(null);
+  const [permissions, setPermissions] = useState([]);
+  const [adminProfile, setAdminProfile] = useState({
+    name: "Admin",
+    avatar: null,
+  });
 
   const handleLogout = () => {
     Modal.confirm({
       title: "Are you sure you want to logout?",
       icon: <LogOut size={20} style={{ color: token.colorError }} />,
       okText: "Logout",
-      cancelText: "Cancel", 
+      cancelText: "Cancel",
       okButtonProps: { danger: true },
       onOk: () => {
         localStorage.removeItem("adminToken");
+        localStorage.removeItem("admin-role");
         navigate("/admin/login");
       },
     });
   };
+  useEffect(() => {
+    axios.get(`${BASE_URL}/api/global-setting`).then((res) => {
+      if (res.data.logoUrl) {
+        setLogoUrl(`${BASE_URL}${res.data.logoUrl}`);
+      }
+    });
+  }, []);
+  useEffect(() => {
+    const fetchAdminProfile = async () => {
+      try {
+        const token = localStorage.getItem("adminToken");
+        const res = await axios.get("http://localhost:5000/api/profile/profile", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+  
+        setAdminProfile(res.data);
+        setPermissions(res.data.permissions || []);
+  
+        // ✅ Store permissions in localStorage for ProtectedRoute
+        localStorage.setItem("admin-permissions", JSON.stringify(res.data.permissions || []));
+      } catch (err) {
+        console.error("Failed to load admin profile", err);
+      }
+    };
+  
+    fetchAdminProfile();
+  }, []);
+  
 
   const menuItems = [
     {
       key: "dashboard",
       icon: <Gauge size={20} />,
       label: "Dashboard",
+      // permission: "dashboard",
       onClick: () => navigate("/admin/dashboard"),
     },
     {
       key: "enquiries",
       icon: <MessageCircle size={20} />,
       label: "Enquiries",
-      hidden: role === "seo", // ❌ hide for SEO
+      permission: "enquiries",
       children: [
         {
           key: "/admin/dashboard/safari-enquiry",
           icon: <Compass size={18} />,
           label: "Safari Enquiry",
+          permission: "enquiries",
           onClick: () => navigate("/admin/dashboard/safari-enquiry"),
         },
         {
           key: "/admin/dashboard/tour-enquiry",
           icon: <HelpCircle size={18} />,
           label: "Tour Enquiry",
+          permission: "enquiries",
           onClick: () => navigate("/admin/dashboard/tour-enquiry"),
         },
         {
           key: "/admin/dashboard/hotel-enquiry",
           icon: <Building2 size={18} />,
           label: "Hotel Enquiry",
+          // permission: "hotel-enquiry",
           onClick: () => navigate("/admin/dashboard/hotel-enquiry"),
         },
       ],
@@ -117,18 +156,20 @@ const DashboardPage = () => {
       key: "bookings",
       icon: <Map size={20} />,
       label: "Bookings",
-      hidden: role === "seo", // ❌ hide for SEO
+      permission: "bookings",
       children: [
         {
           key: "/admin/dashboard/safari-booking-report",
           icon: <Binoculars size={18} />,
           label: "Safari Bookings",
+          permission: "bookings",
           onClick: () => navigate("/admin/dashboard/safari-booking-report"),
         },
         {
           key: "/admin/dashboard/tour-booking",
           icon: <MapPin size={18} />,
           label: "Tour Bookings",
+          permission: "bookings",
           onClick: () => navigate("/admin/dashboard/tour-booking"),
         },
       ],
@@ -137,24 +178,27 @@ const DashboardPage = () => {
       key: "management",
       icon: <Package size={20} />,
       label: "Management",
-      hidden: role !== "admin", // ❌ hide for non-admin
+      permission: "manager",
       children: [
         {
           key: "/admin/dashboard/Packages",
           icon: <MapPin size={18} />,
           label: "Tour Packages",
+          permission: "manager",
           onClick: () => navigate("/admin/dashboard/Packages"),
         },
         {
           key: "/admin/dashboard/hotel-manager",
           icon: <Hotel size={18} />,
           label: "Hotel Manager",
+          permission: "manager",
           onClick: () => navigate("/admin/dashboard/hotel-manager"),
         },
         {
           key: "/admin/dashboard/date-config",
           icon: <Calendar1Icon size={18} />,
           label: "Date Config",
+          permission: "manager",
           onClick: () => navigate("/admin/dashboard/date-config"),
         },
       ],
@@ -163,31 +207,73 @@ const DashboardPage = () => {
       key: "/admin/dashboard/quick-payment",
       icon: <IndianRupee size={20} />,
       label: "Payments",
+      permission: "quick-payment",
       onClick: () => navigate("/admin/dashboard/quick-payment"),
-      hidden: role !== "admin", // ❌ hide for non-admin
     },
     {
       key: "/admin/dashboard/contact-enquiry",
       icon: <PhoneCall size={18} />,
       label: "Contact Enquiry",
+      permission: "contact-enquiry",
       onClick: () => navigate("/admin/dashboard/contact-enquiry"),
-      hidden: role !== "admin", // ❌ hide for non-admin
     },
     {
       key: "/admin/dashboard/blogs",
       icon: <Newspaper size={18} />,
       label: "Blogs",
+      permission: "blogs",
       onClick: () => navigate("/admin/dashboard/blogs"),
-      hidden: role === "sales", // ❌ hide for sales
     },
     {
       key: "/admin/dashboard/setting",
       icon: <Settings size={18} />,
       label: "Global Settings",
+      permission: "global-setting",
       onClick: () => navigate("/admin/dashboard/setting"),
-      hidden: role !== "admin", // ❌ hide for non-admin
+    },
+    {
+      key: "/admin/dashboard/user-manager",
+      icon: <User size={18} />,
+      label: "User Manager",
+      permission: "user-manager",
+      onClick: () => navigate("/admin/dashboard/user-manager"),
+    },
+    {
+      key: "/admin/dashboard/Role-manager",
+      icon: <User size={18} />,
+      label: "Role Manager",
+      permission: "user-manager",
+      onClick: () => navigate("/admin/dashboard/Role-manager"),
+    },
+    {
+      key: "/admin/dashboard/Permission-manager",
+      icon: <User size={18} />,
+      label: "Permission Manager",
+      permission: "user-manager",
+      onClick: () => navigate("/admin/dashboard/Permission-manager"),
     },
   ];
+  
+
+  const visibleMenuItems = menuItems
+  .filter((item) => {
+    if (role === "admin") return true;
+    return !item.permission || permissions.includes(item.permission);
+  })
+  .map((item) => {
+    if (item.children) {
+      const visibleChildren = item.children.filter(
+        (child) =>
+          role === "admin" || !child.permission || permissions.includes(child.permission)
+      );
+      if (visibleChildren.length > 0) {
+        return { ...item, children: visibleChildren };
+      }
+      return null;
+    }
+    return item;
+  })
+  .filter(Boolean);
 
   const userMenu = [
     {
@@ -195,12 +281,6 @@ const DashboardPage = () => {
       icon: <User size={16} />,
       label: "Profile",
       onClick: () => navigate("/admin/dashboard/Admin-profile"),
-    },
-    {
-      key: "settings",
-      icon: <Settings size={16} />,
-      label: "Settings",
-      onClick: () => navigate("/admin/dashboard/settings"),
     },
     {
       type: "divider",
@@ -217,7 +297,6 @@ const DashboardPage = () => {
   return (
     <ConfigProvider theme={corbettTheme}>
       <Layout style={{ minHeight: "100vh" }}>
-        {/* Sidebar */}
         <Sider
           trigger={null}
           collapsible
@@ -235,21 +314,30 @@ const DashboardPage = () => {
           width={240}
           theme="light"
         >
-          {/* Logo and Brand */}
           <div
             style={{
               padding: "20px 16px",
               textAlign: "center",
               borderBottom: `1px solid ${token.colorBorder}`,
-              background: token.colorPrimary,
+              // background: token.colorPrimary,
               display: "flex",
               alignItems: "center",
               justifyContent: collapsed ? "center" : "flex-start",
               paddingLeft: collapsed ? 0 : 24,
+              height: 64,
             }}
           >
-            <Binoculars size={24} color="#ffffff" />
-            {!collapsed && (
+            {logoUrl ? (
+              <img
+                src={logoUrl}
+                alt="Admin Logo"
+                style={{
+                  maxHeight: 40,
+                  maxWidth: "100%",
+                  objectFit: "contain",
+                }}
+              />
+            ) : (
               <Title
                 level={4}
                 style={{
@@ -264,28 +352,26 @@ const DashboardPage = () => {
             )}
           </div>
 
-          {/* Sidebar Menu */}
           <Menu
             mode="inline"
             selectedKeys={[location.pathname]}
-            defaultOpenKeys={collapsed ? [] : ["bookings", "enquiries", "management"]}
+            defaultOpenKeys={
+              collapsed ? [] : ["bookings", "enquiries", "management"]
+            }
             style={{
               borderRight: 0,
               backgroundColor: "transparent",
               padding: "12px 0",
             }}
           >
-            {menuItems.map((item) => {
+            {visibleMenuItems.map((item) => {
               if (item.children) {
                 return (
                   <SubMenu
                     key={item.key}
                     icon={item.icon}
                     title={item.label}
-                    style={{
-                      margin: "4px 8px",
-                      borderRadius: "8px",
-                    }}
+                    style={{ margin: "4px 8px", borderRadius: "8px" }}
                   >
                     {item.children.map((child) => (
                       <Menu.Item
@@ -322,7 +408,6 @@ const DashboardPage = () => {
           </Menu>
         </Sider>
 
-        {/* Main Content */}
         <Layout
           style={{
             marginLeft: collapsed ? 80 : 240,
@@ -330,7 +415,6 @@ const DashboardPage = () => {
             background: token.colorBgLayout,
           }}
         >
-          {/* Header */}
           <Header
             style={{
               padding: "0 24px",
@@ -359,7 +443,6 @@ const DashboardPage = () => {
                   justifyContent: "center",
                 }}
               />
-
             </div>
 
             <Space>
@@ -367,14 +450,16 @@ const DashboardPage = () => {
                 <Space
                   style={{
                     cursor: "pointer",
-                    // padding: "8px 12px",
-                    // borderRadius: "8px",
                     transition: "all 0.3s",
                     background: token.colorBgElevated,
-                    // border: `1px solid ${token.colorBorder}`,
                   }}
                 >
                   <Avatar
+                    src={
+                      adminProfile.avatar
+                        ? `http://localhost:5000${adminProfile.avatar}`
+                        : null
+                    }
                     style={{
                       backgroundColor: token.colorPrimary,
                       display: "flex",
@@ -382,24 +467,30 @@ const DashboardPage = () => {
                       justifyContent: "center",
                     }}
                     size={32}
+                    icon={!adminProfile.avatar && <UserOutlined />}
+                  />
+                  <span
+                    style={{ color: token.colorTextSecondary, fontWeight: 500 }}
                   >
-                    <UserOutlined />
-                  </Avatar>
-                  <span style={{ color: token.colorTextSecondary, fontWeight: 500 }}>
-                    Admin
+                    {adminProfile.name ||
+                      (role === "seo"
+                        ? "SEO"
+                        : role === "sales"
+                        ? "Sales"
+                        : "Admin")}
                   </span>
+
                   <ChevronDown size={16} color={token.colorTextSecondary} />
                 </Space>
               </Dropdown>
             </Space>
           </Header>
 
-          {/* Page Content */}
           <Content
             style={{
               margin: "24px",
               borderRadius: "12px",
-              backgroundColor: "transparent", 
+              backgroundColor: "transparent",
             }}
           >
             <Outlet />

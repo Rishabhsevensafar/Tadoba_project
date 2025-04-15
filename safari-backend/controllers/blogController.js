@@ -13,7 +13,7 @@ exports.createBlog = (req, res) => {
   upload(req, res, async (err) => {
     if (err) return res.status(500).json({ success: false, message: "Image upload failed" });
 
-    const { title, content, tags, status } = req.body;
+    const { title, content, tags, status, metaTitle, metaDescription } = req.body;
     const imageUrl = req.file ? `/uploads/blogs/${req.file.filename}` : "";
 
     try {
@@ -23,6 +23,8 @@ exports.createBlog = (req, res) => {
         image: imageUrl,
         tags: tags ? tags.split(",").map(tag => tag.trim()) : [],
         status,
+        metaTitle, 
+        metaDescription,
         author: req.user.id,
       });
 
@@ -36,7 +38,7 @@ exports.createBlog = (req, res) => {
 
 exports.getBlogs = async (req, res) => {
   try {
-    const blogs = await Blog.find().sort({ createdAt: -1 });
+    const blogs = await Blog.find().sort({ createdAt: -1 }).populate("author", "name");
     res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // Prevent caching
     res.status(200).json(blogs);
   } catch (error) {
@@ -46,7 +48,7 @@ exports.getBlogs = async (req, res) => {
 // ✅ Get All Published Blogs
 exports.getBlogsAdmin = async (req, res) => {
   try {
-      const blogs = await Blog.find().sort({ createdAt: -1 }); // ✅ Fetch all blogs
+      const blogs = await Blog.find().sort({ createdAt: -1 }).populate("author", "name"); // ✅ Fetch all blogs
       res.status(200).json({ success: true, blogs });
     } catch (error) {
       res.status(500).json({ success: false, message: error.message });
@@ -55,7 +57,7 @@ exports.getBlogsAdmin = async (req, res) => {
 // Get a single blog by ID
 exports.getBlogById = async (req, res) => {
   try {
-    const blog = await Blog.findById(req.params.id);
+    const blog = await Blog.findById(req.params.id).populate("author", "name");;
     if (!blog) {
       return res.status(404).json({ success: false, message: "Blog not found" });
     }
@@ -69,7 +71,7 @@ exports.updateBlog = async (req, res) => {
   upload(req, res, async (err) => {
     if (err) return res.status(500).json({ success: false, message: "Image upload failed" });
 
-    const { title, content, tags, status } = req.body;
+    const { title, content, tags, status, metaTitle, metaDescription } = req.body;
     const imageUrl = req.file ? `/uploads/blogs/${req.file.filename}` : req.body.image;
 
     try {
@@ -81,6 +83,8 @@ exports.updateBlog = async (req, res) => {
           image: imageUrl,
           tags: tags ? tags.split(",").map(tag => tag.trim()) : [],
           status,
+          metaTitle, 
+          metaDescription
         },
         { new: true } // Return the updated document
       );
