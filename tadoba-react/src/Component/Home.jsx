@@ -26,6 +26,7 @@ function Home() {
     
     return (
         <> 
+        <h1>SSR HOME PAGE</h1>
         <Header/>
         <Banner/>
         <About/>

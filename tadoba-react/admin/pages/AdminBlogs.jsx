@@ -104,19 +104,26 @@ const AdminBlogs = () => {
     setModalVisible(true);
     setFile(null);
     setImagePreview(blog?.image || null);
+
     if (blog) {
       form.setFieldsValue({
         title: blog.title,
-        content: blog.content,
+        slug: blog.slug, // ✅ Add this line
         tags: blog.tags.join(", "),
         status: blog.status,
         metaTitle: blog.metaTitle,
-        metaDescription: blog.metaDescription
+        metaDescription: blog.metaDescription,
+        metaKeywords: blog.metaKeywords,
       });
-      setContent(blog.content);
+      // Use setTimeout to ensure Quill is ready before setting content
+      setTimeout(() => {
+        setContent(blog.content || "");
+      }, 100);
     } else {
       form.resetFields();
-      setContent("");
+      setTimeout(() => {
+        setContent("");
+      }, 100);
     }
   };
 
@@ -131,14 +138,18 @@ const AdminBlogs = () => {
   };
 
   const handleSubmit = async (values) => {
+    if (!content || content.trim() === "") {
+      return message.error("Content is required.");
+    }
     const formData = new FormData();
     formData.append("title", values.title);
     formData.append("content", content);
+    formData.append("slug", values.slug || "");
     formData.append("tags", values.tags);
     formData.append("status", values.status);
     formData.append("metaTitle", values.metaTitle);
-formData.append("metaDescription", values.metaDescription);
-
+    formData.append("metaDescription", values.metaDescription);
+    formData.append("metaKeywords", values.metaKeywords);
 
     if (file) {
       formData.append("image", file);
@@ -185,6 +196,7 @@ formData.append("metaDescription", values.metaDescription);
       },
     });
   };
+
   const formatDate = (dateString) => {
     if (!dateString) return "-";
     const date = new Date(dateString);
@@ -224,6 +236,7 @@ formData.append("metaDescription", values.metaDescription);
 
     return `${Math.floor(seconds)} second${seconds === 1 ? "" : "s"} ago`;
   };
+
   const columns = [
     {
       title: "Image",
@@ -247,6 +260,13 @@ formData.append("metaDescription", values.metaDescription);
       title: "Title",
       dataIndex: "title",
       key: "title",
+      ellipsis: true,
+    },
+    {
+      title: "Slug",
+      dataIndex: "slug",
+      key: "slug",
+      render: (slug) => <Text copyable>{slug}</Text>,
       ellipsis: true,
     },
     {
@@ -362,7 +382,6 @@ formData.append("metaDescription", values.metaDescription);
         pagination={{ pageSize: 8 }}
         bordered
         size="middle"
-        // scroll={{ x: 'max-content' }}
         className="black-bordered-table"
       />
 
@@ -387,21 +406,26 @@ formData.append("metaDescription", values.metaDescription);
               </Form.Item>
             </Col>
 
+            <Text
+              type="warning"
+              style={{ display: "block", marginBottom: "8px" }}
+            >
+              Note: Image should not exceed 4MB and recommended size is
+              1024x1024 pixels.
+            </Text>
+
             <Col span={24}>
-              <Form.Item
-                name="content"
-                label="Content"
-                rules={[
-                  { required: true, message: "Blog content is required" },
-                ]}
-              >
+              <Form.Item label="Content" required>
                 <ReactQuill
                   theme="snow"
                   value={content}
-                  onChange={setContent}
+                  onChange={(value) => {
+                    setContent(value);
+                  }}
                   modules={modules}
                   formats={formats}
                   style={{ height: "300px", marginBottom: "40px" }}
+                  key={editingBlog?._id || "new"} // Add key to force remount
                 />
               </Form.Item>
             </Col>
@@ -472,6 +496,7 @@ formData.append("metaDescription", values.metaDescription);
                 </Upload>
               </Form.Item>
             </Col>
+
             <Col span={24}>
               <Form.Item
                 name="metaTitle"
@@ -479,6 +504,22 @@ formData.append("metaDescription", values.metaDescription);
                 rules={[{ required: true, message: "Meta title is required" }]}
               >
                 <Input placeholder="SEO Meta Title" />
+              </Form.Item>
+            </Col>
+            <Col span={24}>
+              <Form.Item
+                name="slug"
+                label="Slug"
+                tooltip="Unique URL identifier. Auto-generated if left empty."
+                rules={[
+                  {
+                    pattern: /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+                    message:
+                      "Only lowercase letters, numbers, and dashes allowed.",
+                  },
+                ]}
+              >
+                <Input placeholder="e.g., wildlife-photography-tips" />
               </Form.Item>
             </Col>
 
@@ -496,6 +537,17 @@ formData.append("metaDescription", values.metaDescription);
                 />
               </Form.Item>
             </Col>
+
+            <Col span={24}>
+              <Form.Item
+                name="metaKeywords"
+                label="Meta Keywords"
+                tooltip="Separate keywords with commas"
+              >
+                <Input placeholder="e.g., travel, adventure, wildlife" />
+              </Form.Item>
+            </Col>
+
             <Col span={24}>
               <Form.Item>
                 <Button
@@ -570,6 +622,14 @@ formData.append("metaDescription", values.metaDescription);
               >
                 {currentBlog.status}
               </Text>
+            </div>
+
+            <div style={{ marginBottom: "16px" }}>
+              <Text strong>Slug:</Text> <Text copyable>{currentBlog.slug}</Text>
+            </div>
+
+            <div style={{ marginBottom: "16px" }}>
+              <Text strong>Meta Keywords:</Text> {currentBlog.metaKeywords}
             </div>
 
             <div

@@ -1,40 +1,49 @@
 const SafariBookingEnquiry = require('../models/safaribookingenquiry')
+const uaParser = require("ua-parser-js");
+
+
 exports.createEnquiry = async (req, res) => {
-    console.log("Received Enquiry Data:", req.body); // Debugging
     try {
-        // ✅ Remove empty keys from request body
-        const cleanedData = Object.fromEntries(
-            Object.entries(req.body).filter(([key, value]) => key.trim() !== "" && value !== "")
-        );
-
-        const { name, email, phone, date, safariZone, vehicleType, safariTime, children, adults } = cleanedData;
-
-        if (!name || !email || !phone || !safariZone || !vehicleType || !safariTime || !date || !adults) {
-            return res.status(400).json({ success: false, error: "All fields are required" });
-        }
-
-        const newEnquiry = new SafariBookingEnquiry({
-            name,
-            email,
-            phone,
-            date,
-            safariZone,
-            vehicleType,
-            safariTime,
-            children,
-            adults,
-            status: "Pending",
-        });
-
-        await newEnquiry.save();
-        res.status(201).json({ success: true, message: "Enquiry submitted successfully", enquiry: newEnquiry });
-
+      const cleanedData = Object.fromEntries(
+        Object.entries(req.body).filter(([key, value]) => key.trim() !== "" && value !== "")
+      );
+  
+      const { name, email, phone, date, safariZone, vehicleType, safariTime, children, adults } = cleanedData;
+  
+      if (!name || !email || !phone || !safariZone || !vehicleType || !safariTime || !date || !adults) {
+        return res.status(400).json({ success: false, error: "All fields are required" });
+      }
+  
+      const ua = uaParser(req.headers['user-agent']);
+      const logDetails = {
+        ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+        browser: ua.browser.name + " " + ua.browser.version,
+        device: ua.device.type || "Desktop",
+        userAgent: req.headers['user-agent']
+      };
+  
+      const newEnquiry = new SafariBookingEnquiry({
+        name,
+        email,
+        phone,
+        date,
+        safariZone,
+        vehicleType,
+        safariTime,
+        children,
+        adults,
+        status: "Pending",
+        logDetails, // ✅ Include log details here
+      });
+  
+      await newEnquiry.save();
+      res.status(201).json({ success: true, message: "Enquiry submitted successfully", enquiry: newEnquiry });
+  
     } catch (error) {
-        console.log("Error creating safari enquiry", error);
-        res.status(500).json({ success: false, error: "Failed to submit enquiry" });
+      console.log("Error creating safari enquiry", error);
+      res.status(500).json({ success: false, error: "Failed to submit enquiry" });
     }
-};
-
+  };
 exports.getAllSafariEnquiries = async (req, res) => {
     try {
         const enquiries = await SafariBookingEnquiry.find();
@@ -83,89 +92,75 @@ exports.updateEnquiry = async (req, res) => {
         res.status(500).json({ success: false, error: "Failed to update enquiry" });
     }
 };
-// Add this to your existing safaribookingenquiry controller file
 exports.createManualEnquiry = async (req, res) => {
     try {
-        const {
-            name,
-            email,
-            phone,
-            date,
-            safariZone,
-            vehicleType,
-            safariTime,
-            children,
-            adults,
-            status = "Pending",
-            remark = ""
-        } = req.body;
-
-        // Basic validation
-        if (!name || !phone || !safariZone || !vehicleType || !safariTime || !date || !adults) {
-            return res.status(400).json({ 
-                success: false, 
-                error: "Name, phone, safari zone, vehicle type, safari time, date and adults are required" 
-            });
-        }
-
-        // Validate date format
-        if (isNaN(new Date(date).getTime())) {
-            return res.status(400).json({ 
-                success: false, 
-                error: "Invalid date format" 
-            });
-        }
-
-        // Validate vehicle type
-        const validVehicleTypes = ["Jeep", "Canter"];
-        if (!validVehicleTypes.includes(vehicleType)) {
-            return res.status(400).json({ 
-                success: false, 
-                error: "Invalid vehicle type" 
-            });
-        }
-
-        // Validate safari time
-        const validSafariTimes = ["Morning", "Evening"];
-        if (!validSafariTimes.includes(safariTime)) {
-            return res.status(400).json({ 
-                success: false, 
-                error: "Invalid safari time" 
-            });
-        }
-
-        const newEnquiry = new SafariBookingEnquiry({
-            name,
-            email: email || "manual@enquiry.com", // Default email if not provided
-            phone,
-            date: new Date(date),
-            safariZone,
-            vehicleType,
-            safariTime,
-            children: children || 0,
-            adults,
-            status,
-            remark,
-            isManual: true // Flag to identify manually created enquiries
+      const {
+        name,
+        email,
+        phone,
+        date,
+        safariZone,
+        vehicleType,
+        safariTime,
+        children,
+        adults,
+        status = "Pending",
+        remark = ""
+      } = req.body;
+  
+      if (!name || !phone || !safariZone || !vehicleType || !safariTime || !date || !adults) {
+        return res.status(400).json({
+          success: false,
+          error: "Name, phone, safari zone, vehicle type, safari time, date and adults are required"
         });
-
-        await newEnquiry.save();
-        
-        res.status(201).json({ 
-            success: true, 
-            message: "Manual enquiry created successfully", 
-            enquiry: newEnquiry 
-        });
-
+      }
+  
+      // 🔍 Capture log details
+      const userAgent = req.headers["user-agent"] || "Unknown";
+      const parser = new UAParser(userAgent);
+      const browser = parser.getBrowser().name + " " + parser.getBrowser().version;
+      const device = parser.getDevice().type || "Desktop";
+      const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+  
+      const newEnquiry = new SafariBookingEnquiry({
+        name,
+        email: email || "manual@enquiry.com",
+        phone,
+        date: new Date(date),
+        safariZone,
+        vehicleType,
+        safariTime,
+        children: children || 0,
+        adults,
+        status,
+        remark,
+        isManual: true,
+        logDetails: {
+          ip,
+          browser,
+          device,
+          userAgent
+        }
+      });
+  
+      await newEnquiry.save();
+  
+      res.status(201).json({
+        success: true,
+        message: "Manual enquiry created successfully",
+        enquiry: newEnquiry
+      });
+  
     } catch (error) {
-        console.error("Error creating manual enquiry:", error);
-        res.status(500).json({ 
-            success: false, 
-            error: "Failed to create manual enquiry",
-            details: error.message 
-        });
+      console.error("Error creating manual enquiry:", error);
+      res.status(500).json({
+        success: false,
+        error: "Failed to create manual enquiry",
+        details: error.message
+      });
     }
-};
+  };
+  
 
 // Add this new function to get status history
 exports.getStatusHistory = async (req, res) => {

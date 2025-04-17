@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Card, Table, Button, Select, message, Tag } from "antd";
+import { Table, Card, Select, Tag, Space, message, Typography, Button } from "antd";
 import axios from "axios";
 
 const AdminPermissionManager = () => {
@@ -9,6 +9,7 @@ const AdminPermissionManager = () => {
   const token = localStorage.getItem("adminToken");
 
   const fetchData = async () => {
+    setLoading(true);
     try {
       const [rolesRes, permissionsRes] = await Promise.all([
         axios.get("http://localhost:5000/api/roles", {
@@ -18,27 +19,23 @@ const AdminPermissionManager = () => {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
-      setRoles(rolesRes.data);
+
+      // Admin role gets all permissions, other roles as is
+      const updatedRoles = rolesRes.data.map((role) => {
+        if (role.name.toLowerCase() === "admin") {
+          return {
+            ...role,
+            permissions: permissionsRes.data, // All
+          };
+        }
+        return role;
+      });
+
+      setRoles(updatedRoles);
       setPermissions(permissionsRes.data);
     } catch (err) {
-      message.error("Failed to load data");
-    }
-  };
-
-  const handlePermissionChange = async (roleId, selectedPermissions) => {
-    setLoading(true);
-    try {
-      await axios.put(
-        `http://localhost:5000/api/roles/${roleId}/permissions`,
-        { permissions: selectedPermissions },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
-      );
-      message.success("Permissions updated");
-      fetchData();
-    } catch (err) {
-      message.error("Failed to update permissions");
+      console.error(err);
+      message.error("Failed to load roles/permissions.");
     } finally {
       setLoading(false);
     }
@@ -48,70 +45,178 @@ const AdminPermissionManager = () => {
     fetchData();
   }, []);
 
-  const allPermissions = [
-    "dashboard",
-    "blogs",
-    "bookings",
-    "enquiries",
-    "manager",
-    "user-manager",
-    "setting",
-    "quick-payment",
-    "contact-enquiry",
-  ];
+  const handlePermissionChange = async (roleId, selectedPermissionIds) => {
+    setLoading(true);
+    try {
+      const role = roles.find((r) => r._id === roleId);
+      if (role.name.toLowerCase() === "admin") {
+        message.warning("Admin permissions are fixed and cannot be changed.");
+        return;
+      }
 
-  const columns = [
+      await axios.put(
+        `http://localhost:5000/api/roles/${roleId}/permissions`,
+        { permissions: selectedPermissionIds },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      message.success("Permissions updated successfully.");
+      fetchData();
+    } catch (err) {
+      console.error(err);
+      message.error("Failed to update permissions.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const permissionColumns = [
+    {
+      title: "Permission Name",
+      dataIndex: "name",
+      key: "name",
+    },
+    {
+      title: "Description",
+      dataIndex: "description",
+      key: "description",
+    },
+    {
+      title: "Category",
+      dataIndex: "category",
+      key: "category",
+    },
+  ];
+  const roleColumns = [
     {
       title: "Role",
       dataIndex: "name",
       key: "name",
-      render: (name) => <Tag color="blue">{name}</Tag>,
+      render: (name) => (
+        <Tag color={name.toLowerCase() === "admin" ? "red" : "blue"}>
+          {name}
+        </Tag>
+      ),
     },
     {
       title: "Current Permissions",
       dataIndex: "permissions",
       key: "permissions",
-      render: (perms) => (
-        <div>
+      render: (perms, record) => (
+        <Space size={[0, 8]} wrap>
           {perms?.map((p) => (
-            <Tag key={p} style={{ marginBottom: 4 }}>
-              {p}
+            <Tag key={p._id} color="blue">
+              {p.name}
             </Tag>
           ))}
-        </div>
+        </Space>
       ),
     },
     {
-      title: "Update Permissions",
+      title: "Actions",
       key: "actions",
-      render: (_, record) => (
-        <Select
-          mode="multiple"
-          placeholder="Select permissions"
-          defaultValue={record.permissions || []}
-          style={{ width: "100%" }}
-          onChange={(values) => handlePermissionChange(record._id, values)}
-          loading={loading}
-        >
-          {allPermissions.map((perm) => (
-            <Select.Option key={perm} value={perm}>
-              {perm}
-            </Select.Option>
-          ))}
-        </Select>
-      ),
+      render: (_, record) => {
+        const isAdmin = record.name.toLowerCase() === "admin";
+        return isAdmin ? (
+          <Tag color="red">All Permissions (Fixed)</Tag>
+        ) : (
+          <Select
+            mode="multiple"
+            value={record.permissions?.map((p) => p._id) || []}
+            onChange={(values) => handlePermissionChange(record._id, values)}
+            style={{ width: "100%" }}
+            loading={loading}
+            optionLabelProp="label"
+            placeholder="Assign permissions"
+          >
+            {permissions.map((perm) => (
+              <Select.Option
+                key={perm._id}
+                value={perm._id}
+                label={perm.name}
+              >
+                <div>
+                  <strong>{perm.name}</strong>
+                  <div style={{ fontSize: 12, color: "#888" }}>
+                    {perm.description}
+                  </div>
+                </div>
+              </Select.Option>
+            ))}
+          </Select>
+        );
+      },
     },
   ];
 
   return (
-    <Card title="Permission Management">
-      <Table
-        columns={columns}
-        dataSource={roles}
-        rowKey="_id"
-        pagination={{ pageSize: 5 }}
-      />
-    </Card>
+    <div>
+      <Card title="Available Permissions" style={{ marginBottom: 24 }}>
+        <Table
+        className="black-bordered-table"
+          columns={permissionColumns}
+          dataSource={permissions}
+          rowKey="_id"
+          pagination={false}
+          size="small"
+        />
+      </Card>
+
+      <Card
+        title="Role Permissions Assignment"
+        extra={
+          <Button type="primary" onClick={fetchData} loading={loading}>
+            Refresh
+          </Button>
+        }
+      >
+        <Table
+        className="black-bordered-table"
+          columns={roleColumns}
+          dataSource={roles}
+          rowKey="_id"
+          pagination={{ pageSize: 5 }}
+          loading={loading}
+        />
+      </Card>
+      <style jsx>{`
+        .black-bordered-table table {
+          border: 1px solid #000 !important;
+        }
+        .black-bordered-table th,
+        .black-bordered-table td {
+          border: 1px solid #000 !important;
+        }
+        .black-bordered-descriptions table {
+          border: 1px solid #000 !important;
+        }
+        .black-bordered-descriptions th,
+        .black-bordered-descriptions td {
+          border: 1px solid #000 !important;
+        }
+        .black-bordered-descriptions th {
+          background-color: #2c5f2d !important;
+          color: #fff !important;
+        }
+        .black-bordered-table th {
+          background-color: #2c5f2d !important;
+          color: #fff !important;
+        }
+
+        .black-bordered-table
+          .ant-table-column-sort
+          .ant-table-column-sorter-up.active,
+        .black-bordered-table
+          .ant-table-column-sort
+          .ant-table-column-sorter-down.active {
+          color: #ff4d4f;
+        }
+      `}</style>
+    </div>
   );
 };
 

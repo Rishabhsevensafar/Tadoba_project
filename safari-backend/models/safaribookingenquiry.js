@@ -29,6 +29,12 @@ const SafariBookingEnquirySchema = new mongoose.Schema(
         adults: { type: Number, required: true },
         status: { type: String, enum: ["Pending", "Success", "Not Interested", "No Response"], default: "Pending" }, // Admin can change status
         remark: { type: String, default: "" }, // Admin can add remark
+        logDetails: {
+          ip: String,
+          browser: String,
+          device: String,
+          userAgent: String,
+        },
         statusHistory: [statusHistorySchema]
     },
     { timestamps: true }

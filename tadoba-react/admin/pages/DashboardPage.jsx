@@ -97,23 +97,30 @@ const DashboardPage = () => {
     const fetchAdminProfile = async () => {
       try {
         const token = localStorage.getItem("adminToken");
-        const res = await axios.get("http://localhost:5000/api/profile/profile", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-  
+        const res = await axios.get(
+          "http://localhost:5000/api/profile/profile",
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
         setAdminProfile(res.data);
-        setPermissions(res.data.permissions || []);
-  
-        // ✅ Store permissions in localStorage for ProtectedRoute
-        localStorage.setItem("admin-permissions", JSON.stringify(res.data.permissions || []));
+        const rolePermissions = res.data.role?.permissions || [];
+
+        const permissionNames = rolePermissions.map((p) => p.name);
+
+        setPermissions(permissionNames);
+        localStorage.setItem(
+          "admin-permissions",
+          JSON.stringify(permissionNames)
+        );
       } catch (err) {
         console.error("Failed to load admin profile", err);
       }
     };
-  
+
     fetchAdminProfile();
   }, []);
-  
 
   const menuItems = [
     {
@@ -253,27 +260,30 @@ const DashboardPage = () => {
       onClick: () => navigate("/admin/dashboard/Permission-manager"),
     },
   ];
-  
 
   const visibleMenuItems = menuItems
-  .filter((item) => {
-    if (role === "admin") return true;
-    return !item.permission || permissions.includes(item.permission);
-  })
-  .map((item) => {
-    if (item.children) {
-      const visibleChildren = item.children.filter(
-        (child) =>
-          role === "admin" || !child.permission || permissions.includes(child.permission)
-      );
-      if (visibleChildren.length > 0) {
-        return { ...item, children: visibleChildren };
+    .filter((item) => {
+      // Always show all items for admin
+      if (role === "admin") return true;
+      // For non-admin, check permissions
+      return !item.permission || permissions.includes(item.permission);
+    })
+    .map((item) => {
+      if (item.children) {
+        const visibleChildren = item.children.filter(
+          (child) =>
+            role === "admin" ||
+            !child.permission ||
+            permissions.includes(child.permission)
+        );
+        if (visibleChildren.length > 0) {
+          return { ...item, children: visibleChildren };
+        }
+        return null;
       }
-      return null;
-    }
-    return item;
-  })
-  .filter(Boolean);
+      return item;
+    })
+    .filter(Boolean);
 
   const userMenu = [
     {
@@ -371,7 +381,7 @@ const DashboardPage = () => {
                     key={item.key}
                     icon={item.icon}
                     title={item.label}
-                    style={{ margin: "4px 8px", borderRadius: "8px" }}
+                    style={{ margin: "4px 8px", borderRadius: "8px", }}
                   >
                     {item.children.map((child) => (
                       <Menu.Item
@@ -398,6 +408,7 @@ const DashboardPage = () => {
                   style={{
                     margin: "4px 8px",
                     borderRadius: "8px",
+                    paddingLeft: collapsed ? 24 : 28,
                     transition: "all 0.3s",
                   }}
                 >

@@ -1,12 +1,14 @@
-
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
+import React from "react";
+import { hydrateRoot } from "react-dom/client";
 import './custom.scss';
 import App from "./App.jsx";
 import AppAdmin from "../admin/AppAdmin.jsx";
 
-createRoot(document.getElementById("root")).render(
-  <StrictMode>
-    {window.location.pathname.startsWith("/admin") ? <AppAdmin /> : <App />}
-  </StrictMode>
+const isAdmin = window.location.pathname.startsWith("/admin");
+
+hydrateRoot(
+  document.getElementById("root"),
+  <React.StrictMode>
+    {isAdmin ? <AppAdmin /> : <App router={null} />}
+  </React.StrictMode>
 );

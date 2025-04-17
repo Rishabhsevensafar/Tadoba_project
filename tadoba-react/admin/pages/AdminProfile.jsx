@@ -13,7 +13,7 @@ const AdminProfile = () => {
 
   const role = localStorage.getItem("admin-role");
 
-  const isEmailReadOnly = true;
+  const isEmailReadOnly = role !== "admin";
   const isNameReadOnly = false;
   const isContactReadOnly = role !== "admin";
 
@@ -127,7 +127,7 @@ const AdminProfile = () => {
         </Form.Item>
 
         <Form.Item label="Contact Number" name="contactNumber">
-          <Input placeholder="Contact Number" disabled={isContactReadOnly} />
+          <Input placeholder="Contact Number"/>
         </Form.Item>
         <Form.Item label="Date of Birth" name="dob" required>
           <Input type="date" />
@@ -145,11 +145,11 @@ const AdminProfile = () => {
 
         <h3>Change Password</h3>
         <Form.Item label="Old Password" name="oldPassword">
-          <Input.Password  disabled={isEmailReadOnly}/>
+          <Input.Password  />
         </Form.Item>
 
         <Form.Item label="New Password" name="newPassword">
-          <Input.Password  disabled={isEmailReadOnly}/>
+          <Input.Password />
         </Form.Item>
 
         <Button type="dashed" onClick={handlePasswordChange}>

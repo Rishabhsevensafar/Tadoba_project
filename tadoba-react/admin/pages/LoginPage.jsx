@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { jwtDecode } from "jwt-decode";
+import { message } from "antd";
 
 const AdminLogin = () => {
   const [loading, setLoading] = useState(false);
@@ -21,7 +22,7 @@ const AdminLogin = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+  
     try {
       const response = await axios.post(
         "http://localhost:5000/api/admin/auth/login",
@@ -32,12 +33,12 @@ const AdminLogin = () => {
   
       localStorage.setItem("adminToken", token);
       localStorage.setItem("admin-role", decoded.role);
+      localStorage.setItem("admin-permissions", JSON.stringify(response.data.user.permissions || []));
   
-      alert("Login successful!");
-      
-      setTimeout(() => navigate("/admin/dashboard"), 1000);
+      await message.success("Login successful!"); // ✅ await this
+      navigate("/admin/dashboard");
     } catch (error) {
-      alert(error.response?.data?.message || "Invalid email or password");
+      message.error(error.response?.data?.message || "Invalid email or password");
     } finally {
       setLoading(false);
     }

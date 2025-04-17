@@ -34,7 +34,7 @@ function Header() {
           <Link to="/">Home</Link>
           <Link to="/about">About</Link>
           <a
-            href="/safaribooking"
+            href="/safari-booking"
             style={{
               backgroundColor: "#e68d1d",
               padding: "5px",

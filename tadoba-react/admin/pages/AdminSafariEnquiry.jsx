@@ -113,6 +113,9 @@ const AdminSafariEnquiries = () => {
             adults: typeof item.adults === "number" ? item.adults : 1,
             status: item.status || "Pending",
             remark: item.remark || "No Remark",
+            device: item?.logDetails?.device || "N/A",
+            browser: item?.logDetails?.browser || "N/A",
+            ip: item?.logDetails?.ip || "N/A",
             statusHistory: item.statusHistory || [],
             createdAt: item.createdAt || new Date().toISOString(),
           }));
@@ -697,6 +700,15 @@ const AdminSafariEnquiries = () => {
               </Descriptions.Item>
               <Descriptions.Item label="Adults">
                 {selectedEnquiry?.adults ?? 0}
+              </Descriptions.Item>
+              <Descriptions.Item label="Device">
+                {selectedEnquiry.device || "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Browser">
+                {selectedEnquiry.browser || "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="IP Address" span={2}>
+                {selectedEnquiry.ip || "N/A"}
               </Descriptions.Item>
             </Descriptions>
 

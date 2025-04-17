@@ -8,6 +8,7 @@ import ImportantLinks from "../ImportantLinks";
 import { Helmet } from "react-helmet";
 
 function NewsBlogDetail() {
+  const { slug } = useParams();
   const { id } = useParams();
   const [blog, setBlog] = useState(null);
   const [blogs, setBlogs] = useState([]);
@@ -19,11 +20,11 @@ function NewsBlogDetail() {
         setLoading(true);
         const [blogsRes, blogRes] = await Promise.all([
           axios.get("http://localhost:5000/api/blogs"),
-          axios.get(`http://localhost:5000/api/blogs/blogs/${id}`),
+          axios.get(`http://localhost:5000/api/blogs/slug/${slug}`),
         ]);
 
         if (Array.isArray(blogsRes.data)) {
-          setBlogs(blogsRes.data.filter((blog) => blog.status === "Published"));
+          setBlogs(blogsRes.data.filter((b) => b.status === "Published"));
         }
         setBlog(blogRes.data);
       } catch (error) {
@@ -34,7 +35,7 @@ function NewsBlogDetail() {
     };
 
     fetchData();
-  }, [id]);
+  }, [slug]);
 
   if (loading) {
     return (
@@ -83,11 +84,7 @@ function NewsBlogDetail() {
               </div>
             </header>
 
-            {blog.featuredImage && (
-              <div className="featured-image">
-                <img src={blog.featuredImage} alt={blog.title} />
-              </div>
-            )}
+
 
             <div className="blog-tags">
               {blog.tags?.length > 0 ? (
@@ -101,7 +98,14 @@ function NewsBlogDetail() {
                 </>
               ) : null}
             </div>
-
+            {blog.image && (
+              <div className="featured-image">
+                <img
+                  src={`http://localhost:5000${blog.image}`}
+                  alt={blog.title}
+                />
+              </div>
+            )}
             <div
               className="blog-content"
               dangerouslySetInnerHTML={{ __html: blog.content }}
@@ -118,24 +122,28 @@ function NewsBlogDetail() {
                 .slice(0, 5)
                 .map((blog) => (
                   <a
-                    href={`/blogs/${blog._id}`}
+                    href={`/news-blog/${blog.slug}`}
                     key={blog._id}
-                    className="story-card"
+                    className="story-card-horizontal"
                   >
-                    {blog.featuredImage && (
-                      <div className="story-image">
-                        <img src={blog.featuredImage} alt={blog.title} />
+                    {blog.image && (
+                      <div className="story-thumb">
+                        <img
+                          src={`http://localhost:5000${blog.image}`}
+                          alt={blog.title}
+                        />
                       </div>
                     )}
-                    <div className="story-content">
-                      <h3 className="story-title">{blog.title}</h3>
+                    <div className="story-info">
+                      <h4 className="story-title">{blog.title}</h4>
                       <p className="story-meta">
-  Updated on {new Date(blog.updatedAt).toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric"
-  })} by {blog.author?.name || "Admin"}
-</p>
-
+                        Updated on{" "}
+                        {new Date(blog.updatedAt).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                        })}{" "}
+                        by {blog.author?.name || "Admin"}
+                      </p>
                     </div>
                   </a>
                 ))}

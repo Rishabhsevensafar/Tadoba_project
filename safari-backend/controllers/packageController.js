@@ -80,16 +80,19 @@ const getAllTourPackages = async (req, res) => {
 
 const getTourPackageById = async (req, res) => {
   try {
-    const package = await TourPackage.findById(req.params.id).populate("hotels"); // ✅ Fetch full hotel details
+    const tourPackage = await TourPackage.findById(req.params.id).populate("hotels"); // ✅ Fetch full hotel details
 
-    if (!package) return res.status(404).json({ success: false, error: "Package not found" });
+    if (!tourPackage) {
+      return res.status(404).json({ success: false, error: "Package not found" });
+    }
 
-    res.json({ success: true, package });
+    res.json({ success: true, package: tourPackage }); // ✅ Response key is still 'package'
   } catch (error) {
     console.error("Error fetching package:", error);
     res.status(500).json({ success: false, error: "Failed to retrieve package" });
   }
 };
+
 
 
 const updateTourPackage = async (req, res) => {

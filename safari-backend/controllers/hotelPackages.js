@@ -47,11 +47,11 @@ exports.getAllHotelPackages = async (req, res) => {
 // Get Hotel Package by ID
 exports.getHotelPackageById = async (req, res) => {
     try {
-        const package = await HotelPackage.findById(req.params.id);
-        if (!package) {
+        const hotelpackage = await HotelPackage.findById(req.params.id);
+        if (!hotelpackage) {
             return res.status(404).json({ message: "Package not found" });
         }
-        res.status(200).json(package);
+        res.status(200).json(hotelpackage);
     } catch (error) {
         res.status(500).json({ error: error.message });
     }
@@ -60,13 +60,13 @@ exports.getHotelPackageById = async (req, res) => {
 // Delete Hotel Package and Remove Images
 exports.deleteHotelPackage = async (req, res) => {
     try {
-        const package = await HotelPackage.findById(req.params.id);
-        if (!package) {
+        const hotelpackage = await HotelPackage.findById(req.params.id);
+        if (!hotelpackage) {
             return res.status(404).json({ message: "Package not found" });
         }
 
         // Delete images from uploads folder
-        package.images.forEach(image => {
+        hotelpackage.images.forEach(image => {
             const imagePath = path.join(__dirname, "..", image);
             fs.unlink(imagePath, (err) => {
                 if (err) console.error("Error deleting image:", err);
@@ -84,44 +84,44 @@ exports.updateHotelPackage = async (req, res) => {
         console.log("Received Update Request for ID:", req.params.id);
         console.log("Request Body:", req.body);
 
-        const package = await HotelPackage.findById(req.params.id);
-        if (!package) {
+        const hotelpackage = await HotelPackage.findById(req.params.id);
+        if (!hotelpackage) {
             return res.status(404).json({ message: "Hotel package not found" });
         }
 
         // ✅ Keep existing images if no new images are uploaded
-        let imagePaths = package.images;
+        let imagePaths = hotelpackage.images;
         if (req.files && req.files.length > 0) {
             imagePaths = req.files.map(file => `/uploads/hotel/${file.filename}`);
         }
 
         // ✅ Update hotel package details
-        package.title = req.body.title || package.title;
-        package.description = req.body.description || package.description;
-        package.room_type = req.body.room_type || package.room_type;
-        package.number_of_stars = req.body.number_of_stars || package.number_of_stars;
-        package.real_price = req.body.real_price || package.real_price;
-        package.discounted_price = req.body.discounted_price || package.discounted_price;
+        hotelpackage.title = req.body.title || hotelpackage.title;
+        hotelpackage.description = req.body.description || hotelpackage.description;
+        hotelpackage.room_type = req.body.room_type || hotelpackage.room_type;
+        hotelpackage.number_of_stars = req.body.number_of_stars || hotelpackage.number_of_stars;
+        hotelpackage.real_price = req.body.real_price || hotelpackage.real_price;
+        hotelpackage.discounted_price = req.body.discounted_price || hotelpackage.discounted_price;
         
-        package.amenities = Array.isArray(req.body.amenities) 
+        hotelpackage.amenities = Array.isArray(req.body.amenities) 
             ? req.body.amenities 
-            : package.amenities;
+            : hotelpackage.amenities;
 
-        package.facilities = Array.isArray(req.body.facilities) 
+        hotelpackage.facilities = Array.isArray(req.body.facilities) 
             ? req.body.facilities 
-            : package.facilities;
+            : hotelpackage.facilities;
 
-        package.map_location = req.body.map_location || package.map_location;
-        package.images = imagePaths; // ✅ Keep existing images if no new ones are uploaded
+        hotelpackage.map_location = req.body.map_location || hotelpackage.map_location;
+        hotelpackage.images = imagePaths; // ✅ Keep existing images if no new ones are uploaded
 
         if (req.body.location) {
-            package.location.name = req.body.location.name || package.location.name;
-            package.location.pincode = req.body.location.pincode || package.location.pincode;
+            hotelpackage.location.name = req.body.location.name || hotelpackage.location.name;
+            hotelpackage.location.pincode = req.body.location.pincode || hotelpackage.location.pincode;
         }
 
-        console.log("Updated Package Data:", package);
+        console.log("Updated Package Data:", hotelpackage);
 
-        const updatedPackage = await package.save();
+        const updatedPackage = await hotelpackage.save();
         res.status(200).json({ message: "Hotel package updated successfully", package: updatedPackage });
 
     } catch (error) {

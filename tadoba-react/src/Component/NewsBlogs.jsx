@@ -1,58 +1,129 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-import '../styles/NewsBlogs.css'; // Import your CSS file
+import '../styles/NewsBlogs.css'; // New CSS file name
 import { Link } from 'react-router-dom';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 function NewsBlogs() {
-  const [blogs, setBlogs] = useState([]);
+  const [articles, setArticles] = useState([]);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const sliderRef = useRef(null);
 
-  // Fetch blogs from the backend
+  // Fetch articles from the backend
   useEffect(() => {
-    const fetchBlogs = async () => {
+    const fetchArticles = async () => {
       try {
         const response = await axios.get('http://localhost:5000/api/blogs');
         
-        // Ensure response.data is an array
         if (Array.isArray(response.data)) {
-          const publishedBlogs = response.data.filter(blog => blog.status === 'Published');
-          setBlogs(publishedBlogs);
+          const publishedArticles = response.data.filter(article => article.status === 'Published');
+          setArticles(publishedArticles);
         } else {
           console.error('Invalid response format: Expected an array');
         }
       } catch (error) {
-        console.error('Error fetching blogs:', error);
+        console.error('Error fetching articles:', error);
       }
     };
 
-    fetchBlogs();
+    fetchArticles();
   }, []);
 
+  const nextSlide = () => {
+    if (sliderRef.current) {
+      const slideWidth = sliderRef.current.offsetWidth;
+      const maxScroll = sliderRef.current.scrollWidth - slideWidth;
+      const nextScrollPosition = Math.min(
+        sliderRef.current.scrollLeft + slideWidth, 
+        maxScroll
+      );
+      
+      sliderRef.current.scrollTo({
+        left: nextScrollPosition,
+        behavior: 'smooth'
+      });
+      
+      if (nextScrollPosition >= maxScroll) {
+        setCurrentSlide(Math.ceil(maxScroll / slideWidth));
+      } else {
+        setCurrentSlide(currentSlide + 1);
+      }
+    }
+  };
+
+  const prevSlide = () => {
+    if (sliderRef.current) {
+      const slideWidth = sliderRef.current.offsetWidth;
+      const prevScrollPosition = Math.max(
+        sliderRef.current.scrollLeft - slideWidth, 
+        0
+      );
+      
+      sliderRef.current.scrollTo({
+        left: prevScrollPosition,
+        behavior: 'smooth'
+      });
+      
+      setCurrentSlide(Math.floor(prevScrollPosition / slideWidth));
+    }
+  };
+
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString('en-US', options);
+  };
+
   return (
-    <section className="news-blog-section">
-      <div className="section-header">
-        <h2>Latest News and Blog</h2>
-      </div>
-      <div className="blog-container">
-        <div className="blog-list">
-          {blogs.map((blog) => (
-            <div className="blog-card" key={blog._id}>
-              <img src={`http://localhost:5000${blog.image}`} alt={blog.title} className="blog-image" />
-              <div className="blog-content">
-                <p className="blog-meta">By {blog.author?.name || "Admin"} on {new Date(blog.createdAt).toLocaleDateString()}</p>
-                <h3 className="blog-title">{blog.title}</h3>
-                {/* <p className="blog-description">{blog.content.substring(0, 100)}...</p> */}
-                <Link to={`/news-blog-detail/${blog._id}`}>
-                <button className="read-more-btn">Read More</button></Link>
-              </div>
-            </div>
-          ))}
+    <section className="article-showcase">
+      <div className="article-showcase__header">
+        <h2 className="article-showcase__title">Latest News & Insights</h2>
+        
+        <div className="article-showcase__controls d-none d-md-flex">
+          <button 
+            className="article-showcase__control-btn" 
+            onClick={prevSlide}
+            disabled={currentSlide === 0}
+          >
+            <ChevronLeft size={24} />
+          </button>
+          <button 
+            className="article-showcase__control-btn" 
+            onClick={nextSlide}
+            disabled={articles.length <= 4}
+          >
+            <ChevronRight size={24} />
+          </button>
         </div>
-        <div className="popular-stories">
-          <h4>Popular Stories</h4>
-          {blogs.slice(0, 3).map((blog) => (
-            <div className="story-card" key={blog._id}>
-              <h5 className="story-title">{blog.title}</h5>
-              <p className="story-meta">By {blog.author?.name || "Admin"} on {new Date(blog.createdAt).toLocaleDateString()}</p>
+      </div>
+      
+      <div className="article-showcase__container">
+        <div className="article-showcase__featured" ref={sliderRef}>
+          {articles.map((article) => (
+            <div className="article-item" key={article.slug}>
+              <div className="article-item__image-wrapper">
+                <img 
+                  src={`http://localhost:5000${article.image}`} 
+                  alt={article.title} 
+                  className="article-item__image" 
+                />
+              </div>
+              <div className="article-item__content">
+                <div className="article-item__meta">
+                  <span className="article-item__author">
+                   by {article.author?.name || "Editorial Team"}
+                  </span>
+                  <span className="article-item__date">
+                    {formatDate(article.createdAt)}
+                  </span>
+                </div>
+                <h3 className="article-item__title">{article.title}</h3>
+                <Link 
+                  to={`/news-blog/${article.slug}`} 
+                  className="article-item__link"
+                >
+                  Read Article
+                </Link>
+              </div>
             </div>
           ))}
         </div>
