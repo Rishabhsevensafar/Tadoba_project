@@ -37,7 +37,7 @@ body{
 /* Desktop Nav Links */
 .nav-links {
   display: flex;
-  gap: 20px;
+  gap: 15px;
   align-items: center;
 }
 
@@ -244,7 +244,7 @@ header {
 }
 
 .chronoRow {
-  padding: 30px 0px;
+  padding: 10px 0px;
   align-items: center;
 }
 .chronoSection {
@@ -821,7 +821,7 @@ select {
 }
 
 .tadobahotelImg {
-  width: 260px;
+  width: 320px;
   height: 100%;
   border-radius: 10px;
   object-fit: cover;
@@ -891,13 +891,7 @@ s {
   gap: 15px; /* Row ke andar spacing theek karne ke liye */
 }
 
-.facility-item {
-  display: flex;
-  align-items: center;
-  gap: 5px; /* Icon aur text ke beech ka gap */
-  width: 200px;
-  white-space: nowrap; /* Taaki facilities wrap na ho aur alignment theek rahe */
-}
+
 
 iframe {
   width: 100%;
@@ -949,7 +943,7 @@ select {
 
 .day1Border {
   border: 2px solid rgb(219, 217, 217);
-  padding: 10px;
+  padding: 4px;
 }
 
 .day1Tadoba p {
@@ -1796,4 +1790,12 @@ input {
 @keyframes spin {
   0% { transform: rotate(0deg); }
   100% { transform: rotate(360deg); }
+}
+/* Sidebar font override */
+.ant-menu,
+.ant-menu-item,
+.ant-menu-submenu-title,
+.ant-menu-item-icon,
+.ant-menu-sub {
+  font-family: 'Poppins', sans-serif !important;
 }

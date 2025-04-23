@@ -25,7 +25,7 @@ function Home() {
 
     
     return (
-        <> 
+        <>
         <Header/>
         <Banner/>
         <About/>

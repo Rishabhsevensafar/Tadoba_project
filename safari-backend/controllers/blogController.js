@@ -1,107 +1,148 @@
 const Blog = require("../models/blog");
 const multer = require("multer");
+const slugify = require("slugify");
 
-// ✅ Multer Configuration for Image Upload
+// ✅ Multer Configuration
 const storage = multer.diskStorage({
   destination: "uploads/blogs/",
   filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname),
 });
 const upload = multer({ storage }).single("image");
 
-// ✅ Create a New Blog
+// ✅ Create Blog
 exports.createBlog = (req, res) => {
   upload(req, res, async (err) => {
-    if (err) return res.status(500).json({ success: false, message: "Image upload failed" });
+    if (err)
+      return res.status(500).json({ success: false, message: "Image upload failed" });
 
-    const { title, content, tags, status } = req.body;
+    const { title, content, tags, status, metaTitle, metaDescription, slug, metaKeywords } = req.body;
     const imageUrl = req.file ? `/uploads/blogs/${req.file.filename}` : "";
 
     try {
+      const finalSlug = slug
+        ? slugify(slug, { lower: true, strict: true })
+        : slugify(title, { lower: true, strict: true });
+
+      const existingSlug = await Blog.findOne({ slug: finalSlug });
+      if (existingSlug) {
+        return res.status(400).json({ success: false, message: "Slug already exists" });
+      }
+
       const blog = new Blog({
         title,
+        slug: finalSlug,
         content,
         image: imageUrl,
-        tags: tags ? tags.split(",").map(tag => tag.trim()) : [],
+        tags: tags ? tags.split(",").map((tag) => tag.trim()) : [],
         status,
+        metaTitle,
+        metaDescription,
+        metaKeywords,
         author: req.user.id,
       });
 
       await blog.save();
-      res.status(201).json({ success: true, message: "Blog created successfully", blog });
+      res.status(201).json({ success: true, blog });
     } catch (error) {
       res.status(500).json({ success: false, message: error.message });
     }
   });
 };
 
+// ✅ Update Blog
+exports.updateBlog = (req, res) => {
+  upload(req, res, async (err) => {
+    if (err)
+      return res.status(500).json({ success: false, message: "Image upload failed" });
+
+    try {
+      const { title, content, tags, status, metaTitle, metaDescription, slug, metaKeywords } = req.body;
+
+      let updateData = {
+        title,
+        content,
+        tags: tags ? tags.split(",").map((tag) => tag.trim()) : [],
+        status,
+        metaTitle,
+        metaDescription,
+        metaKeywords,
+      };
+
+      if (slug) {
+        const generatedSlug = slugify(slug, { lower: true, strict: true });
+
+        const exists = await Blog.findOne({ slug: generatedSlug, _id: { $ne: req.params.id } });
+        if (exists) {
+          return res.status(400).json({ success: false, message: "Slug already exists" });
+        }
+
+        updateData.slug = generatedSlug;
+      }
+
+      if (req.file) {
+        updateData.image = `/uploads/blogs/${req.file.filename}`;
+      } else if (req.body.removeImage === "true") {
+        updateData.image = "";
+      }
+
+      const updated = await Blog.findByIdAndUpdate(req.params.id, updateData, { new: true });
+      if (!updated) return res.status(404).json({ message: "Blog not found" });
+
+      res.status(200).json({ success: true, blog: updated });
+    } catch (error) {
+      res.status(500).json({ success: false, message: error.message });
+    }
+  });
+};
+
+// ✅ Get all blogs
 exports.getBlogs = async (req, res) => {
   try {
-    const blogs = await Blog.find().sort({ createdAt: -1 });
-    res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // Prevent caching
+    const blogs = await Blog.find().sort({ createdAt: -1 }).populate("author", "name");
     res.status(200).json(blogs);
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
-// ✅ Get All Published Blogs
+
+// ✅ Get all blogs for admin
 exports.getBlogsAdmin = async (req, res) => {
   try {
-      const blogs = await Blog.find().sort({ createdAt: -1 }); // ✅ Fetch all blogs
-      res.status(200).json({ success: true, blogs });
-    } catch (error) {
-      res.status(500).json({ success: false, message: error.message });
-    }
+    const blogs = await Blog.find().sort({ createdAt: -1 }).populate("author", "name");
+    res.status(200).json({ success: true, blogs });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
-// Get a single blog by ID
+
+// ✅ Get blog by ID
 exports.getBlogById = async (req, res) => {
   try {
-    const blog = await Blog.findById(req.params.id);
-    if (!blog) {
-      return res.status(404).json({ success: false, message: "Blog not found" });
-    }
+    const blog = await Blog.findById(req.params.id).populate("author", "name");
+    if (!blog) return res.status(404).json({ message: "Blog not found" });
     res.status(200).json(blog);
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
-exports.updateBlog = async (req, res) => {
-  upload(req, res, async (err) => {
-    if (err) return res.status(500).json({ success: false, message: "Image upload failed" });
-
-    const { title, content, tags, status } = req.body;
-    const imageUrl = req.file ? `/uploads/blogs/${req.file.filename}` : req.body.image;
-
-    try {
-      const updatedBlog = await Blog.findByIdAndUpdate(
-        req.params.id,
-        {
-          title,
-          content,
-          image: imageUrl,
-          tags: tags ? tags.split(",").map(tag => tag.trim()) : [],
-          status,
-        },
-        { new: true } // Return the updated document
-      );
-
-      if (!updatedBlog) {
-        return res.status(404).json({ success: false, message: "Blog not found" });
-      }
-
-      res.status(200).json({ success: true, message: "Blog updated successfully", updatedBlog });
-    } catch (error) {
-      res.status(500).json({ success: false, message: error.message });
-    }
-  });
+// ✅ Get blog by slug
+exports.getBlogBySlug = async (req, res) => {
+  try {
+    const blog = await Blog.findOne({ slug: req.params.slug }).populate("author", "name");
+    if (!blog) return res.status(404).json({ message: "Blog not found" });
+    res.status(200).json(blog);
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
+
 // ✅ Delete Blog
 exports.deleteBlog = async (req, res) => {
   try {
-    const deletedBlog = await Blog.findByIdAndDelete(req.params.id);
-    if (!deletedBlog) return res.status(404).json({ success: false, message: "Blog not found" });
-
-    res.status(200).json({ success: true, message: "Blog deleted successfully" });
+    const deleted = await Blog.findByIdAndDelete(req.params.id);
+    if (!deleted) return res.status(404).json({ message: "Blog not found" });
+    res.status(200).json({ success: true, message: "Blog deleted" });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

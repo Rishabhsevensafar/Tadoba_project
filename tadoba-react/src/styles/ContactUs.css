@@ -91,7 +91,7 @@
   .form-button {
     width: 100%;
     padding: 12px;
-    background-color: #007bff;
+    background-color: var(--secondary-color);
     color: #fff;
     border: none;
     border-radius: 4px;
@@ -106,9 +106,8 @@
   }
   
   .form-button:hover:not(:disabled) {
-    background-color: #0056b3;
-  }
-  
+    background-color: var(--primary-color);
+  }  
   /* Responsive Design */
   @media (max-width: 768px) {
     .contact-row {

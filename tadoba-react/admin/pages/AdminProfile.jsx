@@ -3,13 +3,19 @@ import { Form, Input, Button, Avatar, Upload, message, Divider } from "antd";
 import { UploadOutlined, UserOutlined } from "@ant-design/icons";
 import axios from "axios";
 
-const BASE_URL = "http://localhost:5000"; // use env in production
+const BASE_URL = "http://localhost:5000";
 
 const AdminProfile = () => {
   const [form] = Form.useForm();
   const [avatar, setAvatar] = useState(null);
   const [adminData, setAdminData] = useState({});
   const [loading, setLoading] = useState(false);
+
+  const role = localStorage.getItem("admin-role");
+
+  const isEmailReadOnly = role !== "admin";
+  const isNameReadOnly = false;
+  const isContactReadOnly = role !== "admin";
 
   useEffect(() => {
     fetchProfile();
@@ -33,9 +39,14 @@ const AdminProfile = () => {
   const handleProfileUpdate = async () => {
     try {
       setLoading(true);
-      const values = await form.validateFields();
-      const formData = new FormData();
+      const values = await form.validateFields([
+        "name",
+        "contactNumber", // no email here
+        "dob",
+        "address",
+      ]);
 
+      const formData = new FormData();
       Object.entries(values).forEach(([key, val]) => {
         formData.append(key, val);
       });
@@ -60,12 +71,14 @@ const AdminProfile = () => {
 
   const handlePasswordChange = async () => {
     try {
-      const oldPassword = form.getFieldValue("oldPassword");
-      const newPassword = form.getFieldValue("newPassword");
+      const values = await form.validateFields(["oldPassword", "newPassword"]);
 
       await axios.put(
         `${BASE_URL}/api/profile/change-password`,
-        { oldPassword, newPassword },
+        {
+          oldPassword: values.oldPassword,
+          newPassword: values.newPassword,
+        },
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
@@ -106,15 +119,22 @@ const AdminProfile = () => {
 
       <Form layout="vertical" form={form}>
         <Form.Item label="Name" name="name">
-          <Input placeholder="Admin name" />
+          <Input placeholder="Your name" disabled={isNameReadOnly} />
         </Form.Item>
 
         <Form.Item label="Email" name="email" rules={[{ required: true }]}>
-          <Input placeholder="Email" />
+          <Input placeholder="Email" disabled={isEmailReadOnly} />
         </Form.Item>
 
         <Form.Item label="Contact Number" name="contactNumber">
-          <Input placeholder="Contact Number" />
+          <Input placeholder="Contact Number"/>
+        </Form.Item>
+        <Form.Item label="Date of Birth" name="dob" required>
+          <Input type="date" />
+        </Form.Item>
+
+        <Form.Item label="Address" name="address">
+          <Input.TextArea rows={2} placeholder="Enter your address" />
         </Form.Item>
 
         <Button type="primary" onClick={handleProfileUpdate} loading={loading}>
@@ -124,11 +144,11 @@ const AdminProfile = () => {
         <Divider />
 
         <h3>Change Password</h3>
-        <Form.Item label="Old Password" name="oldPassword" rules={[{ required: true }]}>
-          <Input.Password />
+        <Form.Item label="Old Password" name="oldPassword">
+          <Input.Password  />
         </Form.Item>
 
-        <Form.Item label="New Password" name="newPassword" rules={[{ required: true }]}>
+        <Form.Item label="New Password" name="newPassword">
           <Input.Password />
         </Form.Item>
 

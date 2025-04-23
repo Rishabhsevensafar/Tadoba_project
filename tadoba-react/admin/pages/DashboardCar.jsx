@@ -1,16 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, Row, Col, Statistic, Spin, message } from "antd";
-import {
-  MessageCircle,
-  Compass,
-  Hotel,
-  MapPin,
-  PhoneCall,
-} from "lucide-react";
+import { MessageCircle, Compass, Hotel, MapPin, PhoneCall } from "lucide-react";
 import axios from "axios";
 import { theme } from "antd";
-const { useToken } = theme;;
+const { useToken } = theme;
 
 const DashboardCards = () => {
   const navigate = useNavigate();
@@ -21,28 +15,23 @@ const DashboardCards = () => {
     safariEnquiries: 0,
     hotelEnquiries: 0,
     tourEnquiries: 0,
-    contactEnquiries: 0
+    contactEnquiries: 0,
   });
 
   useEffect(() => {
     const fetchCounts = async () => {
       try {
         setLoading(true);
-        
-        const [
-          safariRes,
-          hotelRes,
-          tourRes,
-          contactRes
-        ] = await Promise.all([
+
+        const [safariRes, hotelRes, tourRes, contactRes] = await Promise.all([
           axios.get("http://localhost:5000/api/safarienquiry/"),
           axios.get("http://localhost:5000/api/hotelenquiry"),
           axios.get("http://localhost:5000/api/tour/tour-enquiries"),
-          axios.get("http://localhost:5000/api/contactenquiry/")
+          axios.get("http://localhost:5000/api/contactenquiry/"),
         ]);
 
         setCounts({
-          totalEnquiries: 
+          totalEnquiries:
             (safariRes.data?.enquiries?.length || 0) +
             (hotelRes.data?.length || 0) +
             (tourRes.data?.enquiries?.length || 0) +
@@ -50,7 +39,7 @@ const DashboardCards = () => {
           safariEnquiries: safariRes.data?.enquiries?.length || 0,
           hotelEnquiries: hotelRes.data?.length || 0,
           tourEnquiries: tourRes.data?.enquiries?.length || 0,
-          contactEnquiries: contactRes.data?.contacts?.length || 0
+          contactEnquiries: contactRes.data?.contacts?.length || 0,
         });
       } catch (error) {
         console.error("Error fetching counts:", error);
@@ -65,7 +54,14 @@ const DashboardCards = () => {
 
   if (loading) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '200px' }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "200px",
+        }}
+      >
         <Spin size="large" />
       </div>
     );
@@ -85,7 +81,7 @@ const DashboardCards = () => {
           <Statistic
             title="Total Enquiries"
             value={counts.totalEnquiries}
-            valueStyle={{ color: token.colorPrimary, fontWeight: 'bold' }}
+            valueStyle={{ color: token.colorPrimary, fontWeight: "bold" }}
             prefix={<MessageCircle size={24} color={token.colorPrimary} />}
           />
         </Card>
@@ -102,7 +98,7 @@ const DashboardCards = () => {
           <Statistic
             title="Safari Enquiries"
             value={counts.safariEnquiries}
-            valueStyle={{ color: token.colorSuccess, fontWeight: 'bold' }}
+            valueStyle={{ color: token.colorSuccess, fontWeight: "bold" }}
             prefix={<Compass size={24} color={token.colorSuccess} />}
           />
         </Card>
@@ -119,7 +115,7 @@ const DashboardCards = () => {
           <Statistic
             title="Hotel Enquiries"
             value={counts.hotelEnquiries}
-            valueStyle={{ color: token.colorWarning, fontWeight: 'bold' }}
+            valueStyle={{ color: token.colorWarning, fontWeight: "bold" }}
             prefix={<Hotel size={24} color={token.colorWarning} />}
           />
         </Card>
@@ -136,7 +132,7 @@ const DashboardCards = () => {
           <Statistic
             title="Tour Enquiries"
             value={counts.tourEnquiries}
-            valueStyle={{ color: token.colorError, fontWeight: 'bold' }}
+            valueStyle={{ color: token.colorError, fontWeight: "bold" }}
             prefix={<MapPin size={24} color={token.colorError} />}
           />
         </Card>
@@ -153,7 +149,7 @@ const DashboardCards = () => {
           <Statistic
             title="Contact Enquiries"
             value={counts.contactEnquiries}
-            valueStyle={{ color: '#1890ff', fontWeight: 'bold' }}
+            valueStyle={{ color: "#1890ff", fontWeight: "bold" }}
             prefix={<PhoneCall size={24} color="#1890ff" />}
           />
         </Card>

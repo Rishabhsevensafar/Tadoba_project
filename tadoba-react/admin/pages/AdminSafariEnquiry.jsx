@@ -113,6 +113,9 @@ const AdminSafariEnquiries = () => {
             adults: typeof item.adults === "number" ? item.adults : 1,
             status: item.status || "Pending",
             remark: item.remark || "No Remark",
+            device: item?.logDetails?.device || "N/A",
+            browser: item?.logDetails?.browser || "N/A",
+            ip: item?.logDetails?.ip || "N/A",
             statusHistory: item.statusHistory || [],
             createdAt: item.createdAt || new Date().toISOString(),
           }));
@@ -698,6 +701,15 @@ const AdminSafariEnquiries = () => {
               <Descriptions.Item label="Adults">
                 {selectedEnquiry?.adults ?? 0}
               </Descriptions.Item>
+              <Descriptions.Item label="Device">
+                {selectedEnquiry.device || "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="Browser">
+                {selectedEnquiry.browser || "N/A"}
+              </Descriptions.Item>
+              <Descriptions.Item label="IP Address" span={2}>
+                {selectedEnquiry.ip || "N/A"}
+              </Descriptions.Item>
             </Descriptions>
 
             <Descriptions
@@ -886,11 +898,11 @@ const AdminSafariEnquiries = () => {
           border: 1px solid #000 !important;
         }
         .black-bordered-descriptions th {
-          background-color: #2c5f2d !important;
+          background-color: var(--bg-color) !important;
           color: #fff !important;
         }
         .black-bordered-table th {
-          background-color: #2c5f2d !important;
+          background-color: var(--bg-color) !important;
           color: #fff !important;
         }
 

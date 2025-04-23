@@ -2,33 +2,36 @@ const express = require("express");
 const router = express.Router();
 const Booking = require("../models/tourbooking");
 
-
 // ✅ Create a new booking
 router.post("/", async (req, res) => {
   try {
-    const { name, email, phone, address, idProof, package, hotel, checkInDate, checkOutDate, numPersons, numRooms, travelers, totalPrice, paymentStatus } = req.body;
+    const {
+      name, email, phone, address, idProof,
+      package: tourPackage, hotel, checkInDate, checkOutDate,
+      numPersons, numRooms, travelers, totalPrice, paymentStatus
+    } = req.body;
 
-    console.log("Received Booking Data:", req.body);  // ✅ Debugging ke liye
+    console.log("Received Booking Data:", req.body);
 
     const newBooking = new Booking({
-      name,       // ✅ Lead Traveler Name
-      email,      // ✅ Lead Traveler Email
-      phone,      // ✅ Lead Traveler Phone
-      address,    // ✅ Lead Traveler Address
-      idProof,    // ✅ Lead Traveler ID Proof
-      package,
+      name,
+      email,
+      phone,
+      address,
+      idProof,
+      package: tourPackage,  // ✅ Use 'tourPackage' here, still stored in 'package' field in DB
       hotel,
       checkInDate,
       checkOutDate,
       numPersons,
       numRooms,
-      travelers,  // ✅ Sirf additional travelers ka data save hoga
+      travelers,
       totalPrice,
       paymentStatus,
     });
 
     await newBooking.save();
-    console.log("Booking Saved Successfully:", newBooking);  // ✅ Console me save ka confirmation
+    console.log("Booking Saved Successfully:", newBooking);
 
     res.status(201).json({ success: true, booking: newBooking });
   } catch (error) {
@@ -40,17 +43,17 @@ router.post("/", async (req, res) => {
 // ✅ Get all bookings
 router.get("/", async (req, res) => {
   try {
-      console.log("Fetching bookings...");
+    console.log("Fetching bookings...");
 
-      const bookings = await Booking.find()
-          .populate("package")  // ✅ Populating Tour Package
-          .populate("hotel");  // ✅ FIXED: Populating HotelPackage model correctly
+    const bookings = await Booking.find()
+      .populate("package") // ✅ populate 'package' field
+      .populate("hotel");
 
-      console.log("Fetched bookings:", bookings);
-      res.status(200).json({ success: true, bookings });
+    console.log("Fetched bookings:", bookings);
+    res.status(200).json({ success: true, bookings });
   } catch (error) {
-      console.error("Error fetching bookings:", error);
-      res.status(500).json({ success: false, message: "Server Error", error });
+    console.error("Error fetching bookings:", error);
+    res.status(500).json({ success: false, message: "Server Error", error });
   }
 });
 
@@ -68,7 +71,7 @@ router.get("/:id", async (req, res) => {
 // ✅ Update booking status (payment status)
 router.put("/:id/status", async (req, res) => {
   try {
-    const { bookingId, paymentId } = req.body;  // ✅ No userId required
+    const { bookingId, paymentId } = req.body;
 
     const booking = await Booking.findById(req.params.id);
     if (!booking) {
@@ -76,7 +79,7 @@ router.put("/:id/status", async (req, res) => {
     }
 
     booking.paymentStatus = "paid";
-    booking.paymentId = paymentId;  // ✅ Store Razorpay Payment ID
+    booking.paymentId = paymentId;
     await booking.save();
 
     res.status(200).json({ success: true, message: "Payment successful", booking });

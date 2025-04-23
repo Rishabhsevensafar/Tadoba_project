@@ -1,15 +1,50 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { Helmet } from "react-helmet";
+import axios from "axios";
 import Header from "../Header";
 import Footer from "../Footer";
 import ImportantLinks from "../ImportantLinks";
-import aboutBanner from "../../assets/images/about-banner.jpg";
 function Aboutpage() {
+  const [seo, setSeo] = useState({
+    metaTitle: "About Us | Your Site",
+    metaDescription: "",
+    metaKeywords: "",
+    canonicalUrl: "",
+    noIndex: false,
+  });
+  
+  useEffect(() => {
+    const fetchSEO = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/pageseo/get-page-seo", {
+          params: { path: "/about" },
+        });
+
+        if (res.data?.seo) setSeo(res.data.seo);
+      } catch (error) {
+        console.error("Failed to fetch SEO data", error);
+      }
+    };
+
+    fetchSEO();
+  }, []);
   return (
     <>
+     <Helmet>
+        <title>{seo.metaTitle}</title>
+        {seo.metaDescription && (
+          <meta name="description" content={seo.metaDescription} />
+        )}
+        {seo.metaKeywords && (
+          <meta name="keywords" content={seo.metaKeywords} />
+        )}
+        {seo.canonicalUrl && <link rel="canonical" href={seo.canonicalUrl} />}
+        {seo.noIndex && <meta name="robots" content="noindex, nofollow" />}
+      </Helmet>
       <Header />
       <div>
         <img
-          src={aboutBanner}
+          src="/images/about-banner.jpg"
           className="aboutUsBanner"
           alt="About Image banner"
         />

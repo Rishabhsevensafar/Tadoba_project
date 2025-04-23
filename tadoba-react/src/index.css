@@ -1,1 +1,26 @@
-@import "tailwindcss";
+
+:root {
+    --primary-color: #26641a;
+    --secondary-color: #00b894;
+    --text-color: #333;
+    --bg-color: #2c5f2d ;
+    --accent-color: #ffc107;
+  }
+  
+.hf-btn-enquiry {
+    background: var(--secondary-color);
+    border: 1px solid var(--secondary-color);
+    color: #fff;
+    padding: 8px 14px;
+    font-size: 0.95rem;
+    width: 100%;
+    cursor: pointer;
+    transition: 0.3s ease;
+  }
+  
+  .hf-btn-enquiry:hover {
+    background: transparent;
+    color: var(--secondary-color);
+    border: 1px solid var(--secondary-color);
+  }
+  

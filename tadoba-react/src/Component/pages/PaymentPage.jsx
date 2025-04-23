@@ -3,10 +3,39 @@ import Header from "../Header";
 import ImportantLinks from "../ImportantLinks";
 import Footer from "../Footer";
 import { message } from "antd";
-import { createOrder, verifyPayment } from "../../service/quickPaymentSerice"; // ✅ Fixed typo
+import { createOrder, verifyPayment } from "../../service/quickPaymentSerice";
 import { useNavigate } from "react-router-dom";
-
+import "../../styles/Payment.css";
+import { Helmet } from "react-helmet";
+import axios from "axios";
 function PaymentPage() {
+  const [seo, setSeo] = useState({
+    metaTitle: "About Us | Your Site",
+    metaDescription: "",
+    metaKeywords: "",
+    canonicalUrl: "",
+    noIndex: false,
+  });
+
+  useEffect(() => {
+    const fetchSEO = async () => {
+      try {
+        const res = await axios.get(
+          "http://localhost:5000/api/pageseo/get-page-seo",
+          {
+            params: { path: "/paymentpage" },
+          }
+        );
+
+        if (res.data?.seo) setSeo(res.data.seo);
+      } catch (error) {
+        console.error("Failed to fetch SEO data", error);
+      }
+    };
+
+    fetchSEO();
+  }, []);
+
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -22,9 +51,8 @@ function PaymentPage() {
     remark: "",
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
   const handlePayment = async () => {
     try {
@@ -34,7 +62,7 @@ function PaymentPage() {
       }
 
       const orderData = await createOrder(formData);
-      const { order, key_id, bookingId } = orderData; // ✅ bookingId is now included
+      const { order, key_id, bookingId } = orderData;
 
       const options = {
         key: key_id,
@@ -42,29 +70,25 @@ function PaymentPage() {
         currency: "INR",
         name: "Tadoba Quick Payment",
         description: "Payment for services",
-        order_id: order.id, // ✅ Razorpay still needs an order_id
-        handler: async function (response) {
-          console.log("🛠 Payment Response:", response);
-          console.log("🛠 Order Data:", orderData);
-          
+        order_id: order.id,
+        handler: async (response) => {
           try {
             const verifyRes = await verifyPayment({
               order_id: response.razorpay_order_id,
               booking_id: bookingId,
               payment_id: response.razorpay_payment_id,
               signature: response.razorpay_signature,
-          });             
-            console.log("✅ Verify Response:", verifyRes);
+            });
 
             if (verifyRes.success) {
               message.success("Payment successful!");
               navigate(
-                `/payment-success?booking_id=${bookingId}&payment_id=${response.razorpay_payment_id}` // ✅ Passing `bookingId`
+                `/payment-success?booking_id=${bookingId}&payment_id=${response.razorpay_payment_id}`
               );
             } else {
               message.error("Payment verification failed.");
             }
-          } catch (error) {
+          } catch {
             message.error("Payment verification error.");
           }
         },
@@ -74,7 +98,7 @@ function PaymentPage() {
           contact: formData.mobile,
         },
         theme: {
-          color: "#3399cc",
+          color: "#1e88e5",
         },
       };
 
@@ -88,76 +112,101 @@ function PaymentPage() {
 
   return (
     <>
+      <Helmet>
+        <title>{seo.metaTitle}</title>
+        {seo.metaDescription && (
+          <meta name="description" content={seo.metaDescription} />
+        )}
+        {seo.metaKeywords && (
+          <meta name="keywords" content={seo.metaKeywords} />
+        )}
+        {seo.canonicalUrl && <link rel="canonical" href={seo.canonicalUrl} />}
+        {seo.noIndex && <meta name="robots" content="noindex, nofollow" />}
+      </Helmet>
       <Header />
+      <section className="payment-hero-section text-center py-4">
+        <div className="payment-hero-overlay">
+          <h1 className="payment-page-title z-30">Quick Payment</h1>
+          <p className="text-muted">Complete your booking securely</p>
+        </div>
+      </section>
 
-      <div className="paymentHead">
-        <h1>Payment</h1>
-      </div>
-      <section className="leaf">
+      <section className="payment-form-section py-0">
         <div className="container">
-          <div className="paymentbox">
-            <h4>Payment Information</h4>
-            <hr />
-
-            <div className="paymentinput">
-              <div className="row">
-                <div className="col-sm-12 col-md-6 col-lg-6">
-                  <label>
-                    <span>Enter Amount</span>
-                  </label>
-                  <br />
-                  <input type="text" name="amount" placeholder="Enter Amount" onChange={handleChange} />
-                  <br />
-                  <label>
-                    <span>Enter Name</span>
-                  </label>
-                  <br />
-                  <input type="text" name="name" placeholder="Enter Name" onChange={handleChange} />
-                  <br />
-                  <label>
-                    <span>Enter Email</span>
-                  </label>
-                  <br />
-                  <input type="text" name="email" placeholder="Enter Email" onChange={handleChange} />
-                  <br />
-                  <label>
-                    <span>Enter Mobile</span>
-                  </label>
-                  <br />
-                  <input type="text" name="mobile" placeholder="Enter Mobile no" onChange={handleChange} />
-                  <br />
-                </div>
-                <div className="col-sm-12 col-md-6 col-lg-6">
-                  <label>
-                    <span>Enter Zip</span>
-                  </label>
-                  <br />
-                  <input type="text" name="zip" placeholder="ZIP Code" onChange={handleChange} />
-                  <br />
-                  <label>
-                    <span>Enter country Rupee</span>
-                  </label>
-                  <br />
-                  <input type="text" disabled placeholder="INR Indian Rupee" />
-                  <br />
-
-                  <label>
-                    <span>Enter City Name *</span>
-                  </label>
-                  <br />
-                  <input type="text" name="city" placeholder="Enter City Name" onChange={handleChange} />
-
-                  <br />
-                  <label>
-                    <span>Remark If any</span>
-                  </label>
-                  <br />
-                  <input type="text" name="remark" placeholder="Enter remark" onChange={handleChange} />
-                  <br />
-                </div>
+          <div className="payment-form-wrapper">
+            <h4 className="mb-0.5 py-0">Enter Payment Details</h4>
+            <div className="row g-4">
+              <div className="col-md-6">
+                <label>Amount (INR)</label>
+                <input
+                  type="number"
+                  className="form-control"
+                  name="amount"
+                  placeholder="Enter amount"
+                  onChange={handleChange}
+                />
+                <label className="mt-3">Name</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="name"
+                  placeholder="Your name"
+                  onChange={handleChange}
+                />
+                <label className="mt-3">Email</label>
+                <input
+                  type="email"
+                  className="form-control"
+                  name="email"
+                  placeholder="you@example.com"
+                  onChange={handleChange}
+                />
+                <label className="mt-3">Mobile</label>
+                <input
+                  type="tel"
+                  className="form-control"
+                  name="mobile"
+                  placeholder="Mobile number"
+                  onChange={handleChange}
+                />
               </div>
-              <button type="button" className="btn btn-primary mt-3" onClick={handlePayment}>
-                Confirm Booking & Pay
+              <div className="col-md-6">
+                <label>Zip Code</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="zip"
+                  placeholder="ZIP Code"
+                  onChange={handleChange}
+                />
+                <label className="mt-3">City</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="city"
+                  placeholder="Your city"
+                  onChange={handleChange}
+                />
+                <label className="mt-3">Currency</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  value="INR (Indian Rupee)"
+                  disabled
+                />
+                <label className="mt-3">Remark</label>
+                <input
+                  type="text"
+                  className="form-control"
+                  name="remark"
+                  placeholder="Any remarks"
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+            <div className="text-end mt-4">
+              <button className="hf-btn-enquiry px-4" onClick={handlePayment}>
+                Confirm & Pay
               </button>
             </div>
           </div>

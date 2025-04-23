@@ -7,7 +7,6 @@ function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [logoUrl, setLogoUrl] = useState(null);
 
-
   const toggleNavbar = () => {
     setIsOpen(!isOpen);
   };
@@ -23,18 +22,16 @@ function Header() {
     <header className="navbar-container">
       <div className="navbar">
         {/* Logo */}
-        <img
-          src={logoUrl || logo}
-          alt="Logo"
-          className="logo"
-        />
+        <img src={logoUrl || logo} alt="Logo" className="logo" />
 
         {/* Desktop Navbar Links */}
         <nav className="nav-links">
           <Link to="/">Home</Link>
           <Link to="/about">About</Link>
-          <a
-            href="/safaribooking"
+          <Link to="/tourpackage">Tour Package</Link>
+          <Link to="/hotels">Hotel in Tadoba</Link>
+          <Link
+            to="/safari-booking"
             style={{
               backgroundColor: "#e68d1d",
               padding: "5px",
@@ -42,14 +39,12 @@ function Header() {
             }}
           >
             Online Safari Booking
-          </a>
-          <a href="/tourpackage">Tour Package</a>
-          <a href="/hotelpage">Hotel in Tadoba</a>
-          <a href="/paymentpage">Payment</a>
-          <a href="/contactus">Contact Us</a>
-          <a href="#" className="contact-number">
-            +91-7982653974 | +91-7982653974
-          </a>
+          </Link>
+          <Link to="/paymentpage">Payment</Link>
+          <Link to="/contactus">Contact Us</Link>
+          <Link to="#" className="contact-number">
+            +91-7982653974
+          </Link>
         </nav>
 
         {/* Mobile Toggle Button */}
@@ -68,7 +63,7 @@ function Header() {
       <nav className={`mobile-nav ${isOpen ? "slide-in" : "slide-out"}`}>
         {/* Header with Logo & Close Button */}
         <div className="mobile-header">
-            <img
+          <img
             src={logoUrl || "/default-logo.png"}
             alt="Logo"
             className="mobile-logo"
@@ -84,32 +79,23 @@ function Header() {
         <Link to="/about" onClick={toggleNavbar}>
           About
         </Link>
-        <a
-          href="/safaribooking"
-          style={{
-            backgroundColor: "#e68d1d",
-            padding: "5px",
-            borderRadius: "10px",
-          }}
-          onClick={toggleNavbar}
-        >
-          Online Safari Booking
-        </a>
-        <a href="/tourpackage" onClick={toggleNavbar}>
-          Tour Package
-        </a>
-        <a href="/hotelpage" onClick={toggleNavbar}>
-          Hotel in Tadoba
-        </a>
-        <a href="/paymentpage" onClick={toggleNavbar}>
-          Payment
-        </a>
-        <a href="/contactus" onClick={toggleNavbar}>
-          Contact Us
-        </a>
-        <a href="#" className="contact-number" onClick={toggleNavbar}>
-          +91-7982653974 | +91-7982653974
-        </a>
+        <Link to="/tourpackage">Tour Package</Link>
+          <Link to="/hotels">Hotel in Tadoba</Link>
+          <Link
+            to="/safari-booking"
+            style={{
+              backgroundColor: "#e68d1d",
+              padding: "5px",
+              borderRadius: "10px",
+            }}
+          >
+            Online Safari Booking
+          </Link>
+          <Link to="/paymentpage">Payment</Link>
+          <Link to="/contactus">Contact Us</Link>
+        <Link href="#" className="contact-number" onClick={toggleNavbar}>
+          +91-7982653974
+        </Link>
       </nav>
     </header>
   );

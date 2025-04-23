@@ -20,7 +20,13 @@ const enquirySchema = new mongoose.Schema(
     },
     remark: { type: String, default: "" },
     statusHistory: [statusHistorySchema], // Add status history array
-    isManual: { type: Boolean, default: false }
+    isManual: { type: Boolean, default: false },
+    logDetails: {
+      ip: String,
+      browser: String,
+      device: String,
+      userAgent: String
+    },
   },
   { timestamps: true }
 );

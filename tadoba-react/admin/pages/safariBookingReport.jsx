@@ -445,7 +445,7 @@ const SafariBookingReport = () => {
         }
 
         .custom-table th {
-          background-color: #2c5f2d !important;
+          background-color: var(--bg-color) !important;
           border: 1px solid #000 !important;
           color: #fff !important;
         }

@@ -1,60 +1,84 @@
 const TourPackage = require("../models/package");
 const mongoose = require("mongoose");
+const path = require("path");
 
 const createTourPackage = async (req, res) => {
   try {
-      let { hotels, title, description, price, location, duration, startDate, endDate, totalSeats, itinerary, includes, excludes } = req.body;
+    let {
+      hotels,
+      title,
+      description,
+      price,
+      location,
+      duration,
+      startDate,
+      endDate,
+      totalSeats,
+      itinerary,
+      includes,
+      excludes,
+    } = req.body;
 
-      // ✅ Ensure `hotels` is properly parsed
-      if (hotels) {
-          try {
-              if (typeof hotels === "string") {
-                  hotels = JSON.parse(hotels);
-              }
-              if (!Array.isArray(hotels)) {
-                  return res.status(400).json({ success: false, error: "Hotels must be an array" });
-              }
-              hotels = hotels.map(id => new mongoose.Types.ObjectId(id));
-          } catch (error) {
-              return res.status(400).json({ success: false, error: "Invalid JSON format for hotels field" });
-          }
-      } else {
-          hotels = [];
+    // Parse hotels
+    if (hotels) {
+      if (typeof hotels === "string") hotels = JSON.parse(hotels);
+      if (!Array.isArray(hotels)) {
+        return res.status(400).json({ success: false, error: "Hotels must be an array" });
       }
+      hotels = hotels.map(id => new mongoose.Types.ObjectId(id));
+    } else {
+      hotels = [];
+    }
 
-      // ✅ Ensure arrays are parsed correctly
-      const parseArray = (data) => {
-          if (!data) return [];
-          if (typeof data === "string") {
-              try {
-                  return JSON.parse(data);
-              } catch {
-                  return [];
-              }
-          }
-          return Array.isArray(data) ? data : [];
-      };
+    // Helper to parse JSON fields
+    const parseArray = (data) => {
+      if (!data) return [];
+      if (typeof data === "string") {
+        try {
+          return JSON.parse(data);
+        } catch {
+          return [];
+        }
+      }
+      return Array.isArray(data) ? data : [];
+    };
 
-      const newPackage = new TourPackage({
-          title,
-          description,
-          price,
-          location,
-          duration,
-          startDate,
-          endDate,
-          totalSeats,
-          itinerary: parseArray(itinerary),
-          includes: parseArray(includes),
-          excludes: parseArray(excludes),
-          hotels
-      });
+    const includesArray = parseArray(includes);
+    const excludesArray = parseArray(excludes);
+    const itineraryArray = parseArray(itinerary);
 
-      await newPackage.save();
-      res.status(201).json({ success: true, message: "Tour package created successfully", package: newPackage });
+    // ✅ Itinerary images matching by order
+    const itineraryImages = req.files?.itineraryImages || [];
+    const mappedItinerary = itineraryArray.map((item, index) => ({
+      title: item.title,
+      activities: item.activities,
+      image: itineraryImages[index]?.filename || null,
+    }));
+
+    // ✅ Package images
+    const images = req.files?.images?.map(file => file.filename) || [];
+
+    const newPackage = new TourPackage({
+      title,
+      description,
+      price,
+      location,
+      duration,
+      startDate,
+      endDate,
+      totalSeats,
+      itinerary: mappedItinerary,
+      includes: includesArray,
+      excludes: excludesArray,
+      hotels,
+      images,
+    });
+
+    await newPackage.save();
+    res.status(201).json({ success: true, message: "Tour package created successfully", package: newPackage });
   } catch (error) {
-      console.error("Error creating tour package:", error);
-      res.status(500).json({ success: false, error: "Failed to create tour package" });
+    console.error("Error creating tour package:", error);
+    res.status(500).json({ success: false, error: "Failed to create tour package" });
   }
 };
 
@@ -64,11 +88,11 @@ const getAllTourPackages = async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    // Fetch total number of packages
-    const totalPackages = await TourPackage.countDocuments(); // ✅ Correct way to count packages
-
-    // Fetch paginated packages
-    const packages = await TourPackage.find().skip(skip).limit(limit).populate("hotels", "title location");
+    const totalPackages = await TourPackage.countDocuments();
+    const packages = await TourPackage.find()
+      .skip(skip)
+      .limit(limit)
+      .populate("hotels", "title location");
 
     res.json({ success: true, packages, totalPackages });
   } catch (error) {
@@ -77,72 +101,80 @@ const getAllTourPackages = async (req, res) => {
   }
 };
 
-
 const getTourPackageById = async (req, res) => {
   try {
-    const package = await TourPackage.findById(req.params.id).populate("hotels"); // ✅ Fetch full hotel details
+    const tourPackage = await TourPackage.findById(req.params.id).populate("hotels");
+    if (!tourPackage) return res.status(404).json({ success: false, error: "Package not found" });
 
-    if (!package) return res.status(404).json({ success: false, error: "Package not found" });
-
-    res.json({ success: true, package });
+    res.json({ success: true, package: tourPackage });
   } catch (error) {
     console.error("Error fetching package:", error);
     res.status(500).json({ success: false, error: "Failed to retrieve package" });
   }
 };
 
-
 const updateTourPackage = async (req, res) => {
   try {
-      let updatedData = req.body;
+    let updatedData = req.body;
 
-      // ✅ Ensure `hotels` is an array of ObjectIds
-      if (updatedData.hotels) {
-          try {
-              // If `hotels` is a stringified array, parse it
-              const parsedHotels = typeof updatedData.hotels === "string" ? JSON.parse(updatedData.hotels) : updatedData.hotels;
+    // ✅ Hotels parsing
+    if (updatedData.hotels) {
+      const parsedHotels = typeof updatedData.hotels === "string"
+        ? JSON.parse(updatedData.hotels)
+        : updatedData.hotels;
 
-              // Convert hotel IDs to ObjectIds
-              updatedData.hotels = parsedHotels.map(id => new mongoose.Types.ObjectId(id));
-          } catch (error) {
-              return res.status(400).json({ success: false, error: "Invalid format for hotels field" });
-          }
-      }
+      updatedData.hotels = parsedHotels.map(id => new mongoose.Types.ObjectId(id));
+    }
 
-      // ✅ Ensure `itinerary`, `includes`, and `excludes` are properly parsed
-      if (typeof updatedData.itinerary === "string") {
-          updatedData.itinerary = JSON.parse(updatedData.itinerary);
-      }
-      if (typeof updatedData.includes === "string") {
-          updatedData.includes = JSON.parse(updatedData.includes);
-      }
-      if (typeof updatedData.excludes === "string") {
-          updatedData.excludes = JSON.parse(updatedData.excludes);
-      }
+    // ✅ JSON fields parsing
+    const itineraryArray = typeof updatedData.itinerary === "string"
+      ? JSON.parse(updatedData.itinerary)
+      : updatedData.itinerary || [];
 
-      const updatedPackage = await TourPackage.findByIdAndUpdate(
-          req.params.id,
-          updatedData,
-          { new: true, runValidators: true }
-      );
+    const includesArray = typeof updatedData.includes === "string"
+      ? JSON.parse(updatedData.includes)
+      : updatedData.includes || [];
 
-      if (!updatedPackage) return res.status(404).json({ success: false, error: "Package not found" });
+    const excludesArray = typeof updatedData.excludes === "string"
+      ? JSON.parse(updatedData.excludes)
+      : updatedData.excludes || [];
 
-      res.json({ success: true, message: "Tour package updated successfully", package: updatedPackage });
+    // ✅ Map itinerary with new images (by order)
+    const itineraryImages = req.files?.itineraryImages || [];
+    updatedData.itinerary = itineraryArray.map((item, index) => ({
+      title: item.title,
+      activities: item.activities,
+      image: itineraryImages[index]?.filename || item.image || null,
+    }));
 
+    // ✅ Update images if new ones are uploaded
+    if (req.files?.images && req.files.images.length > 0) {
+      updatedData.images = req.files.images.map(file => file.filename);
+    }
+
+    updatedData.includes = includesArray;
+    updatedData.excludes = excludesArray;
+
+    const updatedPackage = await TourPackage.findByIdAndUpdate(
+      req.params.id,
+      updatedData,
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedPackage) {
+      return res.status(404).json({ success: false, error: "Package not found" });
+    }
+
+    res.json({ success: true, message: "Tour package updated successfully", package: updatedPackage });
   } catch (error) {
-      console.error("Error updating package:", error);
-      res.status(500).json({ success: false, error: "Failed to update package" });
+    console.error("Error updating package:", error);
+    res.status(500).json({ success: false, error: "Failed to update package" });
   }
 };
 
-
-
-// ✅ Delete a Tour Package
 const deleteTourPackage = async (req, res) => {
   try {
     const deletedPackage = await TourPackage.findByIdAndDelete(req.params.id);
-
     if (!deletedPackage) return res.status(404).json({ success: false, error: "Package not found" });
 
     res.json({ success: true, message: "Tour package deleted successfully" });
@@ -151,15 +183,16 @@ const deleteTourPackage = async (req, res) => {
     res.status(500).json({ success: false, error: "Failed to delete package" });
   }
 };
+
 const togglePackageStatus = async (req, res) => {
   try {
-    const { id } = req.params; // ✅ Ensure correct parameter usage
+    const { id } = req.params;
     const { isActive } = req.body;
 
     const updatedPackage = await TourPackage.findByIdAndUpdate(
       id,
       { isActive },
-      { new: true, runValidators: true } // ✅ Ensure updated document is returned
+      { new: true, runValidators: true }
     );
 
     if (!updatedPackage) {
@@ -173,4 +206,11 @@ const togglePackageStatus = async (req, res) => {
   }
 };
 
-module.exports = { createTourPackage, getAllTourPackages, getTourPackageById, updateTourPackage, deleteTourPackage, togglePackageStatus };
+module.exports = {
+  createTourPackage,
+  getAllTourPackages,
+  getTourPackageById,
+  updateTourPackage,
+  deleteTourPackage,
+  togglePackageStatus,
+};

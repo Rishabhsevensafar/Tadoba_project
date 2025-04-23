@@ -1,0 +1,95 @@
+.te-modal-wrapper .modal-content {
+  border-radius: 16px;
+  border: 1px solid #c2e0c2;
+  background: #f4f9f5;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.te-modal-header {
+  background: #d5f2d5;
+  border-bottom: 1px solid #b6ddb6;
+  padding: 5px 8px;
+}
+
+.te-modal-title {
+  font-weight: 700;
+  color: #2e7d32;
+}
+
+.te-modal-body {
+  padding: 8px 10px;
+}
+
+.te-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.te-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.te-label {
+  font-weight: 600;
+  color: #355e3b;
+  font-size: 0.92rem;
+  margin-bottom: 1px;
+  padding: 0;
+}
+
+.te-input,
+.te-textarea {
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid #b8e0b8;
+  font-size: 0.9rem;
+  background: #fff;
+  outline: none;
+  transition: 0.3s border-color;
+}
+
+.te-input:focus,
+.te-textarea:focus {
+  border-color: #4caf50;
+  box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.2);
+}
+
+.te-textarea {
+  resize: vertical;
+  min-height: 90px;
+}
+
+.te-submit-btn {
+  background: linear-gradient(to right, #4caf50, #388e3c);
+  color: #fff;
+  font-weight: 600;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  width: 100%;
+  transition: background 0.3s ease;
+  margin-top: 10px;
+}
+
+.te-submit-btn:hover {
+  background: linear-gradient(to right, #388e3c, #2e7d32);
+}
+
+.te-success-msg {
+  color: #2e7d32;
+  margin-top: 12px;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+@media (max-width: 576px) {
+  .te-modal-body {
+    padding: 20px 15px;
+  }
+
+  .te-submit-btn {
+    font-size: 0.95rem;
+  }
+}

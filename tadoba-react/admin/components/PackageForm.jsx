@@ -95,6 +95,7 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
   const [newItineraryEntry, setNewItineraryEntry] = useState({
     title: "",
     activities: "",
+    image: null,
   });
   const [fileList, setFileList] = useState([]);
   const [submitting, setSubmitting] = useState(false);
@@ -135,7 +136,13 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
       setFileList(existingImages);
       setIncludes(selectedPackage.includes || []);
       setExcludes(selectedPackage.excludes || []);
-      setItinerary(selectedPackage.itinerary || []);
+      setItinerary(
+        (selectedPackage.itinerary || []).map((entry) => ({
+          ...entry,
+          image: entry.image || null,
+        }))
+      );
+      
     } else {
       form.resetFields();
       setFileList([]);
@@ -198,6 +205,7 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
           day: `Day ${itinerary.length + 1}`,
           title: newItineraryEntry.title,
           activities: newItineraryEntry.activities,
+          image: newItineraryEntry.image,
         },
       ]);
       setNewItineraryEntry({ title: "", activities: "" });
@@ -234,12 +242,20 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
         }
       });
 
-     // ✅ Send hotels as an actual array (NOT a string)
-     console.log("Selected Hotels Before Sending:", selectedHotels);
-     selectedHotels.forEach((id) => packageData.append("hotels[]", id));
+      // ✅ Send hotels as an actual array (NOT a string)
+      console.log("Selected Hotels Before Sending:", selectedHotels);
+      selectedHotels.forEach((id) => packageData.append("hotels[]", id));
 
       // ✅ Append itinerary, includes, excludes as JSON strings
-      packageData.append("itinerary", JSON.stringify(itinerary));
+      // Append itinerary data and their image files
+      itinerary.forEach((item, index) => {
+        packageData.append(`itinerary[${index}][title]`, item.title);
+        packageData.append(`itinerary[${index}][activities]`, item.activities);
+        if (item.image) {
+          packageData.append(`itineraryImages`, item.image); // field name should match Multer field
+        }
+      });
+
       packageData.append("includes", JSON.stringify(includes));
       packageData.append("excludes", JSON.stringify(excludes));
 
@@ -503,7 +519,7 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
               />
             )}
 
-            <Form.Item  
+            <Form.Item
               name="totalSeats"
               label={
                 <Space>
@@ -677,6 +693,25 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
                     })
                   }
                 />
+                <Upload
+                  beforeUpload={(file) => {
+                    setNewItineraryEntry((prev) => ({
+                      ...prev,
+                      image: file,
+                    }));
+                    return false; // prevent automatic upload
+                  }}
+                  showUploadList={{ showRemoveIcon: true }}
+                  onRemove={() =>
+                    setNewItineraryEntry((prev) => ({ ...prev, image: null }))
+                  }
+                  maxCount={1}
+                >
+                  <Button icon={<UploadOutlined />}>
+                    Upload Itinerary Image
+                  </Button>
+                </Upload>
+
                 <Button
                   type="primary"
                   onClick={handleAddItinerary}
@@ -722,7 +757,22 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
                           </span>
                         </Space>
                       }
-                      description={item.activities}
+                      description={
+                        <>
+                          <div>{item.activities}</div>
+                          {item.image && (
+                            <img
+                              src={
+                                typeof item.image === "string"
+                                  ? `http://localhost:5000/uploads/itinerary/${item.image}`
+                                  : URL.createObjectURL(item.image)
+                              }
+                              alt="Itinerary"
+                              style={{ marginTop: "10px", width: "100%", maxHeight: "150px", objectFit: "cover", borderRadius: "6px" }}
+                            />
+                          )}
+                        </>
+                      }
                     />
                   </List.Item>
                 )}

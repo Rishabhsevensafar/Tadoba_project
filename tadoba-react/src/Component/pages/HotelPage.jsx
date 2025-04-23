@@ -19,6 +19,8 @@ import defaultHotelImage from "../../assets/images/caption.jpg";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import "../../styles/HotelPage.css";
+import { Helmet } from "react-helmet";
 
 function HotelPage() {
   const [date, setDate] = useState(new Date());
@@ -34,7 +36,8 @@ function HotelPage() {
   const [priceRange, setPriceRange] = useState([0, 100000]);
   const [showFilters, setShowFilters] = useState(false);
   const [allHotels, setAllHotels] = useState([]); // Store all hotels initially
-    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const increase = () => {
     setCount(count + 1);
@@ -42,6 +45,32 @@ function HotelPage() {
   const decrease = () => {
     setCount(count - 1);
   };
+  const [seo, setSeo] = useState({
+    metaTitle: "About Us | Your Site",
+    metaDescription: "",
+    metaKeywords: "",
+    canonicalUrl: "",
+    noIndex: false,
+  });
+
+  useEffect(() => {
+    const fetchSEO = async () => {
+      try {
+        const res = await axios.get(
+          "http://localhost:5000/api/pageseo/get-page-seo",
+          {
+            params: { path: "/hotels" },
+          }
+        );
+
+        if (res.data?.seo) setSeo(res.data.seo);
+      } catch (error) {
+        console.error("Failed to fetch SEO data", error);
+      }
+    };
+
+    fetchSEO();
+  }, []);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -53,8 +82,8 @@ function HotelPage() {
 
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
-  }, []); 
-  
+  }, []);
+
   // Update your fetchHotels function to store all hotels
   const fetchHotels = async () => {
     try {
@@ -144,6 +173,21 @@ function HotelPage() {
     setHotels(filteredHotels);
     setShowFilters(false); // Hide filters after applying on mobile
   };
+  const handleSearch = (query) => {
+    setSearchQuery(query);
+
+    const filteredHotels = allHotels.filter((hotel) => {
+      const nameMatch = hotel.title
+        ?.toLowerCase()
+        .includes(query.toLowerCase());
+      const locationMatch = hotel.location?.name
+        ?.toLowerCase()
+        .includes(query.toLowerCase());
+      return nameMatch || locationMatch;
+    });
+
+    setHotels(filteredHotels);
+  };
 
   // Function to clear all filters
   const clearAllFilters = () => {
@@ -155,97 +199,52 @@ function HotelPage() {
     setPriceRange([0, 100000]);
     setHotels(allHotels); // Restore all hotels
   };
-    // Slider settings
-    const sliderSettings = {
-      dots: true,
-      infinite: true,
-      speed: 500,
-      slidesToShow: 1,
-      slidesToScroll: 1,
-      autoplay: true,
-      autoplaySpeed: 3000,
-    };
+  // Slider settings
+  const sliderSettings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,
+    autoplaySpeed: 3000,
+  };
   return (
     <>
+      <Helmet>
+        <title>{seo.metaTitle}</title>
+        {seo.metaDescription && (
+          <meta name="description" content={seo.metaDescription} />
+        )}
+        {seo.metaKeywords && (
+          <meta name="keywords" content={seo.metaKeywords} />
+        )}
+        {seo.canonicalUrl && <link rel="canonical" href={seo.canonicalUrl} />}
+        {seo.noIndex && <meta name="robots" content="noindex, nofollow" />}
+      </Helmet>
       <Header></Header>
 
-      <div >
-        {isMobile ? (
-          <Slider {...sliderSettings}>
-            <div
-            >
-              <img src={hotelBanner1} className="tourPackageImg" alt="Tour Package 1" />
-            </div>
-            <div>
-              <img src={hotelBanner2} className="tourPackageImg" alt="Tour Package 2" />
-            </div>
-            <div>
-              <img src={hotelBanner3} className="tourPackageImg" alt="Tour Package 3" />
-            </div>
-          </Slider>
-        ) : (
-          <div className="row">
-            <div className="col-sm-12 col-md-4 col-lg-4 p-0">
-              <img src={hotelBanner1} className="tourPackageImg pe-lg-1" alt="Tour Package 1" />
-            </div>
-            <div className="col-sm-12 col-md-4 col-lg-4 p-0">
-              <img src={hotelBanner2} className="tourPackageImg pe-lg-1" alt="Tour Package 2" />
-            </div>
-            <div className="col-sm-12 col-md-4 col-lg-4 p-0">
-              <img src={hotelBanner3} className="tourPackageImg" alt="Tour Package 3" />
-            </div>
-          </div>
-        )}
-      </div>
-
-      {/* <div className="row hotelback hotelpagefilter">
-        <div className="col-sm-12 col-md-5 col-lg-5 px-3">
-          <div className="boxx">
-            <select>
-              <option value="">Hotels in tadoba</option>
-              <option value="">Tiger valley resort Tdaoba</option>
-              <option value="">Tiger valley resort Tdaoba</option>
-              <option value="">Tiger valley resort Tdaoba</option>
-            </select>
+      {/* Hero Banner with Text Overlay */}
+      <section className="hero-banner">
+        <div className="banner-image">
+          <img src="/images/hotelhero.webp" alt="Tadoba Safari Tours" />
+          <div className="banner-overlay">
+            <h1>Tadoba Hotels</h1>
+            <p>
+              Here we are empowering the wildlife travellers with instant hotel
+              and resort booking with comprehensive choices in Tadoba Safari. We
+              have tie-up with vast network of hotels in Tadoba which include
+              both luxury and budget hotels.
+            </p>
           </div>
         </div>
-        <div className="col-sm-12 col-md-5 col-lg-5 px-3 ">
-          <div className="boxx">
-            <div className="dateFormat">
-              <DatePicker
-                className="date1"
-                placeholderText="Check In"
-                selectsStart
-                selected={startDate}
-                onChange={(date) => setStartDate(date)}
-                startDate={startDate}
-              />
-              <DatePicker
-                className="date1"
-                placeholderText="Check Out"
-                selectsEnd
-                selected={endDate}
-                onChange={(date) => setEndDate(date)}
-                endDate={endDate}
-                startDate={startDate}
-                minDate={startDate}
-              />
-            </div>
-          </div>
-        </div>
-        <div className="col-sm-12 col-md-2 col-lg-2 px-3">
-          <div className="boxxSearch">
-            <a href="#">Search</a>
-          </div>
-        </div>{" "}
-      </div> */}
+      </section>
       <section className="leaf">
         <div className="container">
-          <div className="row">
+          <div className="row gap-sm-0 gap-md-3">
             {/* Filter */}
-            <div className="col-sm-12 col-md-3 col-lg-3">
+            <div className="filter-sidebar">
               <div className="d-flex justify-content-between align-items-center mb-3">
-                <h5 className="ps-3">FILTER BY</h5>
                 <button
                   className="btn btn-sm btn-outline-secondary d-md-none"
                   onClick={() => setShowFilters(!showFilters)}
@@ -274,7 +273,21 @@ function HotelPage() {
                   </button>
                 </div>
 
-                <h6>Filter price</h6>
+                <h6>Filter</h6>
+                <div className="mb-4">
+                  <label htmlFor="searchHotels" className="form-label">
+                    Search Hotels
+                  </label>
+                  <input
+                    type="text"
+                    id="searchHotels"
+                    className="form-control"
+                    placeholder="Search by name or location"
+                    value={searchQuery}
+                    onChange={(e) => handleSearch(e.target.value)}
+                  />
+                </div>
+
                 <hr />
                 <div className="mb-3">
                   <label htmlFor="priceRange" className="form-label">
@@ -297,7 +310,10 @@ function HotelPage() {
                 <div>
                   <h6>Hotel Star</h6>
                   {[5, 4, 3, 2, 1].map((starCount) => (
-                    <p key={`star-${starCount}`}>
+                    <p
+                      key={`star-${starCount}`}
+                      style={{ display: "flex", alignItems: "center" }}
+                    >
                       <input
                         type="checkbox"
                         id={`star-${starCount}`}
@@ -382,17 +398,14 @@ function HotelPage() {
                     ))}
                   </div>
                 </div>
-                <div className="text-center my-3 d-none d-md-block">
-                  <button
-                    className="btn btn-primary me-2"
-                    onClick={applyFilters}
-                  >
+                <div
+                  className="desk-btn "
+                  style={{ flexDirection: "column !important" }}
+                >
+                  <button className="btn hf-btn-enquiry" onClick={applyFilters}>
                     Apply Filters
                   </button>
-                  <button
-                    className="btn btn-outline-danger"
-                    onClick={clearAllFilters}
-                  >
+                  <button className="btn btn-clear" onClick={clearAllFilters}>
                     Clear All
                   </button>
                 </div>
@@ -400,7 +413,7 @@ function HotelPage() {
             </div>
 
             {/* <p>5 Hotels Found</p> */}
-            <div className="col-sm-12 col-md-9">
+            <div className="hotel-listing-area">
               {hotels.length > 0 ? (
                 hotels.map((hotel) => (
                   <div key={hotel._id} className="hotel mt-3 allhoteldes">
@@ -415,7 +428,7 @@ function HotelPage() {
                         alt={hotel.title}
                       />
                     </div>
-                    <div className="ps-4">
+                    <div className="ps-2">
                       <h5>
                         <Link to={`/hoteldetail/${hotel._id}`}>
                           {hotel.title}
@@ -435,7 +448,7 @@ function HotelPage() {
                         {hotel.amenities && hotel.amenities.length > 0 ? (
                           <>
                             {hotel.amenities
-                              .slice(0, 3)
+                              .slice(0, 2)
                               .map((amenity, index) => (
                                 <span
                                   key={index}
@@ -444,7 +457,7 @@ function HotelPage() {
                                   {amenity}
                                 </span>
                               ))}
-                            {hotel.amenities.length > 3 && (
+                            {hotel.amenities.length > 2 && (
                               <span>
                                 ...{" "}
                                 <Link to={`/hoteldetail/${hotel._id}`}>
@@ -465,7 +478,7 @@ function HotelPage() {
                         {hotel.facilities && hotel.facilities.length > 0 ? (
                           <>
                             {hotel.facilities
-                              .slice(0, 3)
+                              .slice(0, 2)
                               .map((facility, index) => (
                                 <span
                                   key={index}
@@ -474,7 +487,7 @@ function HotelPage() {
                                   {facility}
                                 </span>
                               ))}
-                            {hotel.facilities.length > 3 && (
+                            {hotel.facilities.length > 2 && (
                               <span>
                                 ...{" "}
                                 <Link to={`/hoteldetail/${hotel._id}`}>
@@ -508,7 +521,12 @@ function HotelPage() {
                     </div>
 
                     <div className="ps-3 ms-0 ms-md-auto hotelrightdiv">
-                      <div className="stardes">
+                      <div
+                        className="stardes"
+                        style={{
+                          display: "flex",
+                        }}
+                      >
                         {[...Array(hotel.number_of_stars || 3)].map(
                           (_, index) => (
                             <FaStar key={index} style={{ color: "#FFD43B" }} />
@@ -519,7 +537,7 @@ function HotelPage() {
                       <h4> &#x20B9; {hotel.discounted_price || "N/A"}</h4>
                       <p>+ &#x20B9; 0 taxes & fees per night</p>
                       <Link to={`/hoteldetail/${hotel._id}`}>
-                        <button type="button" className="btn btn-success">
+                        <button type="button" className="btn hf-btn-enquiry">
                           More Details
                         </button>
                       </Link>

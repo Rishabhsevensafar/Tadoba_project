@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Modal, Button, Form, Row, Col } from "react-bootstrap";
+import { Modal, Button, Form } from "react-bootstrap";
 import axios from "axios";
-import "../styles/TourEnquiry.css"; // Add this CSS file to your project
+import "../styles/TourEnquiryModal.css";
 
 const TourEnquiryModal = ({ show, handleClose, hotel, packageId }) => {
   const [formData, setFormData] = useState({
@@ -10,22 +10,24 @@ const TourEnquiryModal = ({ show, handleClose, hotel, packageId }) => {
     phone: "",
     country: "",
     message: "",
-    hotelId: hotel?._id || "", // ✅ Ensure hotel ID is passed
-    packageId: packageId || "", // ✅ Ensure package ID is passed
+    hotelId: hotel?._id || "",
+    packageId: packageId || "",
   });
 
   const [isLoading, setIsLoading] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
   useEffect(() => {
     setFormData((prev) => ({
       ...prev,
-      hotelId: hotel?._id || "", // ✅ Update hotelId when hotel changes
+      hotelId: hotel?._id || "",
     }));
   }, [hotel]);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
@@ -52,74 +54,72 @@ const TourEnquiryModal = ({ show, handleClose, hotel, packageId }) => {
   };
 
   return (
-    <Modal show={show} onHide={handleClose} centered>
-      <Modal.Header closeButton>
-        <Modal.Title>Enquire: {hotel?.title}</Modal.Title>
+    <Modal show={show} onHide={handleClose} centered className="te-modal-wrapper">
+      <Modal.Header closeButton className="te-modal-header">
+        <Modal.Title className="te-modal-title">Enquire: {hotel?.title}</Modal.Title>
       </Modal.Header>
-      <Modal.Body>
-        <Form onSubmit={handleSubmit}>
-          <Form.Group>
-            <Form.Label>Full Name</Form.Label>
-            <Form.Control
+      <Modal.Body className="te-modal-body">
+        <Form onSubmit={handleSubmit} className="te-form">
+          <div className="te-group">
+            <label className="te-label">Full Name</label>
+            <input
               type="text"
               name="name"
+              className="te-input"
               required
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
+              onChange={handleChange}
             />
-          </Form.Group>
+          </div>
 
-          <Form.Group>
-            <Form.Label>Email</Form.Label>
-            <Form.Control
+          <div className="te-group">
+            <label className="te-label">Email</label>
+            <input
               type="email"
               name="email"
+              className="te-input"
               required
-              onChange={(e) =>
-                setFormData({ ...formData, email: e.target.value })
-              }
+              onChange={handleChange}
             />
-          </Form.Group>
+          </div>
 
-          <Form.Group>
-            <Form.Label>Phone</Form.Label>
-            <Form.Control
+          <div className="te-group">
+            <label className="te-label">Phone</label>
+            <input
               type="text"
               name="phone"
+              className="te-input"
               required
-              onChange={(e) =>
-                setFormData({ ...formData, phone: e.target.value })
-              }
+              onChange={handleChange}
             />
-          </Form.Group>
+          </div>
 
-          <Form.Group>
-            <Form.Label>Country</Form.Label>
-            <Form.Control
+          <div className="te-group">
+            <label className="te-label">Country</label>
+            <input
               type="text"
               name="country"
+              className="te-input"
               required
-              onChange={(e) =>
-                setFormData({ ...formData, country: e.target.value })
-              }
+              onChange={handleChange}
             />
-          </Form.Group>
+          </div>
 
-          <Form.Group>
-            <Form.Label>Message</Form.Label>
-            <Form.Control
-              as="textarea"
-              rows={3}
+          <div className="te-group">
+            <label className="te-label">Message</label>
+            <textarea
               name="message"
+              rows={3}
+              className="te-textarea"
               required
-              onChange={(e) =>
-                setFormData({ ...formData, message: e.target.value })
-              }
-            />
-          </Form.Group>
+              onChange={handleChange}
+            ></textarea>
+          </div>
 
-          <Button type="submit">Send Enquiry</Button>
+          <button type="submit" className="te-submit-btn" disabled={isLoading}>
+            {isLoading ? "Sending..." : "Send Enquiry"}
+          </button>
+
+          {successMessage && <p className="te-success-msg">{successMessage}</p>}
         </Form>
       </Modal.Body>
     </Modal>

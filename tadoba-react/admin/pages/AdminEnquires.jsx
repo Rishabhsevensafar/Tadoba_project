@@ -621,6 +621,7 @@ const AdminHotelEnquiries = () => {
                 <HomeOutlined className="mr-2" />{" "}
                 {selectedEnquiry.hotelId?.title || "N/A"}
               </Descriptions.Item>
+
             </Descriptions>
 
             <Descriptions
@@ -642,6 +643,19 @@ const AdminHotelEnquiries = () => {
               <Descriptions.Item label="Current Remark">
                 {selectedEnquiry.remark || "No remark added"}
               </Descriptions.Item>
+              <Descriptions.Item label="Device Info">
+  {selectedEnquiry?.logDetails ? (
+    <>
+      <div><b>IP:</b> {selectedEnquiry.logDetails.ip}</div>
+      <div><b>Browser:</b> {selectedEnquiry.logDetails.browser}</div>
+      <div><b>Device:</b> {selectedEnquiry.logDetails.device}</div>
+      <div><b>User Agent:</b> <span style={{ wordBreak: "break-word" }}>{selectedEnquiry.logDetails.userAgent}</span></div>
+    </>
+  ) : (
+    <Text type="secondary">No log info available</Text>
+  )}
+</Descriptions.Item>
+
             </Descriptions>
             <Divider style={{ margin: "16px 0" }} />
             <Form layout="vertical">
@@ -715,11 +729,11 @@ const AdminHotelEnquiries = () => {
           border: 1px solid #000 !important;
         }
         .black-bordered-descriptions th {
-          background-color: #2c5f2d !important;
+          background-color: var(--bg-color) !important;
           color: #fff !important;
         }
         .black-bordered-table th {
-          background-color: #2c5f2d !important;
+          background-color: var(--bg-color) !important;
           color: #fff !important;
         }
         .black-bordered-table .ant-table-column-sorter {
