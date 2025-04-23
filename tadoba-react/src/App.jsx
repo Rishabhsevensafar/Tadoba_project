@@ -5,6 +5,7 @@ import { Helmet } from "react-helmet";
 import axios from "axios";
 import "bootstrap/dist/css/bootstrap.min.css";
 import AppRoutes from "./AppRoutes";
+import FloatingEnquiry from "./Component/GeneralEnquiry";
 // import "bootstrap/dist/js/bootstrap.bundle.min";
 
 const BASE_URL = "http://localhost:5000"; // ✅ make this .env later if needed
@@ -45,6 +46,7 @@ function App(props) {
           ></script>
         )}
       </Helmet>
+      <FloatingEnquiry/>
       {React.isValidElement(props.router) ? (
         props.router
       ) : (

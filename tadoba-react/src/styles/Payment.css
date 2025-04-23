@@ -1,0 +1,70 @@
+.payment-hero-section {
+    position: relative;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  
+  .payment-hero-section::before {
+    content: "";
+    background-image: url("/images/about-banner.jpg");
+    background-size: cover;
+    background-position: center;
+    filter: blur(2px);
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1;
+  }
+  
+  .payment-hero-overlay {
+    position: relative;
+    z-index: 2;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+  }
+  
+  .payment-page-title {
+    font-weight: 700;
+    font-size: 2.5rem;
+    color: #1e88e5;
+  }
+  
+  .payment-form-wrapper {
+    background: #ffffff;
+    border-radius: 8px;
+    padding: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  }
+  
+  .payment-form-section {
+    background: #fafafa;
+  }
+  
+  .payment-form-wrapper input {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px 12px;
+    font-size: 15px;
+  }
+  
+  .payment-form-wrapper input:focus {
+    outline: none;
+    border-color: #1e88e5;
+    box-shadow: 0 0 3px #1e88e570;
+  }
+  
+  .btn-primary {
+    background-color: #1e88e5;
+    border-color: #1e88e5;
+  }
+  
+  .btn-primary:hover {
+    background-color: #1669bb;
+    border-color: #1669bb;
+  }
+  

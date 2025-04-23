@@ -662,11 +662,11 @@ const AdminBlogs = () => {
             border: 1px solid #000 !important;
           }
           .black-bordered-descriptions th {
-            background-color: #2c5f2d !important;
+            background-color: var(--bg-color) !important;
             color: #fff !important;
           }
           .black-bordered-table th {
-            background-color: #2c5f2d !important;
+            background-color: var(--bg-color) !important;
             color: #fff !important;
           }
 

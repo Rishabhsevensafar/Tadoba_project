@@ -351,7 +351,7 @@ const AdminUserManager = () => {
         justifyContent: 'space-between', 
         alignItems: 'center', 
         marginBottom: 16,
-        background: '#2c5f2d',
+        background: 'var(--bg-color)',
         margin: '-24px -24px 24px -24px',
         padding: '16px 24px',
         borderRadius: '8px 8px 0 0',
@@ -404,7 +404,7 @@ const AdminUserManager = () => {
               marginBottom: 20,
               borderRadius: '8px',
               background: '#fafafa',
-              borderLeft: '4px solid #2c5f2d'
+              borderLeft: '4px solid var(--bg-color)'
             }}
             headStyle={{ 
               background: '#f0f7ff',
@@ -622,11 +622,11 @@ const AdminUserManager = () => {
           border: 1px solid #000 !important;
         }
         .black-bordered-descriptions th {
-          background-color: #2c5f2d !important;
+          background-color: var(--bg-color) !important;
           color: #fff !important;
         }
         .black-bordered-table th {
-          background-color: #2c5f2d !important;
+          background-color: var(--bg-color) !important;
           color: #fff !important;
         }
 

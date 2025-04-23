@@ -1,10 +1,11 @@
 import React from "react";
-import AppRoutes from "./AppRoutes";
+import App from "./App"; // ✅ this will pull in full layout + settings
 import { StaticRouter } from "react-router-dom/server";
+import AppRoutes from "./AppRoutes";
 
 const SSRApp = ({ url }) => (
   <StaticRouter location={url}>
-    <AppRoutes />
+    <App router={<AppRoutes />} />
   </StaticRouter>
 );
 

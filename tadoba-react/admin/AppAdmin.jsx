@@ -21,6 +21,8 @@ import AdminUserManager from "./pages/AdminUserManager";
 import ProtectedRoute from "../admin/pages/PrivateRoutes"; // ✅ Updated import
 import AdminRoleManager from "./pages/AdminRoleManage";
 import AdminPermissionManager from "./pages/AdminPermissionManager";
+import AdminPageSEO from "./pages/AdminSeoPage";
+import HeroSettings from "./pages/AdminHero";
 
 const AppAdmin = () => {
   return (
@@ -159,10 +161,34 @@ const AppAdmin = () => {
             }
           />
           <Route
+            path="Categories"
+            element={
+              <ProtectedRoute allowedPermissions={["manager"]}>
+                <CategoryManager />
+              </ProtectedRoute>
+            }
+          />
+          <Route
             path="booking-report"
             element={
               <ProtectedRoute allowedPermissions={["manager"]}>
                 <AdminBookings />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="on-page-seo"
+            element={
+              <ProtectedRoute allowedPermissions={["global-setting"]}>
+                <AdminPageSEO />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="hero-setting"
+            element={
+              <ProtectedRoute allowedPermissions={["global-setting"]}>
+                <HeroSettings />
               </ProtectedRoute>
             }
           />

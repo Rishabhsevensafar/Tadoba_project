@@ -37,7 +37,7 @@ exports.createOrder = async (req, res) => {
         res.status(200).json({ 
             success: true, 
             order, 
-            key_id: process.env.RAZORPAY_KEY_ID, 
+            key_id: process.env.RAZORPAY_KEY, 
             bookingId // ✅ Return only `bookingId` to frontend
         });
 

@@ -565,15 +565,28 @@ const AdminTourEnquiries = () => {
                 <Descriptions.Item label="Message" span={2}>
                   {selectedEnquiry.message}
                 </Descriptions.Item>
-                <Descriptions.Item label="Current Status">
+                <Descriptions.Item label="Current Status" span={2}>
                   {selectedEnquiry.status && (
                     <Tag color={getStatusInfo(selectedEnquiry.status).color}>
                       {selectedEnquiry.status}
                     </Tag>
                   )}
                 </Descriptions.Item>
-                <Descriptions.Item label="Current Remark">
+                <Descriptions.Item label="Current Remark" span={2}>
                   {selectedEnquiry.remark || "No remark added"}
+                </Descriptions.Item>
+
+                <Descriptions.Item label="IP Address" span={2}>
+                  {selectedEnquiry?.logDetails?.ip || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Device" span={2}>
+                  {selectedEnquiry?.logDetails?.device || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="Browser" span={2}>
+                  {selectedEnquiry?.logDetails?.browser || "N/A"}
+                </Descriptions.Item>
+                <Descriptions.Item label="User Agent" span={2}>
+                  {selectedEnquiry?.logDetails?.userAgent || "N/A"}
                 </Descriptions.Item>
               </Descriptions>
 
@@ -638,15 +651,15 @@ const AdminTourEnquiries = () => {
           border: 1px solid #000 !important;
         }
         .black-bordered-descriptions th {
-          background-color: #2c5f2d !important;
+          background-color: var(--bg-color) !important;
           color: #fff !important;
         }
         .black-bordered-table th {
-          background-color: #2c5f2d !important;
+          background-color: var(--bg-color) !important;
           color: #fff !important;
         }
         .black-bordered-table .ant-table-column-sorter {
-          color: #fff; 
+          color: #fff;
         }
 
         .black-bordered-table
@@ -655,7 +668,7 @@ const AdminTourEnquiries = () => {
         .black-bordered-table
           .ant-table-column-sort
           .ant-table-column-sorter-down.active {
-          color: #ff4d4f; 
+          color: #ff4d4f;
         }
       `}</style>
     </Card>

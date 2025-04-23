@@ -246,6 +246,20 @@ const DashboardPage = () => {
       onClick: () => navigate("/admin/dashboard/user-manager"),
     },
     {
+      key: "/admin/dashboard/hero-setting",
+      icon: <User size={18} />,
+      label: "Hero Settings",
+      permission: "global-setting",
+      onClick: () => navigate("/admin/dashboard/hero-setting"),
+    },
+    {
+      key: "/admin/dashboard/on-page-seo",
+      icon: <User size={18} />,
+      label: "On-page-seo",
+      permission: "global-setting",
+      onClick: () => navigate("/admin/dashboard/on-page-seo"),
+    },
+    {
       key: "/admin/dashboard/Role-manager",
       icon: <User size={18} />,
       label: "Role Manager",

@@ -1,13 +1,18 @@
 const TourEnquiry = require("../models/tourenquirymodel");
-const HotelPackage = require("../models/hotel"); // Ensure correct model import
-const TourPackage = require("../models/package");
 const mongoose = require("mongoose");
-// ✅ Create Enquiry API
+const uaParser = require("ua-parser-js");
+
 exports.createTourEnquiry = async (req, res) => {
   try {
-    console.log("Received Enquiry Data:", req.body); // ✅ Debugging
-
     const { name, email, phone, country, message, hotelId, packageId } = req.body;
+
+    const ua = uaParser(req.headers["user-agent"]);
+    const logDetails = {
+      ip: req.headers["x-forwarded-for"] || req.connection.remoteAddress,
+      browser: ua.browser.name + " " + ua.browser.version,
+      device: ua.device.type || "Desktop",
+      userAgent: req.headers["user-agent"]
+    };
 
     const newEnquiry = new TourEnquiry({
       name,
@@ -18,23 +23,30 @@ exports.createTourEnquiry = async (req, res) => {
       hotel: hotelId ? new mongoose.Types.ObjectId(hotelId) : null,
       package: packageId ? new mongoose.Types.ObjectId(packageId) : null,
       status: "Pending",
+      logDetails
     });
 
     await newEnquiry.save();
-    res.status(201).json({ success: true, message: "Enquiry submitted successfully", enquiry: newEnquiry });
+    res.status(201).json({
+      success: true,
+      message: "Enquiry submitted successfully",
+      enquiry: newEnquiry
+    });
   } catch (error) {
     console.error("Error creating tour enquiry:", error);
-    res.status(500).json({ success: false, error: "Failed to submit enquiry" });
+    res.status(500).json({
+      success: false,
+      error: "Failed to submit enquiry"
+    });
   }
 };
 
 exports.getAllTourEnquiries = async (req, res) => {
   try {
     const enquiries = await TourEnquiry.find()
-      .populate("hotel", "title")  
+      .populate("hotel", "title")
       .populate("package", "title")
-      .sort({ createdAt: -1 })
-      .exec();
+      .sort({ createdAt: -1 });
 
     res.status(200).json({ success: true, enquiries });
   } catch (error) {
@@ -43,24 +55,38 @@ exports.getAllTourEnquiries = async (req, res) => {
   }
 };
 
-// ✅ Update Enquiry Status & Remark (Admin)
 exports.updateEnquiry = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { status, remark } = req.body;
+  try {
+    const { id } = req.params;
+    const { status, remark } = req.body;
 
-        const enquiry = await TourEnquiry.findByIdAndUpdate(
-            id,
-            { status, remark },
-            { new: true }
-        );
-
-        if (!enquiry) {
-            return res.status(404).json({ success: false, message: "Enquiry not found" });
+    const updated = await TourEnquiry.findByIdAndUpdate(
+      id,
+      {
+        status,
+        remark,
+        $push: {
+          statusHistory: {
+            status,
+            remark,
+            changedAt: new Date()
+          }
         }
+      },
+      { new: true }
+    );
 
-        res.status(200).json({ success: true, message: "Enquiry updated successfully", enquiry });
-    } catch (error) {
-        res.status(500).json({ success: false, error: "Failed to update enquiry" });
+    if (!updated) {
+      return res.status(404).json({ success: false, message: "Enquiry not found" });
     }
+
+    res.status(200).json({
+      success: true,
+      message: "Enquiry updated successfully",
+      enquiry: updated
+    });
+  } catch (error) {
+    console.error("Error updating enquiry:", error);
+    res.status(500).json({ success: false, error: "Failed to update enquiry" });
+  }
 };

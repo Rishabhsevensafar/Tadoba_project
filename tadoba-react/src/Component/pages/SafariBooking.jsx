@@ -7,6 +7,8 @@ import Footer from "../Footer";
 import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "../../styles/SafariBooking.css";
+import {Helmet} from "react-helmet";
+import axios from "axios";
 
 function SafariBooking() {
   const [date, setDate] = useState(new Date());
@@ -37,7 +39,33 @@ function SafariBooking() {
     window.scrollTo(0, 0);
     fetchBookingConfig();
   }, []);
-
+  
+    const [seo, setSeo] = useState({
+      metaTitle: "About Us | Your Site",
+      metaDescription: "",
+      metaKeywords: "",
+      canonicalUrl: "",
+      noIndex: false,
+    });
+  
+    useEffect(() => {
+      const fetchSEO = async () => {
+        try {
+          const res = await axios.get(
+            "http://localhost:5000/api/pageseo/get-page-seo",
+            {
+              params: { path: "/safari-booking" },
+            }
+          );
+  
+          if (res.data?.seo) setSeo(res.data.seo);
+        } catch (error) {
+          console.error("Failed to fetch SEO data", error);
+        }
+      };
+  
+      fetchSEO();
+    }, []);
   // Fetch booking configuration from backend
   const fetchBookingConfig = async () => {
     try {
@@ -263,7 +291,21 @@ function SafariBooking() {
   };
 
   return (
+
     <>
+      <Helmet>
+        <title>{seo.metaTitle}</title>
+        {seo.metaDescription && (
+          <meta name="description" content={seo.metaDescription} />
+        )}
+        {seo.metaKeywords && (
+          <meta name="keywords" content={seo.metaKeywords} />
+        )}
+        {seo.canonicalUrl && (
+          <link rel="canonical" href={seo.canonicalUrl} />
+        )}
+        {seo.noIndex && <meta name="robots" content="noindex, nofollow" />}
+      </Helmet>
       <Header />
 
       {/* Main Booking Section */}

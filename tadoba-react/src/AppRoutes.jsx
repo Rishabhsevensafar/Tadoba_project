@@ -79,7 +79,7 @@ const AppRoutes = () => (
       element={<TourPackageDetail />}
     />
     <Route path="/hoteldetail/:id" element={<HotelDetails />} />
-    <Route path="/hotelpage" element={<HotelPage />} />
+    <Route path="/hotels" element={<HotelPage />} />
     <Route path="/paymentpage" element={<PaymentPage />} />
     <Route
       path="/reviewbookinghotel"
@@ -92,9 +92,7 @@ const AppRoutes = () => (
     <Route
       path="/booking-success/:bookingId"
       element={<SafariBookingSuccess />}
-    />
-
-    {/* <Route path="/Route-hero" element= {<HeroSection/>}/> */}
+    />  
   </Routes>
 );
 

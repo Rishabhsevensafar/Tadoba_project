@@ -3,9 +3,36 @@ import Header from "../Header";
 import ImportantLinks from "../ImportantLinks";
 import Footer from "../Footer";
 import contactBanner from "../../assets/images/contact-banner.jpg";
-import "../../styles/ContactUS.css"; // Import the CSS file for styling
-
+import "../../styles/ContactUS.css"; 
+import axios from "axios";
+import { Helmet } from "react-helmet";
 function ContactUs() {
+    const [seo, setSeo] = useState({
+      metaTitle: "About Us | Your Site",
+      metaDescription: "",
+      metaKeywords: "",
+      canonicalUrl: "",
+      noIndex: false,
+    });
+  
+    useEffect(() => {
+      const fetchSEO = async () => {
+        try {
+          const res = await axios.get(
+            "http://localhost:5000/api/pageseo/get-page-seo",
+            {
+              params: { path: "/contactus" },
+            }
+          );
+  
+          if (res.data?.seo) setSeo(res.data.seo);
+        } catch (error) {
+          console.error("Failed to fetch SEO data", error);
+        }
+      };
+  
+      fetchSEO();
+    }, []);
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
@@ -49,6 +76,19 @@ function ContactUs() {
 
   return (
     <>
+      <Helmet>
+        <title>{seo.metaTitle}</title>
+        {seo.metaDescription && (
+          <meta name="description" content={seo.metaDescription} />
+        )}
+        {seo.metaKeywords && (
+          <meta name="keywords" content={seo.metaKeywords} />
+        )}
+        {seo.canonicalUrl && (
+          <link rel="canonical" href={seo.canonicalUrl} />
+        )}
+        {seo.noIndex && <meta name="robots" content="noindex" />}
+      </Helmet>
       <Header />
       <div className="contact-banner">
         <img src={contactBanner} alt="Contact page banner" className="banner-image" />

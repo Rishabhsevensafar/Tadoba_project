@@ -15,6 +15,7 @@ const tourPackageSchema = new mongoose.Schema(
       {
         title: { type: String, required: true },
         activities: { type: String, required: true },
+        image: { type: String }, // ✅ New field for itinerary image
       },
     ],
     includes: [{ type: String }], 

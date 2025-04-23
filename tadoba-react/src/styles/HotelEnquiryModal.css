@@ -1,0 +1,78 @@
+.enquiry-btn {
+    background: #2563eb;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 6px;
+    font-weight: 600;
+    transition: 0.3s ease;
+  }
+  .enquiry-btn:hover {
+    background: #1e40af;
+  }
+  
+  /* Modal Styles */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  .modal-content {
+    background: white;
+    padding: 15px 20px;
+    width: 100%;
+    max-width: 450px;
+    border-radius: 10px;
+    position: relative;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  }
+  .modal-title {
+    font-size: 20px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  .modal-close {
+    position: absolute;
+    top: 12px;
+    right: 15px;
+    font-size: 22px;
+    border: none;
+    background: none;
+    cursor: pointer;
+  }
+  .modal-form input,
+  .modal-form textarea {
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 15px;
+  }
+  .modal-form textarea {
+    resize: vertical;
+    min-height: 80px;
+  }
+  .submit-btn {
+    background: #10b981;
+    color: white;
+    width: 100%;
+    padding: 10px;
+    border-radius: 6px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: 0.3s ease;
+  }
+  .submit-btn:hover {
+    background: #059669;
+  }
+  .submit-btn.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  

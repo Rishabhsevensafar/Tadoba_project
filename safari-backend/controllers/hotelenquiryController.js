@@ -1,4 +1,5 @@
 const Enquiry = require("../models/hotelenquiry");
+const uaParser = require("ua-parser-js");
 
 // ✅ Create a new enquiry
 exports.createEnquiry = async (req, res) => {
@@ -9,12 +10,22 @@ exports.createEnquiry = async (req, res) => {
       return res.status(400).json({ error: "All fields are required" });
     }
 
+    // Capture log details
+    const ua = uaParser(req.headers['user-agent']);
+    const logDetails = {
+      ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+      browser: ua.browser.name + " " + ua.browser.version,
+      device: ua.device.type || "Desktop",
+      userAgent: req.headers['user-agent']
+    };
+
     const newEnquiry = new Enquiry({
       name,
       email,
       phone,
       message,
       hotelId,
+      logDetails
     });
 
     await newEnquiry.save();
@@ -27,14 +38,14 @@ exports.createEnquiry = async (req, res) => {
 // ✅ Fetch all enquiries (Admin Panel)
 exports.getAllEnquiries = async (req, res) => {
   try {
-    const enquiries = await Enquiry.find().populate("hotelId", "title"); // Fetch hotel details
+    const enquiries = await Enquiry.find().populate("hotelId", "title");
     res.status(200).json(enquiries);
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch enquiries" });
   }
 };
 
-// Add this new function to get status history
+// ✅ Get status history
 exports.getStatusHistory = async (req, res) => {
   try {
     const { id } = req.params;
@@ -44,15 +55,13 @@ exports.getStatusHistory = async (req, res) => {
       return res.status(404).json({ error: "Enquiry not found" });
     }
 
-    res.status(200).json({ 
-      statusHistory: enquiry.statusHistory || [] 
-    });
+    res.status(200).json({ statusHistory: enquiry.statusHistory || [] });
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch status history" });
   }
 };
 
-// Update the existing updateEnquiryStatus function
+// ✅ Update status and remark
 exports.updateEnquiryStatus = async (req, res) => {
   try {
     const { status, remark } = req.body;
@@ -67,7 +76,6 @@ exports.updateEnquiryStatus = async (req, res) => {
       return res.status(404).json({ error: "Enquiry not found" });
     }
 
-    // Add current status to history before updating
     if (enquiry.status !== status || remark) {
       enquiry.statusHistory.push({
         status: enquiry.status,
@@ -77,21 +85,20 @@ exports.updateEnquiryStatus = async (req, res) => {
     }
 
     enquiry.status = status;
-    if (remark) {
-      enquiry.remark = remark;
-    }
+    if (remark) enquiry.remark = remark;
 
     const updatedEnquiry = await enquiry.save();
 
-    res.status(200).json({ 
-      message: "Enquiry status updated", 
-      enquiry: updatedEnquiry 
+    res.status(200).json({
+      message: "Enquiry status updated",
+      enquiry: updatedEnquiry
     });
   } catch (error) {
     res.status(500).json({ error: "Failed to update status" });
   }
 };
-// ✅ Add Remark to Enquiry
+
+// ✅ Add remark separately
 exports.addRemarkToEnquiry = async (req, res) => {
   try {
     const { remark } = req.body;
@@ -112,7 +119,8 @@ exports.addRemarkToEnquiry = async (req, res) => {
     res.status(500).json({ error: "Failed to add remark" });
   }
 };
-// Add this to your hotelenquiry controller
+
+// ✅ Create manual enquiry (with log)
 exports.createManualEnquiry = async (req, res) => {
   try {
     const {
@@ -125,12 +133,17 @@ exports.createManualEnquiry = async (req, res) => {
       remark = ""
     } = req.body;
 
-    // Basic validation
     if (!name || !phone || !hotelId) {
-      return res.status(400).json({ 
-        error: "Name, phone and hotel ID are required" 
-      });
+      return res.status(400).json({ error: "Name, phone and hotel ID are required" });
     }
+
+    const ua = uaParser(req.headers['user-agent']);
+    const logDetails = {
+      ip: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
+      browser: ua.browser.name + " " + ua.browser.version,
+      device: ua.device.type || "Desktop",
+      userAgent: req.headers['user-agent']
+    };
 
     const newEnquiry = new Enquiry({
       name,
@@ -140,24 +153,24 @@ exports.createManualEnquiry = async (req, res) => {
       hotelId,
       status,
       remark,
-      isManual: true // Flag to identify manually created enquiries
+      isManual: true,
+      logDetails
     });
 
     await newEnquiry.save();
-    
-    res.status(201).json({ 
-      success: true, 
-      message: "Manual enquiry created successfully", 
-      enquiry: newEnquiry 
+
+    res.status(201).json({
+      success: true,
+      message: "Manual enquiry created successfully",
+      enquiry: newEnquiry
     });
 
   } catch (error) {
     console.error("Error creating manual enquiry:", error);
-    res.status(500).json({ 
-      success: false, 
+    res.status(500).json({
+      success: false,
       error: "Failed to create manual enquiry",
-      details: error.message 
+      details: error.message
     });
   }
 };
-

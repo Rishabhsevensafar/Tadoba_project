@@ -10,7 +10,13 @@ import "react-datepicker/dist/react-datepicker.css";
 import tadobaHotel from "../../assets/images/tadoba1.jpeg";
 import day1package from "../../assets/images/navegaon.jpg";
 import { useState } from "react";
-import { FaBan, FaLocationArrow, FaUtensils, FaWifi } from "react-icons/fa6";
+import {
+  FaBan,
+  FaClock,
+  FaLocationArrow,
+  FaUtensils,
+  FaWifi,
+} from "react-icons/fa6";
 import { FaCarAlt, FaRemoveFormat } from "react-icons/fa";
 import { FaHome } from "react-icons/fa";
 import { CiBeaker1 } from "react-icons/ci";
@@ -19,15 +25,19 @@ import { FaStar } from "react-icons/fa";
 import { useEffect } from "react";
 import day2package from "../../assets/images/morpen1.jpg";
 import { Flex } from "antd";
+import "../../styles/TourPackageDetails.css";
 import TourEnquiryModal from "../tourenquirymodel";
+
 function TourPackageDetail() {
   const [date, setDate] = useState(new Date());
-  const { id } = useParams(); // ✅ Get package ID from URL
+  const { id } = useParams();
   const [packageDetails, setPackageDetails] = useState(null);
   const [startDate, setStartDate] = useState();
   const [endDate, setEndDate] = useState();
   const [showEnquiryModal, setShowEnquiryModal] = useState(false);
   const [selectedHotel, setSelectedHotel] = useState(null);
+
+  // Filter states
   const [filters, setFilters] = useState({
     stars: [],
     facilities: [],
@@ -35,37 +45,45 @@ function TourPackageDetail() {
   });
   const [priceRange, setPriceRange] = useState([0, 100000]);
   const [showFilters, setShowFilters] = useState(false);
-  const [allHotels, setAllHotels] = useState([]); // Store all hotels initially
+
+  // NEW: Added filteredHotels state to store filtered results
+  const [filteredHotels, setFilteredHotels] = useState([]);
 
   const navigate = useNavigate();
+
   useEffect(() => {
     window.scrollTo(0, 0);
     fetchPackageDetails();
   }, []);
+
   const fetchPackageDetails = async () => {
     try {
       const response = await axios.get(
         `http://localhost:5000/api/tourpackage/${id}`
       );
       setPackageDetails(response.data.package);
+
+      // NEW: Initialize filteredHotels with all hotels from the package
+      if (response.data.package && response.data.package.hotels) {
+        setFilteredHotels(response.data.package.hotels);
+      }
     } catch (error) {
       console.error("Error fetching package details:", error);
     }
   };
+
   const handleOpenEnquiryModal = (hotel) => {
-    console.log("Selected Hotel:", hotel); // ✅ Debugging: Check if hotel object is correct
+    console.log("Selected Hotel:", hotel);
     setSelectedHotel(hotel);
     setShowEnquiryModal(true);
   };
+
   const handleBookNow = (hotel) => {
-    navigate(`/booking/${packageDetails._id}`, { state: { hotel } }); // ✅ Passing hotel data
+    navigate(`/booking/${packageDetails._id}`, { state: { hotel } });
   };
 
   const handleCloseEnquiryModal = () => setShowEnquiryModal(false);
 
-  if (!packageDetails) {
-    return <p className="text-center">Loading package details...</p>;
-  }
   // Add this function to handle filter changes
   const handleFilterChange = (filterType, value) => {
     setFilters((prevFilters) => {
@@ -100,9 +118,12 @@ function TourPackageDetail() {
       return updatedFilters;
     });
   };
+
   // Function to apply filters - separate from handleFilterChange
   const applyFilters = () => {
-    const filteredHotels = allHotels.filter((hotel) => {
+    if (!packageDetails || !packageDetails.hotels) return;
+
+    const filteredHotels = packageDetails.hotels.filter((hotel) => {
       // Filter by stars - only filter if some stars are selected
       if (
         filters.stars.length > 0 &&
@@ -140,7 +161,7 @@ function TourPackageDetail() {
       return true;
     });
 
-    setHotels(filteredHotels);
+    setFilteredHotels(filteredHotels);
     setShowFilters(false); // Hide filters after applying on mobile
   };
 
@@ -152,339 +173,353 @@ function TourPackageDetail() {
       locations: [],
     });
     setPriceRange([0, 100000]);
-    setHotels(allHotels); // Restore all hotels
+
+    // Reset to all hotels from the package
+    if (packageDetails && packageDetails.hotels) {
+      setFilteredHotels(packageDetails.hotels);
+    }
   };
+
+  if (!packageDetails) {
+    return <p className="text-center">Loading package details...</p>;
+  }
 
   return (
     <>
       <Header></Header>
 
       <div className="container">
-        <section>
-          <h2>
-            {packageDetails.title} - {packageDetails.duration}
-          </h2>
-          <p>{packageDetails.description}</p>
+        <section className="package-intro">
+          <h1 className="package-title">
+            {packageDetails.title}{" "}
+            <span className="package-duration">
+              ({packageDetails.duration})
+            </span>
+          </h1>
+          <p className="package-description">{packageDetails.description}</p>
         </section>
-        <section>
-          <div className="row">
-            <div className="col-sm-12 col-md-3 col-lg-3">
-              <div className="d-flex justify-content-between align-items-center mb-3">
-                <h5 className="ps-3">FILTER BY</h5>
-                <button
-                  className="btn btn-sm btn-outline-secondary d-md-none"
-                  onClick={() => setShowFilters(!showFilters)}
+
+        <section className="hf-section">
+          {/* FILTERS */}
+          <div className="hf-filters-wrapper">
+            <div className="hf-filters-toggle d-md-none">
+              <button
+                className="filter-toggle-btn"
+                onClick={() => setShowFilters(!showFilters)}
+              >
+                {showFilters ? "Hide Filters" : "Show Filters"}
+              </button>
+            </div>
+
+            <div
+              className={`hf-filters-row ${
+                showFilters ? "d-block" : "d-none d-md-flex"
+              }`}
+            >
+              {/* Price Dropdown */}
+              <div className="hf-filter-box">
+                <label>Price Range</label>
+                <select
+                  value={priceRange[1]}
+                  onChange={(e) =>
+                    setPriceRange([priceRange[0], parseInt(e.target.value)])
+                  }
                 >
-                  {showFilters ? "Hide Filters" : "Show Filters"}
-                </button>
+                  {[1000, 5000, 10000, 20000, 50000, 100000].map((val) => (
+                    <option key={val} value={val}>
+                      Up to ₹{val}
+                    </option>
+                  ))}
+                </select>
               </div>
 
-              <div
-                className={`filterBar ps-3 ${
-                  showFilters ? "d-block" : "d-none d-md-block"
-                }`}
-              >
-                <div className="d-md-none d-flex justify-content-between mb-2">
-                  <button
-                    className="btn btn-sm btn-primary"
-                    onClick={applyFilters}
-                  >
-                    Apply Filters
-                  </button>
-                  <button
-                    className="btn btn-sm btn-outline-danger"
-                    onClick={clearAllFilters}
-                  >
-                    Clear All
-                  </button>
-                </div>
-
-                <h6>Filter price</h6>
-                <hr />
-                <div className="mb-3">
-                  <label htmlFor="priceRange" className="form-label">
-                    Price Range: ₹{priceRange[0]} - ₹{priceRange[1]}
-                  </label>
-                  <input
-                    type="range"
-                    className="form-range"
-                    min="0"
-                    max="100000"
-                    step="1000"
-                    value={priceRange[1]}
-                    onChange={(e) =>
-                      setPriceRange([priceRange[0], parseInt(e.target.value)])
-                    }
-                    id="priceRange"
-                  />
-                </div>
-                <hr />
-                <div>
-                  <h6>Hotel Star</h6>
-                  {[5, 4, 3, 2, 1].map((starCount) => (
-                    <p key={`star-${starCount}`}>
-                      <input
-                        type="checkbox"
-                        id={`star-${starCount}`}
-                        checked={filters.stars.includes(starCount)}
-                        onChange={() => handleFilterChange("stars", starCount)}
-                        className="me-2"
-                      />
-                      {[...Array(starCount)].map((_, index) => (
-                        <FaStar
-                          key={index}
-                          className="mb-1 ms-1"
-                          style={{ color: "#FFD43B" }}
-                        />
-                      ))}
-                      <br />
-                    </p>
+              {/* Stars */}
+              <div className="hf-filter-box">
+                <label>Hotel Rating</label>
+                <select
+                  onChange={(e) =>
+                    handleFilterChange("stars", parseInt(e.target.value))
+                  }
+                  defaultValue=""
+                >
+                  <option value="">All Ratings</option>
+                  {[5, 4, 3, 2, 1].map((val) => (
+                    <option key={val} value={val}>
+                      {val} Stars
+                    </option>
                   ))}
-                </div>
-                <hr />
-                <div>
-                  <h6>Facilities</h6>
-                  <div
-                    className="facilities-list"
-                    style={{ maxHeight: "200px", overflowY: "auto" }}
-                  >
-                    {[
-                      "Swimming Pool",
-                      "Power Backup",
-                      "Restaurant",
-                      "Room Service",
-                      "House Keeping",
-                      "Refrigerator",
-                      "Indoor Games",
-                      "Kids Play Area",
-                      "Jungle Safari",
-                      "Free Parking",
-                      "Air Conditioning",
-                      "Bonfire",
-                      "Dinning Area",
-                      "CCTV",
-                      "Fire Extinguishers",
-                      "Jacuzzi",
-                      "First Aid Services",
-                      "Activity Centre",
-                      "Pool Towels",
-                      "Wake Up Call",
-                      "Outdoor Sports",
-                      "Lawn",
-                    ].map((facility) => (
-                      <p key={facility}>
-                        <input
-                          type="checkbox"
-                          id={`facility-${facility}`}
-                          checked={filters.facilities.includes(facility)}
-                          onChange={() =>
-                            handleFilterChange("facilities", facility)
-                          }
-                          className="me-2"
-                        />
-                        {facility}
-                      </p>
-                    ))}
-                  </div>
-                </div>
-                <hr />
-                <div>
-                  <h6>Location</h6>
-                  <div>
-                    {["Chandrapur", "Nagpur", "Chimur"].map((location) => (
-                      <p key={location}>
-                        <input
-                          type="checkbox"
-                          id={`location-${location}`}
-                          checked={filters.locations.includes(location)}
-                          onChange={() =>
-                            handleFilterChange("locations", location)
-                          }
-                          className="me-2"
-                        />
-                        {location}
-                      </p>
-                    ))}
-                  </div>
-                </div>
-                <div className="text-center my-3 d-none d-md-block">
-                  <button
-                    className="btn btn-primary me-2"
-                    onClick={applyFilters}
-                  >
-                    Apply Filters
-                  </button>
-                  <button
-                    className="btn btn-outline-danger"
-                    onClick={clearAllFilters}
-                  >
-                    Clear All
-                  </button>
-                </div>
+                </select>
+              </div>
+
+              {/* Facilities */}
+              <div className="hf-filter-box">
+                <label>Facility</label>
+                <select
+                  onChange={(e) =>
+                    handleFilterChange("facilities", e.target.value)
+                  }
+                  defaultValue=""
+                >
+                  <option value="">All</option>
+                  {[
+                    "Swimming Pool",
+                    "Restaurant",
+                    "Room Service",
+                    "Bonfire",
+                    "CCTV",
+                    "Jacuzzi",
+                    "Jungle Safari",
+                  ].map((fac) => (
+                    <option key={fac} value={fac}>
+                      {fac}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Location */}
+              <div className="hf-filter-box">
+                <label>Location</label>
+                <select
+                  onChange={(e) =>
+                    handleFilterChange("locations", e.target.value)
+                  }
+                  defaultValue=""
+                >
+                  <option value="">All</option>
+                  {["Chandrapur", "Nagpur", "Chimur"].map((loc) => (
+                    <option key={loc} value={loc}>
+                      {loc}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="hf-filter-actions">
+                <button onClick={applyFilters}>Apply</button>
+                <button onClick={clearAllFilters}>Clear</button>
               </div>
             </div>
-            <div className="col-sm-12 col-md-9 col-lg-9 ">
-              <section>
-                <h5 className="ps-3">Hotels Included in this Package</h5>
-                {packageDetails.hotels && packageDetails.hotels.length > 0 ? (
-                  packageDetails.hotels.map((hotel) => (
-                    <div className="hotelTourPackages mt-3" key={hotel._id}>
-                      <div>
-                        {/* ✅ Display the first image, if available */}
-                        <img
-                          src={
-                            hotel.images?.length > 0
-                              ? `http://localhost:5000${hotel.images[0]}`
-                              : tadobaHotel
-                          }
-                          className="tadobahotelImg"
-                          alt="Hotel"
-                        />
-                      </div>
-                      <div className="ps-0 ps-md-4">
-                        <h5>{hotel.title || "Hotel Name Not Provided"}</h5>
-                        <p>
-                          <FaLocationArrow />{" "}
-                          {hotel.location?.name || "Location Not Provided"}
-                        </p>
-                        <p>
-                          <FaWifi /> Amenities:{" "}
-                          {hotel.amenities?.length
-                            ? hotel.amenities.join(", ")
-                            : "Not Provided"}
-                        </p>
-                        <p>
-                          <FaUtensils /> Facilities:{" "}
-                          {hotel.facilities?.length
-                            ? hotel.facilities.join(", ")
-                            : "Not Provided"}
-                        </p>
-                        <div>
-                          <p
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                            }}
-                          >
-                            <FaBan />
-                            <Link
-                              style={{
-                                textDecoration: "none",
-                                marginLeft: "3px",
-                              }}
-                            >
-                              Cancelation Policy
-                            </Link>
-                          </p>
-                        </div>
-                        <p>
-                          <MdOutlineWatchLater /> {packageDetails.duration} |{" "}
-                          <FaCarAlt /> 1 Jeep | <FaHome />{" "}
-                          {hotel.room_type || "Standard Room"}
-                        </p>
-                      </div>
+          </div>
 
-                      <div className="ps-0 ps-md-5 ms-md-auto text-md-end tourhotside">
-                        <div>
-                          {[...Array(hotel.number_of_stars || 3)].map(
-                            (_, index) => (
-                              <FaStar key={index} className="stardes" />
-                            )
-                          )}
-                        </div>
-                        <s>&#x20B9; {hotel.real_price || "N/A"}</s>
-                        <h4> &#x20B9; {hotel.discounted_price || "N/A"}</h4>
-                        <p>+ &#x20B9; 0 taxes & fees per night</p>
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: "20px",
-                          }}
-                        >
-                          {/* <button
-                            type="button"
-                            className="btn btn-dark"
-                            onClick={() => handleBookNow(hotel)} // ✅ Ensure hotel is passed
-                          >
-                            Book Now
-                          </button> */}
+          {/* HOTEL GRID */}
+          <h2>List of Hotels in Package</h2>
+          <div className="hf-hotel-grid">
+            {filteredHotels?.length > 0 ? (
+              filteredHotels.map((hotel) => (
+                <div className="hf-hotel-card" key={hotel._id}>
+                  <img
+                    src={
+                      hotel.images?.[0]
+                        ? `http://localhost:5000${hotel.images[0]}`
+                        : "/placeholder.jpg"
+                    }
+                    className="hf-card-img"
+                    alt={hotel.title}
+                  />
 
-                          <button
-                            className="btn btn-dark"
-                            onClick={() => handleOpenEnquiryModal(hotel)}
-                          >
-                            Send Enquiry
-                          </button>
+                  <div className="hf-card-content">
+                    {/* Header */}
+                    <div className="hf-card-header">
+                      <h4 className="hf-title">{hotel.title}</h4>
+                      <div className="hf-stars-price">
+                        <div className="hf-price-block">
+                          <s className="hf-price-old">₹{hotel.real_price}</s>
+                          <div className="hf-price-current">
+                            ₹{hotel.discounted_price}
+                          </div>
+                          <div className="hf-price-tax">+ ₹0 taxes & fees</div>
                         </div>
                       </div>
                     </div>
-                  ))
-                ) : (
-                  <p>No hotels added to this package.</p>
-                )}
-              </section>
-            </div>
+
+                    {/* Location */}
+                    <p className="hf-location">
+                      <i className="fas fa-map-marker-alt"></i>{" "}
+                      {hotel.location?.name || "Location Not Provided"}
+                    </p>
+                    <div class="hotel-stars">
+                      {[...Array(hotel.number_of_stars || 3)].map((_, i) => (
+                        <i key={i} class="fas fa-star"></i>
+                      ))}
+                      <span>{hotel.number_of_stars || 3}-Star</span>
+                    </div>
+                    {/* Amenities */}
+                    <p className="hf-feature-line">
+                      <FaWifi />
+                      <strong>Amenities:</strong>{" "}
+                      {hotel.amenities?.slice(0, 1).join(", ") ||
+                        "Not Provided"}
+                      {hotel.amenities?.length > 1 && (
+                        <span className="hf-more">
+                          +{hotel.amenities.length - 1} more
+                          <div className="hf-popup">
+                            {hotel.amenities.map((a, i) => (
+                              <div key={i} className="hf-popup-item">
+                                {a}
+                              </div>
+                            ))}
+                          </div>
+                        </span>
+                      )}
+                    </p>
+
+                    {/* Facilities */}
+                    <p className="hf-feature-line">
+                      <FaUtensils />
+                      <strong>Facilities:</strong>{" "}
+                      {hotel.facilities?.slice(0, 1).join(", ") ||
+                        "Not Provided"}
+                      {hotel.facilities?.length > 1 && (
+                        <span className="hf-more">
+                          +{hotel.facilities.length - 1} more
+                          <div className="hf-popup">
+                            {hotel.facilities.map((f, i) => (
+                              <div key={i} className="hf-popup-item">
+                                {f}
+                              </div>
+                            ))}
+                          </div>
+                        </span>
+                      )}
+                    </p>
+
+                    <p className="hf-feature-line">
+                      <FaClock /> {packageDetails.duration}{" "}
+                      <span className="hf-divider">|</span>
+                      <i className="fas fa-car"></i> 1 Jeep{" "}
+                      <span className="hf-divider">|</span>
+                      <i className="fas fa-home"></i>{" "}
+                      {hotel.room_type || "Standard"}
+                    </p>
+
+                    {/* Send Enquiry Button */}
+                    <div className="hf-bottom">
+                      <button
+                        className="hf-btn-enquiry"
+                        onClick={() => handleOpenEnquiryModal(hotel)}
+                      >
+                        Send Enquiry
+                      </button>
+                      <button
+                        type="button"
+                        className="hf-btn-book-now"
+                        onClick={() => handleBookNow(hotel)} // ✅ Ensure hotel is passed
+                      >
+                        Book Now
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <p className="hf-no-hotels">No hotels found</p>
+            )}
           </div>
         </section>
-        <h6 className="">Showing 1 - 5 of 5 Hotels</h6>
-        <hr />
-        {/* ✅ Itinerary Section */}
+
+        {/* Rest of the component remains unchanged... */}
         <section>
           <h2>Tour Itinerary</h2>
           {packageDetails.itinerary && packageDetails.itinerary.length > 0 ? (
-            packageDetails.itinerary.map((day, index) => (
-              <div className="day1Border day1Tadoba mt-3" key={index}>
-                <div>
-                  <h4>{day.title}</h4>
-                  <p>{day.activities}</p>
+            packageDetails.itinerary.map((day, index) => {
+              const isEven = index % 2 === 0;
+
+              return (
+                <div
+                  className={`day1Border day1Tadoba mt-4 d-flex align-items-center flex-wrap gap-4 ${
+                    isEven ? "flex-row" : "flex-row-reverse"
+                  }`}
+                  key={index}
+                >
+                  <div
+                    className="flex-grow-1"
+                    style={{ flex: 1, minWidth: "250px" }}
+                  >
+                    <h4>{day.title}</h4>
+                    <p>{day.activities}</p>
+                  </div>
+                  <div
+                    className="flex-shrink-0"
+                    style={{ flexBasis: "380px", maxWidth: "100%" }}
+                  >
+                    <img
+                      src={
+                        day.image
+                          ? `http://localhost:5000/uploads/itinerary/${day.image}`
+                          : "/images/navegaon.jpg"
+                      }
+                      onError={(e) => {
+                        e.target.onerror = null;
+                        e.target.src = "/images/navegaon.jpg";
+                      }}
+                      className="img-fluid rounded shadow-sm"
+                      alt={day.title}
+                    />
+                  </div>
                 </div>
-                <img
-                  src={index % 2 === 0 ? day1package : day2package}
-                  className="day1package"
-                  alt=""
-                />
-              </div>
-            ))
+              );
+            })
           ) : (
             <p>No itinerary available.</p>
           )}
         </section>
+
+        {/* ✅ Includes & Excludes */}
         {/* ✅ Includes & Excludes */}
         <section>
           <div className="day1Border mt-3">
-            <div className=" INCLISionExclusion">
-              <ul>
-                <h4>Inclusions</h4>
-                {packageDetails.includes &&
-                packageDetails.includes.length > 0 ? (
-                  packageDetails.includes.map((item, index) => (
-                    <li key={index}>{item}</li>
-                  ))
-                ) : (
-                  <li>No inclusions specified</li>
-                )}
-              </ul>
-              <ul>
-                <h4>Exclusions</h4>
-                {packageDetails.excludes &&
-                packageDetails.excludes.length > 0 ? (
-                  packageDetails.excludes.map((item, index) => (
-                    <li key={index}>{item}</li>
-                  ))
-                ) : (
-                  <li>No exclusions specified</li>
-                )}
-              </ul>
-              <div className="d-flex flex-column">
-                <h4 className="mx-4">Notes:</h4>
-                <ul>
-                  <li>Breakfast & dinner at resor</li>
-                  <li>1 Jeep inside the Tadoba National Park</li>
-                  <li>Expert guide during the safari</li>
+            <div className="inclusions-exclusions-container">
+              <div className="inclusion-exclusion-box">
+                <h4 className="inclusion-exclusion-title">Inclusions</h4>
+                <ul className="inclusion-exclusion-list">
+                  {packageDetails.includes &&
+                  packageDetails.includes.length > 0 ? (
+                    packageDetails.includes.map((item, index) => (
+                      <li key={index}>
+                        <span className="check-icon">✓</span> {item}
+                      </li>
+                    ))
+                  ) : (
+                    <li>No inclusions specified</li>
+                  )}
+                </ul>
+              </div>
+
+              <div className="inclusion-exclusion-box">
+                <h4 className="inclusion-exclusion-title">Exclusions</h4>
+                <ul className="inclusion-exclusion-list">
+                  {packageDetails.excludes &&
+                  packageDetails.excludes.length > 0 ? (
+                    packageDetails.excludes.map((item, index) => (
+                      <li key={index}>
+                        <span className="cross-icon">✗</span> {item}
+                      </li>
+                    ))
+                  ) : (
+                    <li>No exclusions specified</li>
+                  )}
+                </ul>
+              </div>
+
+              <div className="inclusion-exclusion-box">
+                <h4 className="inclusion-exclusion-title">Notes:</h4>
+                <ul className="inclusion-exclusion-list">
                   <li>
-                    Complimentary use of recreational activities in resort
-                    premises.
+                    <span className="info-icon">ℹ</span> Breakfast & dinner at
+                    resort
+                  </li>
+                  <li>
+                    <span className="info-icon">ℹ</span> 1 Jeep inside the
+                    Tadoba National Park
+                  </li>
+                  <li>
+                    <span className="info-icon">ℹ</span> Expert guide during the
+                    safari
+                  </li>
+                  <li>
+                    <span className="info-icon">ℹ</span> Complimentary use of
+                    recreational activities in resort premises.
                   </li>
                 </ul>
               </div>
@@ -558,13 +593,13 @@ function TourPackageDetail() {
                 will be informed by mail or phone before traveling date.
               </li>
               <li>
-                Important Note: In case your safari is not booked due to reasons
+                Important Note: In case your safari is not booked due to reasons
                 like technical error or non-availability of seat, we will refund
                 the whole amount in your given bank account. The same would be
                 communicated accordingly.
               </li>
               <li>
-                In case of peak season: weekends or weekdays (Holi, Diwali,
+                In case of peak season: weekends or weekdays (Holi, Diwali,
                 X'Mas & New Year) hotel/Forest Lodges bookings separate
                 cancellation policy is applicable (which would be advised as and
                 when required).

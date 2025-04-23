@@ -159,7 +159,7 @@ const ReviewBookingTour = () => {
               }
             );
             alert("Payment Successful!");
-            window.location.href = "/booking-success"; // ✅ Redirect on success
+            window.location.href = `/booking-success/${bookingId}`; // ✅ Redirect on success
           },
         };
   
