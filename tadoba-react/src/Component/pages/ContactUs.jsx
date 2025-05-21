@@ -19,7 +19,7 @@ function ContactUs() {
       const fetchSEO = async () => {
         try {
           const res = await axios.get(
-            "http://localhost:5000/api/pageseo/get-page-seo",
+            "http://localhost:5001/api/pageseo/get-page-seo",
             {
               params: { path: "/contactus" },
             }
@@ -53,7 +53,7 @@ function ContactUs() {
   const handleSubmit = async () => {
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:5000/api/contactenquiry/submit", {
+      const response = await fetch("http://localhost:5001/api/contactenquiry/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),

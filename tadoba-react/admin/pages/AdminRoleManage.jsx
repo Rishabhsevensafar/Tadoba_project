@@ -30,7 +30,7 @@ const AdminRoleManager = () => {
 
   const fetchRoles = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/roles", {
+      const res = await axios.get("http://localhost:5001/api/roles", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setRoles(res.data);
@@ -41,7 +41,7 @@ const AdminRoleManager = () => {
 
   const fetchPermissions = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/permissions", {
+      const res = await axios.get("http://localhost:5001/api/permissions", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setPermissions(res.data);
@@ -54,8 +54,8 @@ const AdminRoleManager = () => {
     setLoading(true);
     try {
       const url = editId 
-        ? `http://localhost:5000/api/roles/${editId}`
-        : "http://localhost:5000/api/roles";
+        ? `http://localhost:5001/api/roles/${editId}`
+        : "http://localhost:5001/api/roles";
       
       const method = editId ? "put" : "post";
 
@@ -80,7 +80,7 @@ const AdminRoleManager = () => {
     }
   
     try {
-      const response = await axios.delete(`http://localhost:5000/api/roles/${id}`, {
+      const response = await axios.delete(`http://localhost:5001/api/roles/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       

@@ -33,7 +33,7 @@ const ReviewBookingTour = () => {
   const fetchPackageDetails = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/tourpackage/${id}`
+        `http://localhost:5001/api/tourpackage/${id}`
       );
       setPackageDetails(response.data.package);
     } catch (error) {
@@ -117,7 +117,7 @@ const ReviewBookingTour = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/tourbooking/",
+        "http://localhost:5001/api/tourbooking/",
         bookingData
       );
       if (response.data.success) {
@@ -133,7 +133,7 @@ const ReviewBookingTour = () => {
   const initiatePayment = async (bookingId) => {
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/tourpayment/create-order",
+        "http://localhost:5001/api/tourpayment/create-order",
         {
           amount: totalPrice,
           bookingId,
@@ -152,7 +152,7 @@ const ReviewBookingTour = () => {
           order_id: order.id,
           handler: async function (response) {
             await axios.post(
-              "http://localhost:5000/api/tourpayment/verify-payment",
+              "http://localhost:5001/api/tourpayment/verify-payment",
               {
                 bookingId,
                 paymentId: response.razorpay_payment_id,

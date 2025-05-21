@@ -43,7 +43,7 @@ function PaymentSuccess() {
         }
     
         // Use the new endpoint that only requires booking_id
-        const response = await fetch(`http://localhost:5000/api/quick-payment/payment-status`, {
+        const response = await fetch(`http://localhost:5001/api/quick-payment/payment-status`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ booking_id: bookingId })

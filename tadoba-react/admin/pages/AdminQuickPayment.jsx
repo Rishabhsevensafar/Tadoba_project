@@ -26,7 +26,7 @@ const AdminQuickPaymentReports = () => {
     setLoading(true);
     try {
       const { startDate, endDate, status } = filters;
-      const response = await axios.get("http://localhost:5000/api/quick-payment/all", {
+      const response = await axios.get("http://localhost:5001/api/quick-payment/all", {
         params: { startDate, endDate, status },
       });
 
@@ -52,7 +52,7 @@ const AdminQuickPaymentReports = () => {
     
     setUpdating(true);
     try {
-      const response = await axios.put(`http://localhost:5000/api/quick-payment/update-status/${selectedPayment._id}`, {
+      const response = await axios.put(`http://localhost:5001/api/quick-payment/update-status/${selectedPayment._id}`, {
         status: newStatus,
       });
 

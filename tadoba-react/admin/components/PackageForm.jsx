@@ -262,7 +262,7 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
       // ✅ Determine whether to create or update the package
       if (selectedPackage) {
         await axios.put(
-          `http://localhost:5000/api/tourpackage/${selectedPackage._id}`,
+          `http://localhost:5001/api/tourpackage/${selectedPackage._id}`,
           packageData,
           {
             headers: {
@@ -277,7 +277,7 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
         });
       } else {
         await axios.post(
-          "http://localhost:5000/api/tourpackage/create",
+          "http://localhost:5001/api/tourpackage/create",
           packageData,
           {
             headers: {
@@ -764,7 +764,7 @@ const PackageForm = ({ onClose, fetchPackages, selectedPackage }) => {
                             <img
                               src={
                                 typeof item.image === "string"
-                                  ? `http://localhost:5000/uploads/itinerary/${item.image}`
+                                  ? `http://localhost:5001/uploads/itinerary/${item.image}`
                                   : URL.createObjectURL(item.image)
                               }
                               alt="Itinerary"

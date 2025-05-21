@@ -49,7 +49,7 @@ function TourPackageDetail() {
   const fetchPackageDetails = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/tourpackage/${id}`
+        `http://localhost:5001/api/tourpackage/${id}`
       );
       setPackageDetails(response.data.package);
     } catch (error) {
@@ -320,7 +320,7 @@ function TourPackageDetail() {
                       <img
                         src={
                           hotel.images?.length > 0
-                            ? `http://localhost:5000${hotel.images[0]}`
+                            ? `http://localhost:5001${hotel.images[0]}`
                             : tadobaHotel
                         }
                         className="tp_hotel_image"

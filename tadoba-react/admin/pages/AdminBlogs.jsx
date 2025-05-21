@@ -245,7 +245,7 @@ const AdminBlogs = () => {
       width: 100,
       render: (image) => (
         <img
-          src={`http://localhost:5000${image}`}
+          src={`http://localhost:5001${image}`}
           alt="Blog"
           style={{
             width: "60px",
@@ -465,7 +465,7 @@ const AdminBlogs = () => {
                         src={
                           imagePreview.startsWith("data:")
                             ? imagePreview
-                            : `http://localhost:5000${imagePreview}`
+                            : `http://localhost:5001${imagePreview}`
                         }
                         alt="Preview"
                         style={{
@@ -591,7 +591,7 @@ const AdminBlogs = () => {
             {currentBlog.image && (
               <div style={{ textAlign: "center", marginBottom: "20px" }}>
                 <img
-                  src={`http://localhost:5000${currentBlog.image}`}
+                  src={`http://localhost:5001${currentBlog.image}`}
                   alt={currentBlog.title}
                   style={{
                     maxWidth: "100%",

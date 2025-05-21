@@ -185,10 +185,10 @@ const DashboardStats = () => {
           tourRes,
           contactRes
         ] = await Promise.all([
-          axios.get("http://localhost:5000/api/safarienquiry/"),
-          axios.get("http://localhost:5000/api/hotelenquiry"),
-          axios.get("http://localhost:5000/api/tour/tour-enquiries"),
-          axios.get("http://localhost:5000/api/contactenquiry/")
+          axios.get("http://localhost:5001/api/safarienquiry/"),
+          axios.get("http://localhost:5001/api/hotelenquiry"),
+          axios.get("http://localhost:5001/api/tour/tour-enquiries"),
+          axios.get("http://localhost:5001/api/contactenquiry/")
         ]);
 
         // Process raw data with type information

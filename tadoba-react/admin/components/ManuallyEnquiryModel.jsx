@@ -30,7 +30,7 @@ const ManualEnquiryModal = ({ visible, onCancel, refreshEnquiries }) => {
         isManual: true
       };
 
-      const response = await axios.post('http://localhost:5000/api/safarienquiry/manual', enquiryData, {
+      const response = await axios.post('http://localhost:5001/api/safarienquiry/manual', enquiryData, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
         }

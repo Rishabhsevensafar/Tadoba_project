@@ -26,7 +26,7 @@ function TourPackage() {
       const fetchSEO = async () => {
         try {
           const res = await axios.get(
-            "http://localhost:5000/api/pageseo/get-page-seo",
+            "http://localhost:5001/api/pageseo/get-page-seo",
             {
               params: { path: "/tourpackage" },
             }
@@ -55,7 +55,7 @@ function TourPackage() {
 
   const fetchPackages = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/tourpackage");
+      const response = await axios.get("http://localhost:5001/api/tourpackage");
       setPackages(response.data.packages);
     } catch (error) {
       console.error("Error fetching tour packages:", error);
@@ -114,7 +114,7 @@ function TourPackage() {
                     <img
                       src={
                         pkg.images && pkg.images.length > 0
-                          ? `http://localhost:5000/uploads/packages/${pkg.images[0]}`
+                          ? `http://localhost:5001/uploads/packages/${pkg.images[0]}`
                           : banner2
                       }
                       alt={pkg.title}

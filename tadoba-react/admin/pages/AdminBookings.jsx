@@ -12,7 +12,7 @@ const AdminBookings = () => {
         const fetchBookings = async () => {
             try {
                 const { data } = await axios.get(
-                    `http://localhost:5000/api/admin/bookings?page=${currentPage}&limit=${bookingsPerPage}`,
+                    `http://localhost:5001/api/admin/bookings?page=${currentPage}&limit=${bookingsPerPage}`,
                     {
                         headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` },
                     }
@@ -41,7 +41,7 @@ const AdminBookings = () => {
     const handleStatusChange = async (bookingId, newStatus) => {
         try {
             await axios.put(
-                `http://localhost:5000/api/admin/bookings/${bookingId}/status`, // Fixed route
+                `http://localhost:5001/api/admin/bookings/${bookingId}/status`, // Fixed route
                 { status: newStatus },
                 {
                     headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` },
@@ -62,7 +62,7 @@ const AdminBookings = () => {
     const handleCancelBooking = async (bookingId) => {
         try {
             await axios.put(
-                `http://localhost:5000/api/admin/bookings/${bookingId}/cancel`, // Fixed cancellation route
+                `http://localhost:5001/api/admin/bookings/${bookingId}/cancel`, // Fixed cancellation route
                 {},
                 {
                     headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` },
@@ -82,7 +82,7 @@ const AdminBookings = () => {
     // ✅ Handle CSV Download
     const handleDownloadCSV = async () => {
         try {
-            const response = await axios.get("http://localhost:5000/api/admin/bookings/download", {
+            const response = await axios.get("http://localhost:5001/api/admin/bookings/download", {
                 headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` },
                 responseType: "blob",
             });

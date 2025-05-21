@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api'; // Backend URL
+const API_URL = 'http://localhost:5001/api'; // Backend URL
 
 export const getAllHotels = async () => {
     return await axios.get(`${API_URL}/hotel/hotel-packages`);

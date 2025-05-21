@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import logo from "../assets/images/logo.png";
 import axios from "axios";
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "http://localhost:5001";
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [logoUrl, setLogoUrl] = useState(null);
@@ -64,7 +64,7 @@ function Header() {
         {/* Header with Logo & Close Button */}
         <div className="mobile-header">
           <img
-            src={logoUrl || "/default-logo.png"}
+            src={logoUrl}
             alt="Logo"
             className="mobile-logo"
           />
@@ -93,7 +93,7 @@ function Header() {
           </Link>
           <Link to="/paymentpage">Payment</Link>
           <Link to="/contactus">Contact Us</Link>
-        <Link href="#" className="contact-number" onClick={toggleNavbar}>
+        <Link to="#" className="contact-number" onClick={toggleNavbar}>
           +91-7982653974
         </Link>
       </nav>

@@ -52,7 +52,7 @@ const HotelDetails = () => {
   const fetchHotelDetails = async () => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/hotel/hotel-packages/${id}`
+        `http://localhost:5001/api/hotel/hotel-packages/${id}`
       );
       setHotel(res.data);
     } catch (err) {
@@ -73,7 +73,7 @@ const HotelDetails = () => {
           <div className="d-none d-lg-flex gap-2">
             {hotel.images?.slice(0, 3).map((img, i) => (
               <img
-                src={`http://localhost:5000${img}`}
+                src={`http://localhost:5001${img}`}
                 key={i}
                 className="hotel-gallery-img"
                 alt={`hotel-img-${i}`}

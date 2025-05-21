@@ -18,7 +18,7 @@ function AdminBookingConfig() {
 
   const fetchConfig = async () => {
     try {
-      const response = await fetch("http://localhost:5000/api/safaridate/config");
+      const response = await fetch("http://localhost:5001/api/safaridate/config");
       const data = await response.json();
       if (response.ok) {
         setConfig({
@@ -65,7 +65,7 @@ function AdminBookingConfig() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:5000/api/safaridate/config", {
+      const response = await fetch("http://localhost:5001/api/safaridate/config", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

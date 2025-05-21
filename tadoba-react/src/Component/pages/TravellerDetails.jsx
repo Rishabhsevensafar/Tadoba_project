@@ -101,7 +101,7 @@ function TravellerDetails() {
 
       // 2. Submit Traveler Details to Backend
       const travelerResponse = await fetch(
-        `http://localhost:5000/api/booking/${bookingId}/travelers`,
+        `http://localhost:5001/api/booking/${bookingId}/travelers`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -119,7 +119,7 @@ function TravellerDetails() {
 
       // 3. Create Razorpay Order
       const orderResponse = await fetch(
-        "http://localhost:5000/api/payment/create-order",
+        "http://localhost:5001/api/payment/create-order",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -160,7 +160,7 @@ function TravellerDetails() {
           try {
             setIsProcessingPayment(true);
             const verifyRes = await fetch(
-              "http://localhost:5000/api/payment/verify-payment",
+              "http://localhost:5001/api/payment/verify-payment",
               {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },

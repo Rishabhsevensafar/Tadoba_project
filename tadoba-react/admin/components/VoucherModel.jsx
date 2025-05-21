@@ -18,7 +18,7 @@ const SafariVoucherModal = ({ visible, onClose, enquiry }) => {
         safariPhone: values.safariPhone,
       };
 
-      await axios.post("http://localhost:5000/api/voucher/create", payload);
+      await axios.post("http://localhost:5001/api/voucher/create", payload);
       message.success("Voucher saved successfully!");
       handleDownloadPDF(values);
     } catch (error) {

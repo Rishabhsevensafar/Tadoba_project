@@ -28,7 +28,7 @@ const ManualHotelEnquiryModal = ({
   const fetchHotels = async () => {
     try {
       setFetchingHotels(true);
-      const response = await axios.get('http://localhost:5000/api/hotel/hotels-dropdown', {
+      const response = await axios.get('http://localhost:5001/api/hotel/hotels-dropdown', {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('adminToken')}`
         }
@@ -56,7 +56,7 @@ const ManualHotelEnquiryModal = ({
       };
 
       const response = await axios.post(
-        "http://localhost:5000/api/hotelenquiry/manual",
+        "http://localhost:5001/api/hotelenquiry/manual",
         enquiryData,
         {
           headers: {

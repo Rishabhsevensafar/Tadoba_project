@@ -21,7 +21,7 @@ function PaymentPage() {
     const fetchSEO = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:5000/api/pageseo/get-page-seo",
+          "http://localhost:5001/api/pageseo/get-page-seo",
           {
             params: { path: "/paymentpage" },
           }

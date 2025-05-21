@@ -30,7 +30,7 @@ const AdminPageSEO = () => {
     form.resetFields();
     setLoading(true);
     try {
-      const { data } = await axios.get("http://localhost:5000/api/pageseo/get-page-seo", {
+      const { data } = await axios.get("http://localhost:5001/api/pageseo/get-page-seo", {
         params: { path },
       });
       if (data?.seo) {
@@ -48,7 +48,7 @@ const AdminPageSEO = () => {
   const handleSubmit = async (values) => {
     setLoading(true);
     try {
-      await axios.post("http://localhost:5000/api/pageseo/set-page-seo", values);
+      await axios.post("http://localhost:5001/api/pageseo/set-page-seo", values);
       message.success("SEO updated successfully");
     } catch (err) {
       message.error("Failed to save SEO");

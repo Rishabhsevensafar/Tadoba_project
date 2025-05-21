@@ -49,7 +49,7 @@ const TourBookingReport = () => {
   const fetchBookings = async () => {
     try {
       setLoading(true);
-      const response = await axios.get("http://localhost:5000/api/tourbooking");
+      const response = await axios.get("http://localhost:5001/api/tourbooking");
       setBookings(
         Array.isArray(response?.data?.bookings) ? response.data.bookings : []
       );
@@ -113,7 +113,7 @@ const TourBookingReport = () => {
       setStatusUpdateLoading(true);
       // Replace with your actual API endpoint
       const response = await axios.put(
-        `http://localhost:5000/api/tourbooking/${selectedBooking._id}/status`,
+        `http://localhost:5001/api/tourbooking/${selectedBooking._id}/status`,
         {
           paymentStatus: newStatus,
         }

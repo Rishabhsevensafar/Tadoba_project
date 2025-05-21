@@ -61,7 +61,7 @@ const PackageManager = () => {
     setLoading(true);
     try {
       const { data } = await axios.get(
-        `http://localhost:5000/api/tourpackage/`,
+        `http://localhost:5001/api/tourpackage/`,
         {
           headers: { Authorization: `Bearer ${adminToken}` },
           params: { page, limit: pageSize },
@@ -108,7 +108,7 @@ const PackageManager = () => {
       cancelText: "Cancel",
       onOk: async () => {
         try {
-          await axios.delete(`http://localhost:5000/api/tourpackage/${id}`, {
+          await axios.delete(`http://localhost:5001/api/tourpackage/${id}`, {
             headers: { Authorization: `Bearer ${adminToken}` },
           });
           fetchPackages(currentPage);
@@ -123,7 +123,7 @@ const PackageManager = () => {
   const handleToggleStatus = async (id, isActive) => {
     try {
       const response = await axios.put(
-        `http://localhost:5000/api/tourpackage/${id}/status`,
+        `http://localhost:5001/api/tourpackage/${id}/status`,
         { isActive: !isActive },
         {
           headers: { Authorization: `Bearer ${adminToken}` },

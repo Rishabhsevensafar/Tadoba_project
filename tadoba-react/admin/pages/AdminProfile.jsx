@@ -3,7 +3,7 @@ import { Form, Input, Button, Avatar, Upload, message, Divider } from "antd";
 import { UploadOutlined, UserOutlined } from "@ant-design/icons";
 import axios from "axios";
 
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "http://localhost:5001";
 
 const AdminProfile = () => {
   const [form] = Form.useForm();
