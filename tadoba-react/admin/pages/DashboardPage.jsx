@@ -31,6 +31,16 @@ import {
   User,
   IndianRupee,
   Calendar1Icon,
+  Lock,
+  Shield,
+  Users,
+  Sliders,
+  MessagesSquare,
+  BookOpen,
+  Briefcase,
+  Calendar,
+  Search,
+  LayoutDashboard,
 } from "lucide-react";
 import {
   UserOutlined,
@@ -38,7 +48,7 @@ import {
   MenuUnfoldOutlined,
 } from "@ant-design/icons";
 import axios from "axios";
-const BASE_URL = "http://localhost:5000";
+const BASE_URL = "http://localhost:5001";
 
 const { Header, Sider, Content } = Layout;
 const { Title } = Typography;
@@ -98,7 +108,7 @@ const DashboardPage = () => {
       try {
         const token = localStorage.getItem("adminToken");
         const res = await axios.get(
-          "http://localhost:5000/api/profile/profile",
+          "http://localhost:5001/api/profile/profile",
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -122,158 +132,178 @@ const DashboardPage = () => {
     fetchAdminProfile();
   }, []);
 
-  const menuItems = [
-    {
-      key: "dashboard",
-      icon: <Gauge size={20} />,
-      label: "Dashboard",
-      // permission: "dashboard",
-      onClick: () => navigate("/admin/dashboard"),
-    },
-    {
-      key: "enquiries",
-      icon: <MessageCircle size={20} />,
-      label: "Enquiries",
-      permission: "enquiries",
-      children: [
-        {
-          key: "/admin/dashboard/safari-enquiry",
-          icon: <Compass size={18} />,
-          label: "Safari Enquiry",
-          permission: "enquiries",
-          onClick: () => navigate("/admin/dashboard/safari-enquiry"),
-        },
-        {
-          key: "/admin/dashboard/tour-enquiry",
-          icon: <HelpCircle size={18} />,
-          label: "Tour Enquiry",
-          permission: "enquiries",
-          onClick: () => navigate("/admin/dashboard/tour-enquiry"),
-        },
-        {
-          key: "/admin/dashboard/hotel-enquiry",
-          icon: <Building2 size={18} />,
-          label: "Hotel Enquiry",
-          // permission: "hotel-enquiry",
-          onClick: () => navigate("/admin/dashboard/hotel-enquiry"),
-        },
-      ],
-    },
-    {
-      key: "bookings",
-      icon: <Map size={20} />,
-      label: "Bookings",
-      permission: "bookings",
-      children: [
-        {
-          key: "/admin/dashboard/safari-booking-report",
-          icon: <Binoculars size={18} />,
-          label: "Safari Bookings",
-          permission: "bookings",
-          onClick: () => navigate("/admin/dashboard/safari-booking-report"),
-        },
-        {
-          key: "/admin/dashboard/tour-booking",
-          icon: <MapPin size={18} />,
-          label: "Tour Bookings",
-          permission: "bookings",
-          onClick: () => navigate("/admin/dashboard/tour-booking"),
-        },
-      ],
-    },
-    {
-      key: "management",
-      icon: <Package size={20} />,
-      label: "Management",
-      permission: "manager",
-      children: [
-        {
-          key: "/admin/dashboard/Packages",
-          icon: <MapPin size={18} />,
-          label: "Tour Packages",
-          permission: "manager",
-          onClick: () => navigate("/admin/dashboard/Packages"),
-        },
-        {
-          key: "/admin/dashboard/hotel-manager",
-          icon: <Hotel size={18} />,
-          label: "Hotel Manager",
-          permission: "manager",
-          onClick: () => navigate("/admin/dashboard/hotel-manager"),
-        },
-        {
-          key: "/admin/dashboard/date-config",
-          icon: <Calendar1Icon size={18} />,
-          label: "Date Config",
-          permission: "manager",
-          onClick: () => navigate("/admin/dashboard/date-config"),
-        },
-      ],
-    },
-    {
-      key: "/admin/dashboard/quick-payment",
-      icon: <IndianRupee size={20} />,
-      label: "Payments",
-      permission: "quick-payment",
-      onClick: () => navigate("/admin/dashboard/quick-payment"),
-    },
-    {
-      key: "/admin/dashboard/contact-enquiry",
-      icon: <PhoneCall size={18} />,
-      label: "Contact Enquiry",
-      permission: "contact-enquiry",
-      onClick: () => navigate("/admin/dashboard/contact-enquiry"),
-    },
-    {
-      key: "/admin/dashboard/blogs",
-      icon: <Newspaper size={18} />,
-      label: "Blogs",
-      permission: "blogs",
-      onClick: () => navigate("/admin/dashboard/blogs"),
-    },
-    {
-      key: "/admin/dashboard/setting",
-      icon: <Settings size={18} />,
-      label: "Global Settings",
-      permission: "global-setting",
-      onClick: () => navigate("/admin/dashboard/setting"),
-    },
-    {
-      key: "/admin/dashboard/user-manager",
-      icon: <User size={18} />,
-      label: "User Manager",
-      permission: "user-manager",
-      onClick: () => navigate("/admin/dashboard/user-manager"),
-    },
-    {
-      key: "/admin/dashboard/hero-setting",
-      icon: <User size={18} />,
-      label: "Hero Settings",
-      permission: "global-setting",
-      onClick: () => navigate("/admin/dashboard/hero-setting"),
-    },
-    {
-      key: "/admin/dashboard/on-page-seo",
-      icon: <User size={18} />,
-      label: "On-page-seo",
-      permission: "global-setting",
-      onClick: () => navigate("/admin/dashboard/on-page-seo"),
-    },
-    {
-      key: "/admin/dashboard/Role-manager",
-      icon: <User size={18} />,
-      label: "Role Manager",
-      permission: "user-manager",
-      onClick: () => navigate("/admin/dashboard/Role-manager"),
-    },
-    {
-      key: "/admin/dashboard/Permission-manager",
-      icon: <User size={18} />,
-      label: "Permission Manager",
-      permission: "user-manager",
-      onClick: () => navigate("/admin/dashboard/Permission-manager"),
-    },
-  ];
+const menuItems = [
+  {
+    key: "dashboard",
+    icon: <Gauge size={20} />,
+    label: "Dashboard",
+    onClick: () => navigate("/admin/dashboard"),
+  },
+  {
+    key: "enquiries",
+    icon: <MessageCircle size={20} />,
+    label: "Enquiries",
+    permission: "enquiries",
+    children: [
+      {
+        key: "/admin/dashboard/safari-enquiry",
+        icon: <Compass size={18} />,
+        label: "Safari Enquiry",
+        permission: "enquiries",
+        onClick: () => navigate("/admin/dashboard/safari-enquiry"),
+      },
+      {
+        key: "/admin/dashboard/tour-enquiry",
+        icon: <HelpCircle size={18} />,
+        label: "Tour Enquiry",
+        permission: "enquiries",
+        onClick: () => navigate("/admin/dashboard/tour-enquiry"),
+      },
+      {
+        key: "/admin/dashboard/hotel-enquiry",
+        icon: <Building2 size={18} />,
+        label: "Hotel Enquiry",
+        onClick: () => navigate("/admin/dashboard/hotel-enquiry"),
+      },
+      {
+        key: "/admin/dashboard/general-enquiry",
+        icon: <MessagesSquare size={18} />,
+        label: "General Enquiry",
+        onClick: () => navigate("/admin/dashboard/general-enquiry"),
+      },
+    ],
+  },
+  {
+    key: "bookings",
+    icon: <BookOpen size={20} />,
+    label: "Bookings",
+    permission: "bookings",
+    children: [
+      {
+        key: "/admin/dashboard/safari-booking-report",
+        icon: <Binoculars size={18} />,
+        label: "Safari Bookings",
+        permission: "bookings",
+        onClick: () => navigate("/admin/dashboard/safari-booking-report"),
+      },
+      {
+        key: "/admin/dashboard/tour-booking",
+        icon: <MapPin size={18} />,
+        label: "Tour Bookings",
+        permission: "bookings",
+        onClick: () => navigate("/admin/dashboard/tour-booking"),
+      },
+    ],
+  },
+  {
+    key: "management",
+    icon: <Package size={20} />,
+    label: "Management",
+    permission: "manager",
+    children: [
+      {
+        key: "/admin/dashboard/Packages",
+        icon: <Briefcase size={18} />,
+        label: "Tour Packages",
+        permission: "manager",
+        onClick: () => navigate("/admin/dashboard/Packages"),
+      },
+      {
+        key: "/admin/dashboard/hotel-manager",
+        icon: <Hotel size={18} />,
+        label: "Hotel Manager",
+        permission: "manager",
+        onClick: () => navigate("/admin/dashboard/hotel-manager"),
+      },
+      {
+        key: "/admin/dashboard/date-config",
+        icon: <Calendar size={18} />,
+        label: "Date Config",
+        permission: "manager",
+        onClick: () => navigate("/admin/dashboard/date-config"),
+      },
+    ],
+  },
+  {
+    key: "/admin/dashboard/quick-payment",
+    icon: <IndianRupee size={20} />,
+    label: "Payments",
+    permission: "quick-payment",
+    onClick: () => navigate("/admin/dashboard/quick-payment"),
+  },
+  {
+    key: "/admin/dashboard/contact-enquiry",
+    icon: <PhoneCall size={18} />,
+    label: "Contact Enquiry",
+    permission: "contact-enquiry",
+    onClick: () => navigate("/admin/dashboard/contact-enquiry"),
+  },
+  {
+    key: "/admin/dashboard/blogs",
+    icon: <Newspaper size={18} />,
+    label: "Blogs",
+    permission: "blogs",
+    onClick: () => navigate("/admin/dashboard/blogs"),
+  },
+  {
+    key: "settings",
+    icon: <Settings size={20} />,
+    label: "Settings",
+    permission: "global-setting",
+    children: [
+      {
+        key: "/admin/dashboard/setting",
+        icon: <Sliders size={18} />,
+        label: "Global Settings",
+        permission: "global-setting",
+        onClick: () => navigate("/admin/dashboard/setting"),
+      },
+      {
+        key: "/admin/dashboard/hero-setting",
+        icon: <LayoutDashboard size={18} />,
+        label: "Hero Settings",
+        permission: "global-setting",
+        onClick: () => navigate("/admin/dashboard/hero-setting"),
+      },
+      {
+        key: "/admin/dashboard/on-page-seo",
+        icon: <Search size={18} />,
+        label: "On-page SEO",
+        permission: "global-setting",
+        onClick: () => navigate("/admin/dashboard/on-page-seo"),
+      },
+    ],
+  },
+  {
+    key: "user-management",
+    icon: <Users size={20} />,
+    label: "User Management",
+    permission: "user-manager",
+    children: [
+      {
+        key: "/admin/dashboard/user-manager",
+        icon: <User size={18} />,
+        label: "User Manager",
+        permission: "user-manager",
+        onClick: () => navigate("/admin/dashboard/user-manager"),
+      },
+      {
+        key: "/admin/dashboard/Role-manager",
+        icon: <Shield size={18} />,
+        label: "Role Manager",
+        permission: "user-manager",
+        onClick: () => navigate("/admin/dashboard/Role-manager"),
+      },
+      {
+        key: "/admin/dashboard/Permission-manager",
+        icon: <Lock size={18} />,
+        label: "Permission Manager",
+        permission: "user-manager",
+        onClick: () => navigate("/admin/dashboard/Permission-manager"),
+      },
+    ],
+  },
+];
 
   const visibleMenuItems = menuItems
     .filter((item) => {
@@ -482,7 +512,7 @@ const DashboardPage = () => {
                   <Avatar
                     src={
                       adminProfile.avatar
-                        ? `http://localhost:5000${adminProfile.avatar}`
+                        ? `http://localhost:5001${adminProfile.avatar}`
                         : null
                     }
                     style={{

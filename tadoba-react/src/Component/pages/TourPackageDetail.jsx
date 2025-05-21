@@ -59,7 +59,7 @@ function TourPackageDetail() {
   const fetchPackageDetails = async () => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/tourpackage/${id}`
+        `http://localhost:5001/api/tourpackage/${id}`
       );
       setPackageDetails(response.data.package);
 
@@ -311,7 +311,7 @@ function TourPackageDetail() {
                   <img
                     src={
                       hotel.images?.[0]
-                        ? `http://localhost:5000${hotel.images[0]}`
+                        ? `http://localhost:5001${hotel.images[0]}`
                         : "/placeholder.jpg"
                     }
                     className="hf-card-img"
@@ -446,7 +446,7 @@ function TourPackageDetail() {
                     <img
                       src={
                         day.image
-                          ? `http://localhost:5000/uploads/itinerary/${day.image}`
+                          ? `http://localhost:5001/uploads/itinerary/${day.image}`
                           : "/images/navegaon.jpg"
                       }
                       onError={(e) => {

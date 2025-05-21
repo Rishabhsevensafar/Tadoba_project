@@ -19,8 +19,8 @@ function NewsBlogDetail() {
       try {
         setLoading(true);
         const [blogsRes, blogRes] = await Promise.all([
-          axios.get("http://localhost:5000/api/blogs"),
-          axios.get(`http://localhost:5000/api/blogs/slug/${slug}`),
+          axios.get("http://localhost:5001/api/blogs"),
+          axios.get(`http://localhost:5001/api/blogs/slug/${slug}`),
         ]);
 
         if (Array.isArray(blogsRes.data)) {
@@ -101,7 +101,7 @@ function NewsBlogDetail() {
             {blog.image && (
               <div className="featured-image">
                 <img
-                  src={`http://localhost:5000${blog.image}`}
+                  src={`http://localhost:5001${blog.image}`}
                   alt={blog.title}
                 />
               </div>
@@ -129,7 +129,7 @@ function NewsBlogDetail() {
                     {blog.image && (
                       <div className="story-thumb">
                         <img
-                          src={`http://localhost:5000${blog.image}`}
+                          src={`http://localhost:5001${blog.image}`}
                           alt={blog.title}
                         />
                       </div>

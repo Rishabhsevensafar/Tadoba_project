@@ -48,7 +48,7 @@ const AdminBannerUpload = () => {
 
     try {
       setUploading(true);
-      await axios.post("http://localhost:5000/api/herosection/upload-banner", formData);
+      await axios.post("http://localhost:5001/api/herosection/upload-banner", formData);
       message.success("Images uploaded successfully!");
       setFileList([]);
     } catch (error) {

@@ -38,7 +38,7 @@ const HotelEnquiry = ({ hotelId }) => {
 
     try {
       setLoading(true);
-      await axios.post("http://localhost:5000/api/hotelenquiry", {
+      await axios.post("http://localhost:5001/api/hotelenquiry", {
         ...formData,
         hotelId,
       });

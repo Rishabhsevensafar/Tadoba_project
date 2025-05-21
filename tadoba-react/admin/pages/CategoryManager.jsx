@@ -16,7 +16,7 @@ const CategoryManager = () => {
   const fetchCategories = async () => {
     try {
       const { data } = await axios.get(
-        "http://localhost:5000/api/admin/categories/?isAdmin=true",
+        "http://localhost:5001/api/admin/categories/?isAdmin=true",
         {
           headers: { Authorization: `Bearer ${adminToken}` },
         }
@@ -42,7 +42,7 @@ const CategoryManager = () => {
 
     try {
       const { data } = await axios.post(
-        "http://localhost:5000/api/admin/categories/create",
+        "http://localhost:5001/api/admin/categories/create",
         formData,
         {
           headers: {
@@ -66,7 +66,7 @@ const CategoryManager = () => {
   const handleToggleCategory = async (id, isActive) => {
     try {
       const { data } = await axios.put(
-        `http://localhost:5000/api/admin/categories/${id}/status`,
+        `http://localhost:5001/api/admin/categories/${id}/status`,
         { isActive: !isActive },
         {
           headers: { Authorization: `Bearer ${adminToken}` },
@@ -84,7 +84,7 @@ const CategoryManager = () => {
   const handleToggleTrending = async (id, isTrending) => {
     try {
       const { data } = await axios.put(
-        `http://localhost:5000/api/admin/categories/${id}/trending`,
+        `http://localhost:5001/api/admin/categories/${id}/trending`,
         { isTrending: !isTrending },
         {
           headers: { Authorization: `Bearer ${adminToken}` },

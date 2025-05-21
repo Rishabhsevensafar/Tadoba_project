@@ -66,7 +66,7 @@ const AdminContactEnquiries = () => {
   const fetchContacts = async () => {
     setLoading(true);
     try {
-      const response = await axios.get("http://localhost:5000/api/contactenquiry/");
+      const response = await axios.get("http://localhost:5001/api/contactenquiry/");
       if (response.data && Array.isArray(response.data.contacts)) {
         setContacts(response.data.contacts);
         setFilteredContacts(response.data.contacts);
@@ -92,7 +92,7 @@ const AdminContactEnquiries = () => {
 
   const handleUpdate = async () => {
     try {
-      await axios.put(`http://localhost:5000/api/contactenquiry/update/${selectedContact._id}`, {
+      await axios.put(`http://localhost:5001/api/contactenquiry/update/${selectedContact._id}`, {
         status,
         remark,
       });
@@ -107,7 +107,7 @@ const AdminContactEnquiries = () => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/contactenquiry/delete/${id}`);
+      await axios.delete(`http://localhost:5001/api/contactenquiry/delete/${id}`);
       message.success("Contact deleted successfully!");
       fetchContacts();
     } catch (error) {

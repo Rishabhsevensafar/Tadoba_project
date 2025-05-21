@@ -23,10 +23,10 @@ import AdminRoleManager from "./pages/AdminRoleManage";
 import AdminPermissionManager from "./pages/AdminPermissionManager";
 import AdminPageSEO from "./pages/AdminSeoPage";
 import HeroSettings from "./pages/AdminHero";
+import AdminGeneralEnquiries from "./pages/AdminGeneralEnquiry";
 
 const AppAdmin = () => {
   return (
-    <Router>
       <Routes>
         <Route path="/admin/login" element={<LoginPage />} />
         <Route path="/admin/dashboard" element={<DashboardPage />}>
@@ -53,6 +53,14 @@ const AppAdmin = () => {
             element={
               <ProtectedRoute allowedPermissions={["enquiries"]}>
                 <AdminEnquiries />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="general-enquiry"
+            element={
+              <ProtectedRoute allowedPermissions={["enquiries"]}>
+                <AdminGeneralEnquiries />
               </ProtectedRoute>
             }
           />
@@ -197,7 +205,6 @@ const AppAdmin = () => {
 
         <Route path="*" element={<div>404 Not Found</div>} />
       </Routes>
-    </Router>
   );
 };
 

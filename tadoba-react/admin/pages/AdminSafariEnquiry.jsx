@@ -94,7 +94,7 @@ const AdminSafariEnquiries = () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/safarienquiry/"
+        "http://localhost:5001/api/safarienquiry/"
       );
 
       if (response.data && Array.isArray(response.data.enquiries)) {
@@ -139,7 +139,7 @@ const AdminSafariEnquiries = () => {
   const fetchStatusHistory = async (enquiryId) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/safarienquiry/status-history/${enquiryId}`
+        `http://localhost:5001/api/safarienquiry/status-history/${enquiryId}`
       );
       setStatusHistory(response.data.statusHistory || []);
       setHistoryModalVisible(true);
@@ -169,7 +169,7 @@ const AdminSafariEnquiries = () => {
       };
 
       await axios.put(
-        `http://localhost:5000/api/safarienquiry/update-status/${selectedEnquiry._id}`,
+        `http://localhost:5001/api/safarienquiry/update-status/${selectedEnquiry._id}`,
         updateData
       );
       message.success("Safari enquiry updated successfully!");
@@ -183,7 +183,7 @@ const AdminSafariEnquiries = () => {
 
   const handleDeleteEnquiry = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/safarienquiry/${id}`);
+      await axios.delete(`http://localhost:5001/api/safarienquiry/${id}`);
       message.success("Safari enquiry deleted successfully!");
       fetchEnquiries();
       setIsModalVisible(false);

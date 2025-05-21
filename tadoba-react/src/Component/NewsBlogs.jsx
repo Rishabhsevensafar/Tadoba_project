@@ -13,7 +13,7 @@ function NewsBlogs() {
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/blogs');
+        const response = await axios.get('http://localhost:5001/api/blogs');
         
         if (Array.isArray(response.data)) {
           const publishedArticles = response.data.filter(article => article.status === 'Published');
@@ -102,7 +102,7 @@ function NewsBlogs() {
             <div className="article-item" key={article.slug}>
               <div className="article-item__image-wrapper">
                 <img 
-                  src={`http://localhost:5000${article.image}`} 
+                  src={`http://localhost:5001${article.image}`} 
                   alt={article.title} 
                   className="article-item__image" 
                 />

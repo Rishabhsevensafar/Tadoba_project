@@ -52,7 +52,7 @@ function SafariBooking() {
       const fetchSEO = async () => {
         try {
           const res = await axios.get(
-            "http://localhost:5000/api/pageseo/get-page-seo",
+            "http://localhost:5001/api/pageseo/get-page-seo",
             {
               params: { path: "/safari-booking" },
             }
@@ -70,7 +70,7 @@ function SafariBooking() {
   const fetchBookingConfig = async () => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/safaridate/config"
+        "http://localhost:5001/api/safaridate/config"
       );
       const data = await response.json();
       if (response.ok) {
@@ -182,7 +182,7 @@ function SafariBooking() {
       const payload = { ...formData, date: selectedDate.toISOString() };
       console.log("Sending booking request with data:", payload);
 
-      const response = await fetch("http://localhost:5000/api/booking/book", {
+      const response = await fetch("http://localhost:5001/api/booking/book", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -233,7 +233,7 @@ function SafariBooking() {
       );
 
       const response = await fetch(
-        "http://localhost:5000/api/safarienquiry/create",
+        "http://localhost:5001/api/safarienquiry/create",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

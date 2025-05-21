@@ -25,7 +25,7 @@ const AdminLogin = () => {
   
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/admin/auth/login",
+        "http://localhost:5001/api/admin/auth/login",
         formData
       );
       const token = response.data.token;

@@ -57,7 +57,7 @@ function HotelPage() {
     const fetchSEO = async () => {
       try {
         const res = await axios.get(
-          "http://localhost:5000/api/pageseo/get-page-seo",
+          "http://localhost:5001/api/pageseo/get-page-seo",
           {
             params: { path: "/hotels" },
           }
@@ -88,7 +88,7 @@ function HotelPage() {
   const fetchHotels = async () => {
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/hotel/hotel-packages"
+        "http://localhost:5001/api/hotel/hotel-packages"
       );
       setAllHotels(response.data.hotels); // Store all hotels
       setHotels(response.data.hotels); // Display all hotels initially
@@ -421,7 +421,7 @@ function HotelPage() {
                       <img
                         src={
                           hotel.images && hotel.images.length > 0
-                            ? `http://localhost:5000${hotel.images[0]}`
+                            ? `http://localhost:5001${hotel.images[0]}`
                             : defaultHotelImage
                         }
                         className="tadobahotelImg"

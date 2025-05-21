@@ -95,7 +95,7 @@ const AdminHotelEnquiries = () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/hotelenquiry"
+        "http://localhost:5001/api/hotelenquiry"
       );
       setEnquiries(response.data);
       setFilteredData(response.data);
@@ -151,7 +151,7 @@ const AdminHotelEnquiries = () => {
   const fetchStatusHistory = async (enquiryId) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/hotelenquiry/status-history/${enquiryId}`
+        `http://localhost:5001/api/hotelenquiry/status-history/${enquiryId}`
       );
       setStatusHistory(response.data.statusHistory || []);
       setHistoryModalVisible(true);
@@ -170,13 +170,13 @@ const AdminHotelEnquiries = () => {
 
       if (status && status !== selectedEnquiry.status) {
         await axios.put(
-          `http://localhost:5000/api/hotelenquiry/${selectedEnquiry._id}/status`,
+          `http://localhost:5001/api/hotelenquiry/${selectedEnquiry._id}/status`,
           updateData
         );
         message.success("Status updated successfully!");
       } else if (remark && remark !== selectedEnquiry.remark) {
         await axios.put(
-          `http://localhost:5000/api/hotelenquiry/${selectedEnquiry._id}/remark`,
+          `http://localhost:5001/api/hotelenquiry/${selectedEnquiry._id}/remark`,
           { remark }
         );
         message.success("Remark updated successfully!");
@@ -191,7 +191,7 @@ const AdminHotelEnquiries = () => {
   };
   const handleDeleteEnquiry = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/hotelenquiry/${id}`);
+      await axios.delete(`http://localhost:5001/api/hotelenquiry/${id}`);
       message.success("Enquiry deleted successfully!");
       fetchEnquiries();
       setIsModalVisible(false);

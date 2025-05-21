@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import "../styles/GeneralEnquiry.css"
 
 const FloatingEnquiry = () => {
   const [visible, setVisible] = useState(false);
@@ -20,7 +21,7 @@ const FloatingEnquiry = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post("http://localhost:5000/api/general/submit-enquiry", formData);
+      await axios.post("http://localhost:5001/api/general/submit-enquiry", formData);
       alert("Enquiry submitted successfully!");
       setFormData({ name: "", email: "", phone: "", enquiryType: "", location: "", message: "" });
       setVisible(false);
@@ -59,72 +60,6 @@ const FloatingEnquiry = () => {
           </div>
         </div>
       )}
-
-      <style jsx>{`
-        .floating-btn {
-          position: fixed;
-          bottom: 20px;
-          right: 20px;
-          background-color: #2c5f2d;
-          color: #fff;
-          border: none;
-          padding: 12px 20px;
-          border-radius: 50px;
-          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-          cursor: pointer;
-          z-index: 999;
-        }
-        .enquiry-modal {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100vh;
-          background: rgba(0, 0, 0, 0.5);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 1000;
-        }
-        .modal-content {
-          background: #fff;
-          padding: 25px;
-          border-radius: 8px;
-          width: 90%;
-          max-width: 450px;
-          position: relative;
-        }
-        .modal-content h3 {
-          margin-bottom: 20px;
-        }
-        .modal-content input,
-        .modal-content select,
-        .modal-content textarea {
-          width: 100%;
-          margin-bottom: 12px;
-          padding: 10px;
-          border: 1px solid #ccc;
-          border-radius: 4px;
-        }
-        .modal-content button[type="submit"] {
-          background-color: #2c5f2d;
-          color: white;
-          border: none;
-          padding: 10px;
-          width: 100%;
-          border-radius: 4px;
-          cursor: pointer;
-        }
-        .close-btn {
-          position: absolute;
-          top: 8px;
-          right: 12px;
-          background: transparent;
-          border: none;
-          font-size: 22px;
-          cursor: pointer;
-        }
-      `}</style>
     </>
   );
 };

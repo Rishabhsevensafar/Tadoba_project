@@ -60,7 +60,7 @@ const AdminUserManager = () => {
   const fetchUsers = async () => {
     setTableLoading(true);
     try {
-      const res = await axios.get("http://localhost:5000/api/profile/users", {
+      const res = await axios.get("http://localhost:5001/api/profile/users", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUsers(res.data);
@@ -75,7 +75,7 @@ const AdminUserManager = () => {
   const fetchLoginLogs = async (userId) => {
     try {
       const res = await axios.get(
-        `http://localhost:5000/api/profile/login-logs/${userId}`,
+        `http://localhost:5001/api/profile/login-logs/${userId}`,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -89,7 +89,7 @@ const AdminUserManager = () => {
 
   const fetchRoles = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/roles", {
+      const res = await axios.get("http://localhost:5001/api/roles", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setRoles(res.data);
@@ -102,8 +102,8 @@ const AdminUserManager = () => {
     setLoading(true);
     try {
       const url = editId
-        ? `http://localhost:5000/api/profile/user/${editId}`
-        : `http://localhost:5000/api/profile/create-user`;
+        ? `http://localhost:5001/api/profile/user/${editId}`
+        : `http://localhost:5001/api/profile/create-user`;
 
       const method = editId ? "put" : "post";
 
@@ -135,7 +135,7 @@ const AdminUserManager = () => {
       cancelText: 'Cancel',
       onOk: async () => {
         try {
-          await axios.delete(`http://localhost:5000/api/profile/user/${id}`, {
+          await axios.delete(`http://localhost:5001/api/profile/user/${id}`, {
             headers: { Authorization: `Bearer ${token}` },
           });
           message.success("User deleted successfully");
@@ -150,7 +150,7 @@ const AdminUserManager = () => {
   const handleToggleStatus = async (id, isActive) => {
     try {
       await axios.put(
-        `http://localhost:5000/api/profile/user/${id}/toggle`,
+        `http://localhost:5001/api/profile/user/${id}/toggle`,
         {},
         {
           headers: { Authorization: `Bearer ${token}` },

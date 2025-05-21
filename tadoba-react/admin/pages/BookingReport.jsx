@@ -9,7 +9,7 @@ const BookingReport = () => {
   useEffect(() => {
     const fetchBookings = async () => {
       try {
-        const { data } = await axios.get("http://localhost:5000/api/admin/bookings", {
+        const { data } = await axios.get("http://localhost:5001/api/admin/bookings", {
           headers: { Authorization: `Bearer ${localStorage.getItem("adminToken")}` },
         });
         setBookings(data.bookings);

@@ -14,7 +14,7 @@ function TourPackages() {
 
   const fetchPackages = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/tourpackage");
+      const response = await axios.get("http://localhost:5001/api/tourpackage");
       setPackages(response.data.packages.slice(0, 4)); // ✅ Limit to 4 packages
     } catch (error) {
       console.error("Error fetching tour packages:", error);
@@ -33,7 +33,7 @@ function TourPackages() {
                   <img
                     src={
                       pkg.images?.length > 0
-                        ? `http://localhost:5000/uploads/packages/${pkg.images[0]}`
+                        ? `http://localhost:5001/uploads/packages/${pkg.images[0]}`
                         : tadobaHotel
                     }
                     alt={pkg.title}

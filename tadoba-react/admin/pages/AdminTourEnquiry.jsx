@@ -77,7 +77,7 @@ const AdminTourEnquiries = () => {
     setLoading(true);
     try {
       const response = await axios.get(
-        "http://localhost:5000/api/tour/tour-enquiries"
+        "http://localhost:5001/api/tour/tour-enquiries"
       );
       setEnquiries(response.data.enquiries);
       setFilteredData(response.data.enquiries);
@@ -103,7 +103,7 @@ const AdminTourEnquiries = () => {
   const handleUpdateEnquiry = async () => {
     try {
       await axios.put(
-        `http://localhost:5000/api/tour/tour-enquiry/${selectedEnquiry._id}`,
+        `http://localhost:5001/api/tour/tour-enquiry/${selectedEnquiry._id}`,
         { status, remark }
       );
       message.success("Enquiry updated successfully!");
@@ -117,7 +117,7 @@ const AdminTourEnquiries = () => {
 
   const handleDeleteEnquiry = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/tour/tour-enquiry/${id}`);
+      await axios.delete(`http://localhost:5001/api/tour/tour-enquiry/${id}`);
       message.success("Enquiry deleted successfully!");
       fetchEnquiries();
       setIsModalVisible(false);

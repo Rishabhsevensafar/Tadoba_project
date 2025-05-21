@@ -35,7 +35,7 @@ const TourEnquiryModal = ({ show, handleClose, hotel, packageId }) => {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/tour/tour-enquiry",
+        "http://localhost:5001/api/tour/tour-enquiry",
         formData
       );
       if (response.data.success) {

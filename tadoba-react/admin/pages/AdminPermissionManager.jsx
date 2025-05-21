@@ -12,10 +12,10 @@ const AdminPermissionManager = () => {
     setLoading(true);
     try {
       const [rolesRes, permissionsRes] = await Promise.all([
-        axios.get("http://localhost:5000/api/roles", {
+        axios.get("http://localhost:5001/api/roles", {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        axios.get("http://localhost:5000/api/permissions", {
+        axios.get("http://localhost:5001/api/permissions", {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
@@ -55,7 +55,7 @@ const AdminPermissionManager = () => {
       }
 
       await axios.put(
-        `http://localhost:5000/api/roles/${roleId}/permissions`,
+        `http://localhost:5001/api/roles/${roleId}/permissions`,
         { permissions: selectedPermissionIds },
         {
           headers: {
